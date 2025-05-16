@@ -1,5 +1,16 @@
-pub const xlsxError = @import("errors.zig");
-pub usingnamespace @cImport({
-    @cDefine("struct_headname", "");
-    @cInclude("xlsxwriter.h");
-});
+pub const c = @import("xlsxwriter_c");
+
+pub const XlsxError = @import("errors.zig").XlsxError;
+pub const checkResult = @import("errors.zig").checkResult;
+pub const formatErr = @import("errors.zig").formatErr;
+
+pub const WorkBook = @import("WorkBook.zig");
+pub const WorkSheet = @import("WorkSheet.zig");
+pub const Format = @import("Format.zig");
+pub const Chart = @import("Chart.zig");
+
+pub const explicit_false = c.LXW_EXPLICIT_FALSE;
+pub const datetime = c.lxw_datetime;
+pub const range = c.RANGE;
+pub const cell = c.CELL;
+pub const cols = c.COLS;

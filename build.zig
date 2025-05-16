@@ -4,40 +4,51 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const xlsxwriter_dep = b.dependency("xlsxwriter", .{
+    const xlsxwriter_dep = b.dependency("libxlsxwriter", .{
         .target = target,
         .optimize = optimize,
         .USE_SYSTEM_MINIZIP = true,
     });
-    const xlsxwriter_module = b.addModule("xlsxwriter", .{
-        .root_source_file = b.path("src/xlsxwriter.zig"),
+
+    const xlsxwriter_c = b.addTranslateC(.{
+        .root_source_file = xlsxwriter_dep.path("include/xlsxwriter.h"),
+        .target = target,
+        .optimize = optimize,
     });
 
-    // get libxlsxwriter
-    xlsxwriter_module.linkLibrary(xlsxwriter_dep.artifact("xlsxwriter"));
-    xlsxwriter_module.link_libc = true;
+    const xlsxwriter_c_mod = xlsxwriter_c.createModule();
+    xlsxwriter_c_mod.linkLibrary(xlsxwriter_dep.artifact("xlsxwriter"));
+    xlsxwriter_c_mod.link_libc = true;
+    xlsxwriter_c_mod.addCMacro("struct_headname", "");
+
+    const xlsxwriter_mod = b.addModule("xlsxwriter", .{
+        .root_source_file = b.path("src/xlsxwriter.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    xlsxwriter_mod.addImport("xlsxwriter_c", xlsxwriter_c_mod);
 
     makeExample(b, .{
         .path = "examples/tutorial1.zig",
-        .module = xlsxwriter_module,
+        .zig_mod = xlsxwriter_mod,
         .target = target,
         .optimize = optimize,
     });
     makeExample(b, .{
         .path = "examples/tutorial2.zig",
-        .module = xlsxwriter_module,
+        .zig_mod = xlsxwriter_mod,
         .target = target,
         .optimize = optimize,
     });
     makeExample(b, .{
         .path = "examples/array_formula.zig",
-        .module = xlsxwriter_module,
+        .zig_mod = xlsxwriter_mod,
         .target = target,
         .optimize = optimize,
     });
     makeExample(b, .{
         .path = "examples/chart.zig",
-        .module = xlsxwriter_module,
+        .zig_mod = xlsxwriter_mod,
         .target = target,
         .optimize = optimize,
     });
@@ -51,10 +62,7 @@ fn makeExample(b: *std.Build, options: BuildInfo) void {
         .optimize = options.optimize,
     });
 
-    for (options.module.include_dirs.items) |include| {
-        example.root_module.include_dirs.append(b.allocator, include) catch {};
-    }
-    example.root_module.addImport("xlsxwriter", options.module);
+    example.root_module.addImport("xlsxwriter", options.zig_mod);
 
     b.installArtifact(example);
 
@@ -72,7 +80,7 @@ fn makeExample(b: *std.Build, options: BuildInfo) void {
 const BuildInfo = struct {
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
-    module: *std.Build.Module,
+    zig_mod: *std.Build.Module,
     path: []const u8,
 
     fn filename(self: BuildInfo) []const u8 {

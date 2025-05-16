@@ -1,32 +1,105 @@
-const xlsxwriter = @import("xlsxwriter");
+const xlsxwriter_c = @import("xlsxwriter_c");
 
-pub fn main() void {
+pub fn main() !void {
 
     // Create a new workbook and add a worksheet.
-    const workbook: ?*xlsxwriter.lxw_workbook = xlsxwriter.workbook_new("out/array_formula.xlsx");
-    const worksheet: ?*xlsxwriter.lxw_worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = try xlsxwriter.WorkBook.init("out/array_formula.xlsx");
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Write some data for the formulas.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 0, 1, 500, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 1, 10, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 1, 1, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 5, 1, 2, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 6, 1, 3, null);
+    try worksheet.writeNumber(
+        0,
+        1,
+        500,
+        .none,
+    );
+    try worksheet.writeNumber(
+        1,
+        1,
+        10,
+        .none,
+    );
+    try worksheet.writeNumber(
+        4,
+        1,
+        1,
+        .none,
+    );
+    try worksheet.writeNumber(
+        5,
+        1,
+        2,
+        .none,
+    );
+    try worksheet.writeNumber(
+        6,
+        1,
+        3,
+        .none,
+    );
 
-    _ = xlsxwriter.worksheet_write_number(worksheet, 0, 2, 300, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 2, 15, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 2, 20234, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 5, 2, 21003, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 6, 2, 10000, null);
+    try worksheet.writeNumber(
+        0,
+        2,
+        300,
+        .none,
+    );
+    try worksheet.writeNumber(
+        1,
+        2,
+        15,
+        .none,
+    );
+    try worksheet.writeNumber(
+        4,
+        2,
+        20234,
+        .none,
+    );
+    try worksheet.writeNumber(
+        5,
+        2,
+        21003,
+        .none,
+    );
+    try worksheet.writeNumber(
+        6,
+        2,
+        10000,
+        .none,
+    );
 
     // Write an array formula that returns a single value.
-    _ = xlsxwriter.worksheet_write_array_formula(worksheet, 0, 0, 0, 0, "{=SUM(B1:C1*B2:C2)}", null);
+    try worksheet.writeArrayFormula(
+        0,
+        0,
+        0,
+        0,
+        "{=SUM(B1:C1*B2:C2)}",
+        .none,
+    );
 
     // Similar to above but using the RANGE macro.
-    _ = xlsxwriter.worksheet_write_array_formula(worksheet, 1, xlsxwriter.RANGE("A2:A2"), 0, 0, "{=SUM(B1:C1*B2:C2)}", null);
+    try worksheet.writeArrayFormula(
+        1,
+        xlsxwriter.range("A2:A2"),
+        0,
+        0,
+        "{=SUM(B1:C1*B2:C2)}",
+        .none,
+    );
 
     // Write an array formula that returns a range of values.
-    _ = xlsxwriter.worksheet_write_array_formula(worksheet, 4, 0, 6, 0, "{=TREND(C5:C7,B5:B7)}", null);
+    try worksheet.writeArrayFormula(
+        4,
+        0,
+        6,
+        0,
+        "{=TREND(C5:C7,B5:B7)}",
+        .none,
+    );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    try workbook.deinit();
 }
+
+const xlsxwriter = @import("xlsxwriter");

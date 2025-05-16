@@ -1,29 +1,26 @@
-const xlsxwriter = @import("xlsxwriter");
-
-pub fn main() void {
+pub fn main() !void {
 
     // Create a new workbook and add a worksheet.
-    const workbook: ?*xlsxwriter.lxw_workbook = xlsxwriter.workbook_new("out/chart.xlsx");
-    const worksheet: ?*xlsxwriter.lxw_worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = try xlsxwriter.WorkBook.init("out/chart.xlsx");
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Write some data for the chart. */
-    write_worksheet_data(worksheet);
+    try write_worksheet_data(worksheet);
 
     // Create a chart object. */
-    const chart: ?*xlsxwriter.lxw_chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_COLUMN);
+    const chart = try workbook.addChart(Chart.Type.column);
 
     // Configure the chart. In simplest case we just add some value data
     // series. The null categories will default to 1 to 5 like in Excel.
+    _ = try chart.addSeries(null, "Sheet1!$A$1:$A$5");
+    _ = try chart.addSeries(null, "Sheet1!$B$1:$B$5");
+    _ = try chart.addSeries(null, "Sheet1!$C$1:$C$5");
 
-    _ = xlsxwriter.chart_add_series(chart, null, "Sheet1!$A$1:$A$5");
-    _ = xlsxwriter.chart_add_series(chart, null, "Sheet1!$B$1:$B$5");
-    _ = xlsxwriter.chart_add_series(chart, null, "Sheet1!$C$1:$C$5");
-
-    var font: xlsxwriter.lxw_chart_font = .{
+    var font: Chart.Font = .{
         .name = @constCast("Chart example"),
-        .bold = xlsxwriter.LXW_EXPLICIT_FALSE,
-        .color = xlsxwriter.LXW_COLOR_BLUE,
-        .italic = xlsxwriter.LXW_EXPLICIT_FALSE,
+        .bold = xlsxwriter.explicit_false,
+        .color = @intFromEnum(xlsxwriter.Format.DefinedColor.blue),
+        .italic = xlsxwriter.explicit_false,
         .size = 16,
         .rotation = 0,
         .underline = 0,
@@ -32,16 +29,19 @@ pub fn main() void {
         .baseline = 0,
     };
 
-    _ = xlsxwriter.chart_title_set_name(chart, "Year End Results");
-    _ = xlsxwriter.chart_title_set_name_font(chart, &font);
+    chart.titleSetName("Year End Results", &font);
 
     // Insert the chart into the worksheet.
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, xlsxwriter.CELL("B7"), xlsxwriter.COLS("A1"), chart);
+    try worksheet.insertChart(
+        xlsxwriter.cell("B7"),
+        xlsxwriter.cols("A1"),
+        chart,
+    );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    try workbook.deinit();
 }
 
-fn write_worksheet_data(worksheet: ?*xlsxwriter.lxw_worksheet) void {
+fn write_worksheet_data(worksheet: xlsxwriter.WorkSheet) !void {
     const data: [5][3]f64 = .{
         [3]f64{ 1, 2, 3 },
         [3]f64{ 2, 4, 6 },
@@ -55,8 +55,16 @@ fn write_worksheet_data(worksheet: ?*xlsxwriter.lxw_worksheet) void {
     {
         while (row < 5) : (row += 1) {
             while (col < 3) : (col += 1) {
-                _ = xlsxwriter.worksheet_write_number(worksheet, row, col, data[row][col], null);
+                try worksheet.writeNumber(
+                    row,
+                    col,
+                    data[row][col],
+                    .none,
+                );
             }
         }
     }
 }
+
+const xlsxwriter = @import("xlsxwriter");
+const Chart = @import("xlsxwriter").Chart;

@@ -1,56 +1,142 @@
-const testing = @import("std").testing;
-
-// zig fmt: off
-pub const XlsxError = error {
-    RowColumnLimitError,
-    RowColumnOrderError,
-    SheetnameCannotBeBlank,
-    SheetnameLengthExceeded,
-    SheetnameReused,
-    SheetnameContainsInvalidCharacter,
-    SheetnameStartsOrEndsWithApostrophe,
-    MaxStringLengthExceeded,
-    UnknownWorksheetNameOrIndex,
-    MergeRangeSingleCell,
-    MergeRangeOverlaps,
-    MaxUrlLengthExceeded,
-    UnknownUrlType,
-    IoError
+const result_enum = enum(c_int) {
+    no_error = c.LXW_NO_ERROR,
+    memory_malloc_failed = c.LXW_ERROR_MEMORY_MALLOC_FAILED,
+    creating_xlsx_file = c.LXW_ERROR_CREATING_XLSX_FILE,
+    creating_tmpfile = c.LXW_ERROR_CREATING_TMPFILE,
+    reading_tmpfile = c.LXW_ERROR_READING_TMPFILE,
+    zip_file_operation = c.LXW_ERROR_ZIP_FILE_OPERATION,
+    zip_parameter_error = c.LXW_ERROR_ZIP_PARAMETER_ERROR,
+    zip_bad_zip_file = c.LXW_ERROR_ZIP_BAD_ZIP_FILE,
+    zip_internal_error = c.LXW_ERROR_ZIP_INTERNAL_ERROR,
+    zip_file_add = c.LXW_ERROR_ZIP_FILE_ADD,
+    zip_close = c.LXW_ERROR_ZIP_CLOSE,
+    feature_not_supported = c.LXW_ERROR_FEATURE_NOT_SUPPORTED,
+    null_parameter_ignored = c.LXW_ERROR_NULL_PARAMETER_IGNORED,
+    parameter_validation = c.LXW_ERROR_PARAMETER_VALIDATION,
+    parameter_is_empty = c.LXW_ERROR_PARAMETER_IS_EMPTY,
+    sheetname_length_exceeded = c.LXW_ERROR_SHEETNAME_LENGTH_EXCEEDED,
+    invalid_sheetname_character = c.LXW_ERROR_INVALID_SHEETNAME_CHARACTER,
+    sheetname_start_end_apostrophe = c.LXW_ERROR_SHEETNAME_START_END_APOSTROPHE,
+    sheetname_already_used = c.LXW_ERROR_SHEETNAME_ALREADY_USED,
+    string_32_length_exceeded = c.LXW_ERROR_32_STRING_LENGTH_EXCEEDED,
+    string_128_length_exceeded = c.LXW_ERROR_128_STRING_LENGTH_EXCEEDED,
+    string_255_length_exceeded = c.LXW_ERROR_255_STRING_LENGTH_EXCEEDED,
+    string_max_length_exceeded = c.LXW_ERROR_MAX_STRING_LENGTH_EXCEEDED,
+    shared_string_index_not_found = c.LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND,
+    worksheet_index_out_of_range = c.LXW_ERROR_WORKSHEET_INDEX_OUT_OF_RANGE,
+    worksheet_max_url_length_exceeded = c.LXW_ERROR_WORKSHEET_MAX_URL_LENGTH_EXCEEDED,
+    workseet_max_number_urls_exceeded = c.LXW_ERROR_WORKSHEET_MAX_NUMBER_URLS_EXCEEDED,
+    image_dimensions = c.LXW_ERROR_IMAGE_DIMENSIONS,
+    _,
 };
 
-// zig fmt: on
-pub fn formatErr(err: XlsxError) XlsxError![]const u8 {
+pub const XlsxError = error{
+    MemoryMallocFailed,
+    CreatingXlsxFile,
+    CreatingTmpfile,
+    ReadingTmpfile,
+    ZipFileOperation,
+    ZipParameterError,
+    ZipBadZipFile,
+    ZipInternalError,
+    ZipFileAdd,
+    ZipClose,
+    FeatureNotSupported,
+    NullParameterIgnored,
+    ParameterValidation,
+    ParameterIsEmpty,
+    SheetnameLengthExceeded,
+    InvalidSheetnameCharacter,
+    SheetnameStartEndApostrophe,
+    SheetnameAlreadyUsed,
+    String32LengthExceeded,
+    String128LengthExceeded,
+    String255LengthExceeded,
+    StringMaxLengthExceeded,
+    SharedStringIndexNotFound,
+    WorksheetIndexOutOfRange,
+    WorksheetMaxUrlLengthExceeded,
+    WorkseetMaxNumberUrlsExceeded,
+    ImageDimensions,
+    NewWorkBook,
+    AddWorkSheet,
+    AddFormat,
+    AddChart,
+    ChartAddSeries,
+    UnknownError,
+};
+
+pub inline fn checkResult(error_code: c_uint) XlsxError!void {
+    const result: result_enum = @enumFromInt(error_code);
+    if (result == .no_error) return;
+    return switch (result) {
+        .memory_malloc_failed => XlsxError.MemoryMallocFailed,
+        .creating_xlsx_file => XlsxError.CreatingXlsxFile,
+        .creating_tmpfile => XlsxError.CreatingTmpfile,
+        .reading_tmpfile => XlsxError.ReadingTmpfile,
+        .zip_file_operation => XlsxError.ZipFileOperation,
+        .zip_parameter_error => XlsxError.ZipParameterError,
+        .zip_bad_zip_file => XlsxError.ZipBadZipFile,
+        .zip_internal_error => XlsxError.ZipInternalError,
+        .zip_file_add => XlsxError.ZipFileAdd,
+        .zip_close => XlsxError.ZipClose,
+        .feature_not_supported => XlsxError.FeatureNotSupported,
+        .null_parameter_ignored => XlsxError.NullParameterIgnored,
+        .parameter_validation => XlsxError.ParameterValidation,
+        .parameter_is_empty => XlsxError.ParameterIsEmpty,
+        .sheetname_length_exceeded => XlsxError.SheetnameLengthExceeded,
+        .invalid_sheetname_character => XlsxError.InvalidSheetnameCharacter,
+        .sheetname_start_end_apostrophe => XlsxError.SheetnameStartEndApostrophe,
+        .sheetname_already_used => XlsxError.SheetnameAlreadyUsed,
+        .string_32_length_exceeded => XlsxError.String32LengthExceeded,
+        .string_128_length_exceeded => XlsxError.String128LengthExceeded,
+        .string_255_length_exceeded => XlsxError.String255LengthExceeded,
+        .string_max_length_exceeded => XlsxError.StringMaxLengthExceeded,
+        .shared_string_index_not_found => XlsxError.SharedStringIndexNotFound,
+        .worksheet_index_out_of_range => XlsxError.WorksheetIndexOutOfRange,
+        .worksheet_max_url_length_exceeded => XlsxError.WorksheetMaxUrlLengthExceeded,
+        .workseet_max_number_urls_exceeded => XlsxError.WorkseetMaxNumberUrlsExceeded,
+        .image_dimensions => XlsxError.ImageDimensions,
+        else => XlsxError.UnknownError,
+    };
+}
+pub inline fn formatErr(err: XlsxError) []const u8 {
     return switch (err) {
-        error.RowColumnLimitError => "Row Column Limit Error",
-        error.RowColumnOrderError => "Row Column Order Error",
-        error.SheetnameCannotBeBlank => "Sheetname Cannot Be Blank",
+        error.MemoryMallocFailed => "Memory Malloc Failed",
+        error.CreatingXlsxFile => "Creating Xlsx File",
+        error.CreatingTmpfile => "Creating Tmpfile",
+        error.ReadingTmpfile => "Reading Tmpfile",
+        error.ZipFileOperation => "Zip File Operation",
+        error.ZipParameterError => "Zip Parameter Error",
+        error.ZipBadZipFile => "Zip Bad Zip File",
+        error.ZipInternalError => "Zip Internal Error",
+        error.ZipFileAdd => "Zip File Add",
+        error.ZipClose => "Zip Close",
+        error.FeatureNotSupported => "Feature Not Supported",
+        error.NullParameterIgnored => "Null Parameter Ignored",
+        error.ParameterValidation => "Parameter Validation",
+        error.ParameterIsEmpty => "Parameter Is Empty",
         error.SheetnameLengthExceeded => "Sheetname Length Exceeded",
-        error.SheetnameReused => "Sheetname Reused",
-        error.SheetnameContainsInvalidCharacter => "Sheetname Contains Invalid Character",
-        error.SheetnameStartsOrEndsWithApostrophe => "Sheetname Starts Or Ends With Apostrophe",
-        error.MaxStringLengthExceeded => "Max String Length Exceeded",
-        error.UnknownWorksheetNameOrIndex => "Unknown Worksheet Name Or Index",
-        error.MergeRangeSingleCell => "Merge Range Single Cell",
-        error.MergeRangeOverlaps => "Merge Range Overlaps",
-        error.MaxUrlLengthExceeded => "Max Url Length Exceeded",
-        error.UnknownUrlType => "Unknown Url Type",
-        error.IoError => "I/O Error",
+        error.InvalidSheetnameCharacter => "Invalid Sheetname Character",
+        error.SheetnameStartEndApostrophe => "Sheetname Start End Apostrophe",
+        error.SheetnameAlreadyUsed => "Sheetname Already Used",
+        error.String32LengthExceeded => "32 String Length Exceeded",
+        error.String128LengthExceeded => "128 String Length Exceeded",
+        error.String255LengthExceeded => "255 String Length Exceeded",
+        error.StringMaxLengthExceeded => "Max String Length Exceeded",
+        error.SharedStringIndexNotFound => "Shared String Index Not Found",
+        error.WorksheetIndexOutOfRange => "Worksheet Index Out Of Range",
+        error.WorksheetMaxUrlLengthExceeded => "Worksheet Max Url Length Exceeded",
+        error.WorkseetMaxNumberUrlsExceeded => "Workseet Max Number Urls Exceeded",
+        error.ImageDimensions => "Image Dimensions",
+        error.NewWorkBook => "New WorkBook",
+        error.AddWorkSheet => "Add WorkSheet",
+        error.AddFormat => "Add Format",
+        error.AddChart => "Add Chart",
+        error.ChartAddSeries => " Chart Add Series",
+        else => "xlsxwriter Unknown Error",
     };
 }
 
-test "Error name" {
-    try testing.expectEqualStrings("Row Column Limit Error", try formatErr(error.RowColumnLimitError));
-    try testing.expectEqualStrings("Row Column Order Error", try formatErr(error.RowColumnOrderError));
-    try testing.expectEqualStrings("Sheetname Cannot Be Blank", try formatErr(error.SheetnameCannotBeBlank));
-    try testing.expectEqualStrings("Sheetname Length Exceeded", try formatErr(error.SheetnameLengthExceeded));
-    try testing.expectEqualStrings("Sheetname Reused", try formatErr(error.SheetnameReused));
-    try testing.expectEqualStrings("Sheetname Contains Invalid Character", try formatErr(error.SheetnameContainsInvalidCharacter));
-    try testing.expectEqualStrings("Sheetname Starts Or Ends With Apostrophe", try formatErr(error.SheetnameStartsOrEndsWithApostrophe));
-    try testing.expectEqualStrings("Max String Length Exceeded", try formatErr(error.MaxStringLengthExceeded));
-    try testing.expectEqualStrings("Unknown Worksheet Name Or Index", try formatErr(error.UnknownWorksheetNameOrIndex));
-    try testing.expectEqualStrings("Merge Range Single Cell", try formatErr(error.MergeRangeSingleCell));
-    try testing.expectEqualStrings("Merge Range Overlaps", try formatErr(error.MergeRangeOverlaps));
-    try testing.expectEqualStrings("Max Url Length Exceeded", try formatErr(error.MaxUrlLengthExceeded));
-    try testing.expectEqualStrings("Unknown Url Type", try formatErr(error.UnknownUrlType));
-    try testing.expectEqualStrings("I/O Error", try formatErr(error.IoError));
-}
+const xlsxwriter = @import("xlsxwriter");
+const c = @import("xlsxwriter_c");
