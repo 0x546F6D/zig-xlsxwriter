@@ -138,5 +138,4 @@ pub inline fn formatErr(err: XlsxError) []const u8 {
     };
 }
 
-const xlsxwriter = @import("xlsxwriter");
 const c = @import("xlsxwriter_c");

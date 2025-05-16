@@ -41,4 +41,4 @@ pub inline fn titleSetName(self: Chart, name: [*c]const u8, font: ?*Font) void {
 }
 
 const c = @import("xlsxwriter_c");
-pub const XlsxError = @import("errors.zig").XlsxError;
+const XlsxError = @import("errors.zig").XlsxError;

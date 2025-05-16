@@ -17,6 +17,7 @@ pub const DefinedColor = enum(c_int) {
     magenta = c.LXW_COLOR_MAGENTA,
     navy = c.LXW_COLOR_NAVY,
     orange = c.LXW_COLOR_ORANGE,
+    // MAGENTA and PINK have the some color code
     // pink = c.LXW_COLOR_PINK,
     purple = c.LXW_COLOR_PURPLE,
     red = c.LXW_COLOR_RED,
@@ -25,11 +26,11 @@ pub const DefinedColor = enum(c_int) {
     yellow = c.LXW_COLOR_YELLOW,
 };
 
-pub fn setBold(self: Format) void {
+pub inline fn setBold(self: Format) void {
     c.format_set_bold(self.format_c);
 }
 
-pub fn setNumFormat(self: Format, num_format: [*c]const u8) void {
+pub inline fn setNumFormat(self: Format, num_format: [*c]const u8) void {
     c.format_set_num_format(self.format_c, num_format);
 }
 

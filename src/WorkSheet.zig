@@ -117,7 +117,7 @@ pub inline fn insertChart(
 }
 
 const c = @import("xlsxwriter_c");
-pub const XlsxError = @import("errors.zig").XlsxError;
-pub const check = @import("errors.zig").checkResult;
-pub const Format = @import("Format.zig");
-pub const Chart = @import("Chart.zig");
+const XlsxError = @import("errors.zig").XlsxError;
+const check = @import("errors.zig").checkResult;
+const Format = @import("Format.zig");
+const Chart = @import("Chart.zig");
