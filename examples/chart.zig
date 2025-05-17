@@ -8,7 +8,7 @@ pub fn main() !void {
     try write_worksheet_data(worksheet);
 
     // Create a chart object. */
-    const chart = try workbook.addChart(Chart.Type.column);
+    const chart = try workbook.addChart(ChartType.column);
 
     // Configure the chart. In simplest case we just add some value data
     // series. The null categories will default to 1 to 5 like in Excel.
@@ -16,10 +16,10 @@ pub fn main() !void {
     _ = try chart.addSeries(null, "Sheet1!$B$1:$B$5");
     _ = try chart.addSeries(null, "Sheet1!$C$1:$C$5");
 
-    var font: Chart.Font = .{
+    var font: ChartFont = .{
         .name = @constCast("Chart example"),
         .bold = xlsxwriter.explicit_false,
-        .color = @intFromEnum(xlsxwriter.Format.DefinedColor.blue),
+        .color = @intFromEnum(xlsxwriter.DefinedColor.blue),
         .italic = xlsxwriter.explicit_false,
         .size = 16,
         .rotation = 0,
@@ -67,4 +67,5 @@ fn write_worksheet_data(worksheet: xlsxwriter.WorkSheet) !void {
 }
 
 const xlsxwriter = @import("xlsxwriter");
-const Chart = @import("xlsxwriter").Chart;
+const ChartType = xlsxwriter.ChartType;
+const ChartFont = xlsxwriter.ChartFont;

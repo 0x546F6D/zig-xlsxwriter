@@ -19,6 +19,7 @@ pub const DefinedColor = enum(c_int) {
     orange = c.LXW_COLOR_ORANGE,
     // MAGENTA and PINK have the some color code
     // pink = c.LXW_COLOR_PINK,
+    pink = 0xFFC0CB,
     purple = c.LXW_COLOR_PURPLE,
     red = c.LXW_COLOR_RED,
     silver = c.LXW_COLOR_SILVER,

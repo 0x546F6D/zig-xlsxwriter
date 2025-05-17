@@ -2,8 +2,8 @@ const Chart = @This();
 
 chart_c: *c.lxw_chart,
 
-pub const Series = *c.lxw_chart_series;
 pub const Font = c.lxw_chart_font;
+pub const Series = c.lxw_chart_series;
 
 pub const Type = enum(u8) {
     area = c.LXW_CHART_AREA,
@@ -30,7 +30,7 @@ pub const Type = enum(u8) {
     radar_filled = c.LXW_CHART_RADAR_FILLED,
 };
 
-pub inline fn addSeries(self: Chart, categories: [*c]const u8, values: [*c]const u8) XlsxError!Series {
+pub inline fn addSeries(self: Chart, categories: [*c]const u8, values: [*c]const u8) XlsxError!*Series {
     return c.chart_add_series(self.chart_c, categories, values) orelse XlsxError.ChartAddSeries;
 }
 
