@@ -81,7 +81,6 @@ pub fn main() !void {
     // Start from the first cell. Rows and columns are zero indexed.
     var row: u32 = 0;
     const col: u16 = 0;
-    const index: usize = 0;
 
     // Add a bold format to use to highlight cells.
     const bold = try workbook.addFormat();
@@ -116,29 +115,30 @@ pub fn main() !void {
         "Cost",
         bold,
     );
-    row += 1;
 
     // Iterate over the data and write it out element by element.
-    while (row < 5) : (row += 1) {
+    for (&expenses) |*expense| {
+        row += 1;
         try worksheet.writeString(
             row,
             col,
-            expenses[index].item,
+            expense.item,
             .none,
         );
         try worksheet.writeDateTime(
             row,
             col + 1,
-            &expenses[index].datetime,
+            &expense.datetime,
             date_format,
         );
         try worksheet.writeNumber(
             row,
             col + 2,
-            expenses[index].cost,
+            expense.cost,
             money,
         );
     }
+    row += 1;
 
     // Write a total using a formula.
     try worksheet.writeString(
@@ -148,7 +148,7 @@ pub fn main() !void {
         .none,
     );
     try worksheet.writeFormula(
-        row + 1,
+        row,
         col + 2,
         "=SUM(C2:C5)",
         .none,

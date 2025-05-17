@@ -28,30 +28,21 @@ pub fn build(b: *std.Build) void {
     });
     xlsxwriter_mod.addImport("xlsxwriter_c", xlsxwriter_c_mod);
 
-    makeExample(b, .{
-        .path = "examples/tutorial1.zig",
-        .zig_mod = xlsxwriter_mod,
-        .target = target,
-        .optimize = optimize,
-    });
-    makeExample(b, .{
-        .path = "examples/tutorial2.zig",
-        .zig_mod = xlsxwriter_mod,
-        .target = target,
-        .optimize = optimize,
-    });
-    makeExample(b, .{
-        .path = "examples/array_formula.zig",
-        .zig_mod = xlsxwriter_mod,
-        .target = target,
-        .optimize = optimize,
-    });
-    makeExample(b, .{
-        .path = "examples/chart.zig",
-        .zig_mod = xlsxwriter_mod,
-        .target = target,
-        .optimize = optimize,
-    });
+    const make = b.option([]const u8, "make", "Provide name of example to make example (ex: 'tutorial1'") orelse null;
+    if (make) |name| {
+        var dbga: std.heap.DebugAllocator(.{}) = .init;
+        defer _ = dbga.deinit();
+        const alloc = dbga.allocator();
+
+        const example_path = std.fmt.allocPrint(alloc, "examples/{s}.zig", .{name}) catch "examples/tutorial1.zig";
+        defer alloc.free(example_path);
+        makeExample(b, .{
+            .path = example_path,
+            .zig_mod = xlsxwriter_mod,
+            .target = target,
+            .optimize = optimize,
+        });
+    }
 }
 
 fn makeExample(b: *std.Build, options: BuildInfo) void {
