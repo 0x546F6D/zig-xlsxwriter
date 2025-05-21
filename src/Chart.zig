@@ -1,6 +1,6 @@
 const Chart = @This();
 
-chart_c: *c.lxw_chart,
+chart_c: ?*c.lxw_chart,
 
 pub const Font = c.lxw_chart_font;
 pub const Series = c.lxw_chart_series;

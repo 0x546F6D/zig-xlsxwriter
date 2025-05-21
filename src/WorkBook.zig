@@ -1,6 +1,6 @@
 const WorkBook = @This();
 
-workbook_c: *c.lxw_workbook,
+workbook_c: ?*c.lxw_workbook,
 
 pub inline fn init(filename: [*c]const u8) XlsxError!WorkBook {
     return WorkBook{
@@ -30,6 +30,15 @@ pub inline fn addChart(self: WorkBook, chart_type: Chart.Type) XlsxError!Chart {
     };
 }
 
+test "assembling a complete Workbook file." {
+
+    // The Standard Library contains useful functions to help create tests.
+    // `expect` is a function that verifies its argument is true.
+    // It will return an error if its argument is false to indicate a failure.
+    // `try` is used to return an error to the test runner to notify it that the test failed.
+    try std.testing.expect(42 == 42);
+}
+const std = @import("std");
 const c = @import("xlsxwriter_c");
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;

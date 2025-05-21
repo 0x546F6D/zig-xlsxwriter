@@ -58,12 +58,12 @@ pub const XlsxError = error{
     WorksheetMaxUrlLengthExceeded,
     WorkseetMaxNumberUrlsExceeded,
     ImageDimensions,
+    UnknownError,
     NewWorkBook,
     AddWorkSheet,
     AddFormat,
     AddChart,
     ChartAddSeries,
-    UnknownError,
 };
 
 pub inline fn checkResult(error_code: c_uint) XlsxError!void {
@@ -100,41 +100,47 @@ pub inline fn checkResult(error_code: c_uint) XlsxError!void {
         else => XlsxError.UnknownError,
     };
 }
-pub inline fn formatErr(err: XlsxError) []const u8 {
-    return switch (err) {
-        error.MemoryMallocFailed => "Memory Malloc Failed",
-        error.CreatingXlsxFile => "Creating Xlsx File",
-        error.CreatingTmpfile => "Creating Tmpfile",
-        error.ReadingTmpfile => "Reading Tmpfile",
-        error.ZipFileOperation => "Zip File Operation",
-        error.ZipParameterError => "Zip Parameter Error",
-        error.ZipBadZipFile => "Zip Bad Zip File",
-        error.ZipInternalError => "Zip Internal Error",
-        error.ZipFileAdd => "Zip File Add",
-        error.ZipClose => "Zip Close",
-        error.FeatureNotSupported => "Feature Not Supported",
-        error.NullParameterIgnored => "Null Parameter Ignored",
-        error.ParameterValidation => "Parameter Validation",
-        error.ParameterIsEmpty => "Parameter Is Empty",
-        error.SheetnameLengthExceeded => "Sheetname Length Exceeded",
-        error.InvalidSheetnameCharacter => "Invalid Sheetname Character",
-        error.SheetnameStartEndApostrophe => "Sheetname Start End Apostrophe",
-        error.SheetnameAlreadyUsed => "Sheetname Already Used",
-        error.String32LengthExceeded => "32 String Length Exceeded",
-        error.String128LengthExceeded => "128 String Length Exceeded",
-        error.String255LengthExceeded => "255 String Length Exceeded",
-        error.StringMaxLengthExceeded => "Max String Length Exceeded",
-        error.SharedStringIndexNotFound => "Shared String Index Not Found",
-        error.WorksheetIndexOutOfRange => "Worksheet Index Out Of Range",
-        error.WorksheetMaxUrlLengthExceeded => "Worksheet Max Url Length Exceeded",
-        error.WorkseetMaxNumberUrlsExceeded => "Workseet Max Number Urls Exceeded",
-        error.ImageDimensions => "Image Dimensions",
-        error.NewWorkBook => "New WorkBook",
-        error.AddWorkSheet => "Add WorkSheet",
-        error.AddFormat => "Add Format",
-        error.AddChart => "Add Chart",
-        error.ChartAddSeries => " Chart Add Series",
-        else => "xlsxwriter Unknown Error",
+
+pub inline fn strError(err: XlsxError) [*c]const u8 {
+    const error_code: ?result_enum = switch (err) {
+        error.MemoryMallocFailed => .memory_malloc_failed,
+        error.CreatingXlsxFile => .creating_xlsx_file,
+        error.CreatingTmpfile => .creating_tmpfile,
+        error.ReadingTmpfile => .reading_tmpfile,
+        error.ZipFileOperation => .zip_file_operation,
+        error.ZipParameterError => .zip_parameter_error,
+        error.ZipBadZipFile => .zip_bad_zip_file,
+        error.ZipInternalError => .zip_internal_error,
+        error.ZipFileAdd => .zip_file_add,
+        error.ZipClose => .zip_close,
+        error.FeatureNotSupported => .feature_not_supported,
+        error.NullParameterIgnored => .null_parameter_ignored,
+        error.ParameterValidation => .parameter_validation,
+        error.ParameterIsEmpty => .parameter_is_empty,
+        error.SheetnameLengthExceeded => .sheetname_length_exceeded,
+        error.InvalidSheetnameCharacter => .invalid_sheetname_character,
+        error.SheetnameStartEndApostrophe => .sheetname_start_end_apostrophe,
+        error.SheetnameAlreadyUsed => .sheetname_already_used,
+        error.String32LengthExceeded => .string_32_length_exceeded,
+        error.String128LengthExceeded => .string_128_length_exceeded,
+        error.String255LengthExceeded => .string_255_length_exceeded,
+        error.StringMaxLengthExceeded => .string_max_length_exceeded,
+        error.SharedStringIndexNotFound => .shared_string_index_not_found,
+        error.WorksheetIndexOutOfRange => .worksheet_index_out_of_range,
+        error.WorksheetMaxUrlLengthExceeded => .worksheet_max_url_length_exceeded,
+        error.WorkseetMaxNumberUrlsExceeded => .workseet_max_number_urls_exceeded,
+        error.ImageDimensions => .image_dimensions,
+        else => null,
+    };
+    if (error_code) |code| {
+        return c.lxw_strerror(@intCast(@intFromEnum(code)));
+    } else return switch (err) {
+        error.NewWorkBook => "new_workbook() returned a null pointer.",
+        error.AddWorkSheet => "add_worksheet() returned a null pointer.",
+        error.AddFormat => "add_format() returned a null pointer.",
+        error.AddChart => "add_chart() returned a null pointer.",
+        error.ChartAddSeries => "chart_add_series() returned a null pointer.",
+        else => "xlsxwriter returned an unknown error",
     };
 }
 

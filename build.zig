@@ -34,7 +34,8 @@ pub fn build(b: *std.Build) void {
         defer _ = dbga.deinit();
         const alloc = dbga.allocator();
 
-        const example_path = std.fmt.allocPrint(alloc, "examples/{s}.zig", .{name}) catch "examples/tutorial1.zig";
+        const example_dir = "examples/wrapped";
+        const example_path = std.fmt.allocPrint(alloc, "{s}/{s}.zig", .{ example_dir, name }) catch example_dir ++ "/tutorial1.zig";
         defer alloc.free(example_path);
         makeExample(b, .{
             .path = example_path,
