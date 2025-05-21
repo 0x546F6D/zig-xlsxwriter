@@ -15,4 +15,14 @@ pub fn getXlsxPath(alloc: std.mem.Allocator, example_name: []const u8) ![:0]cons
     );
 }
 
+pub fn getAssetPath(alloc: std.mem.Allocator, asset_name: []const u8) ![:0]const u8 {
+    const exe_dir = try std.fs.selfExeDirPathAlloc(alloc);
+    defer alloc.free(exe_dir);
+
+    return try std.fs.path.joinZ(
+        alloc,
+        &[_][]const u8{ exe_dir, "..", "..", "examples", "assets", asset_name },
+    );
+}
+
 const std = @import("std");

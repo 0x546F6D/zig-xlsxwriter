@@ -1,64 +1,48 @@
-//
-// A simple example of some of the features of the libxlsxwriter library.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-const mktmp = @import("mktmp");
-
-// Embed the logo image directly into the executable
-const logo_data = @embedFile("logo.png");
-
 pub fn main() !void {
-    // Create a temporary file for the logo using the TmpFile API
-    var arena = std.heap.ArenaAllocator.init(
-        std.heap.page_allocator,
-    );
-    defer arena.deinit();
-    const allocator = arena.allocator();
+    defer _ = dbga.deinit();
 
-    var tmp_file = try mktmp.TmpFile.create(
-        allocator,
-        "logo_",
-    );
-    defer tmp_file.cleanUp();
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    // Write the embedded data to the temporary file
-    try tmp_file.write(logo_data);
-
-    // Create a new workbook and add a worksheet.
-    const workbook = xlsxwriter.workbook_new("zig-demo.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Add a format.
-    const format = xlsxwriter.workbook_add_format(workbook);
+    const format = try workbook.addFormat();
 
     // Set the bold property for the format
-    _ = xlsxwriter.format_set_bold(format);
+    format.setBold();
 
     // Change the column width for clarity.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    try worksheet.setColumn(0, 0, 20, .none);
 
     // Write some simple text.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Hello", null);
+    try worksheet.writeString(0, 0, "Hello", .none);
 
     // Text with formatting.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 0, "World", format);
+    try worksheet.writeString(1, 0, "World", format);
 
     // Write some numbers.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 0, 123, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 0, 123.456, null);
+    try worksheet.writeNumber(2, 0, 123, .none);
+    try worksheet.writeNumber(3, 0, 123.456, .none);
 
-    // Insert an image using the temporary file path
-    // Convert the path to a null-terminated C string pointer
-    const c_path = @as(
-        [*c]const u8,
-        @ptrCast(tmp_file.path.ptr),
-    );
-    _ = xlsxwriter.worksheet_insert_image(worksheet, 1, 2, c_path);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    // Insert an image.
+    const use_buffer = false;
+    if (use_buffer) {
+        // using embed + insertImageBuffer
+        const logo_data = @import("assets").logo_data;
+        try worksheet.insertImageBuffer(1, 2, logo_data, logo_data.len);
+    } else {
+        // using image path + insertImage
+        const asset_path = try h.getAssetPath(alloc, "logo.png");
+        defer alloc.free(asset_path);
+        try worksheet.insertImage(1, 2, asset_path);
+    }
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

@@ -211,8 +211,38 @@ pub inline fn writeDateTime(
 
 // image functions
 // pub extern fn worksheet_insert_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
+pub inline fn insertImage(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    filename: [*c]const u8,
+) XlsxError!void {
+    try check(c.worksheet_insert_image(
+        self.worksheet_c,
+        row,
+        col,
+        filename,
+    ));
+}
+
 // pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 // pub extern fn worksheet_insert_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+pub inline fn insertImageBuffer(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    image_buffer: [*c]const u8,
+    image_size: usize,
+) XlsxError!void {
+    try check(c.worksheet_insert_image_buffer(
+        self.worksheet_c,
+        row,
+        col,
+        image_buffer,
+        image_size,
+    ));
+}
+
 // pub extern fn worksheet_insert_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
 // pub extern fn worksheet_embed_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
 // pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;

@@ -55,6 +55,9 @@ fn makeExample(b: *std.Build, options: BuildInfo) void {
     });
 
     example.root_module.addImport("xlsxwriter", options.zig_mod);
+    example.root_module.addAnonymousImport("assets", .{
+        .root_source_file = b.path("examples/assets/embed.zig"),
+    });
 
     b.installArtifact(example);
 
