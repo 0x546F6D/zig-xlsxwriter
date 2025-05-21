@@ -31,6 +31,10 @@ pub inline fn setBold(self: Format) void {
     c.format_set_bold(self.format_c);
 }
 
+pub inline fn setItalic(self: Format) void {
+    c.format_set_italic(self.format_c);
+}
+
 pub inline fn setNumFormat(self: Format, num_format: [*c]const u8) void {
     c.format_set_num_format(self.format_c, num_format);
 }
