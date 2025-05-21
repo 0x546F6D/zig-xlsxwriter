@@ -1,35 +1,34 @@
-//
-// Example of writing dates and times in Excel using a Unix datetime and date
-// formatting.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times03.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Add a format with date formatting.
-    const format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
+    const format = try workbook.addFormat();
+    format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    try worksheet.setColumn(0, 0, 20, .none);
 
     // Write some Unix datetimes with formatting.
 
     // 1970-01-01. The Unix epoch.
-    _ = xlsxwriter.worksheet_write_unixtime(worksheet, 0, 0, 0, format);
+    try worksheet.writeUnixTime(0, 0, 0, format);
 
     // 2000-01-01.
-    _ = xlsxwriter.worksheet_write_unixtime(worksheet, 1, 0, 1577836800, format);
+    try worksheet.writeUnixTime(1, 0, 1577836800, format);
 
     // 1900-01-01.
-    _ = xlsxwriter.worksheet_write_unixtime(worksheet, 2, 0, -2208988800, format);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.writeUnixTime(2, 0, -2208988800, format);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

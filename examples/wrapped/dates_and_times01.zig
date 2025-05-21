@@ -1,43 +1,37 @@
-//
-// Example of writing a dates and time in Excel using a number with date
-// formatting. This demonstrates that dates and times in Excel are just
-// formatted real numbers.
-//
-// An easier approach using a lxw_datetime struct is shown in example
-// dates_and_times02.c.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+// A number to display as a date.
+const number = 41333.5;
 
 pub fn main() !void {
-    // A number to display as a date.
-    const number = 41333.5;
+    defer _ = dbga.deinit();
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times01.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch |err| {
+        std.debug.print("{}: {s}\n", .{ err, xlsxwriter.strError(err) });
+    };
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Add a format with date formatting.
-    const format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
+    const format = try workbook.addFormat();
+    format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    try worksheet.setColumn(0, 0, 20, .none);
 
     // Write the number without formatting.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 0, 0, number, null); // 41333.5
+    try worksheet.writeNumber(0, 0, number, .none);
 
     // Write the number with formatting. Note: the worksheet_write_datetime()
     // or worksheet_write_unixtime() functions are preferable for writing
     // dates and times. This is for demonstration purposes only.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 0, number, format); // Feb 28 2013 12:00 PM
-
-    const result = xlsxwriter.workbook_close(workbook);
-    if (result != xlsxwriter.LXW_NO_ERROR) {
-        std.debug.print("Error closing workbook: {d}\n", .{result});
-        return error.WorkbookCloseFailed;
-    }
+    try worksheet.writeNumber(1, 0, number, format);
 }
+
+const std = @import("std");
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

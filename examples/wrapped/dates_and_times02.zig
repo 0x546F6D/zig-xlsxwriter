@@ -1,40 +1,39 @@
-//
-// Example of writing dates and times in Excel using an lxw_datetime struct
-// and date formatting.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+// A datetime to display.
+var datetime: xlsxwriter.DateTime = .{
+    .year = 2013,
+    .month = 2,
+    .day = 28,
+    .hour = 12,
+    .min = 0,
+    .sec = 0.0,
+};
 
 pub fn main() !void {
-    // A datetime to display.
-    var datetime = xlsxwriter.lxw_datetime{
-        .year = 2013,
-        .month = 2,
-        .day = 28,
-        .hour = 12,
-        .min = 0,
-        .sec = 0.0,
-    };
+    defer _ = dbga.deinit();
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times02.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Add a format with date formatting.
-    const format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
+    const format = try workbook.addFormat();
+    format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    try worksheet.setColumn(0, 0, 20, .none);
 
     // Write the datetime without formatting.
-    _ = xlsxwriter.worksheet_write_datetime(worksheet, 0, 0, &datetime, null); // 41333.5
+    try worksheet.writeDateTime(0, 0, datetime, .none);
 
     // Write the datetime with formatting.
-    _ = xlsxwriter.worksheet_write_datetime(worksheet, 1, 0, &datetime, format); // Feb 28 2013 12:00 PM
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.writeDateTime(1, 0, datetime, format);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

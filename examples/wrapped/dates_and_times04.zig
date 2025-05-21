@@ -1,74 +1,71 @@
-//
-// Example of writing dates and times in Excel using different date formats.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
+// A datetime to display.
+var datetime: xlsxwriter.DateTime = .{
+    .year = 2013,
+    .month = 1,
+    .day = 23,
+    .hour = 12,
+    .min = 30,
+    .sec = 5.123,
+};
 
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+// Examples date and time formats. In the output file compare how changing
+// the format strings changes the appearance of the date.
+const date_formats = [_][]const u8{
+    "dd/mm/yy",
+    "mm/dd/yy",
+    "dd m yy",
+    "d mm yy",
+    "d mmm yy",
+    "d mmmm yy",
+    "d mmmm yyy",
+    "d mmmm yyyy",
+    "dd/mm/yy hh:mm",
+    "dd/mm/yy hh:mm:ss",
+    "dd/mm/yy hh:mm:ss.000",
+    "hh:mm",
+    "hh:mm:ss",
+    "hh:mm:ss.000",
+};
 
 pub fn main() !void {
-    // A datetime to display.
-    var datetime = xlsxwriter.lxw_datetime{
-        .year = 2013,
-        .month = 1,
-        .day = 23,
-        .hour = 12,
-        .min = 30,
-        .sec = 5.123,
-    };
-    var row: u32 = 0;
-    const col: u16 = 0;
+    defer _ = dbga.deinit();
 
-    // Examples date and time formats. In the output file compare how changing
-    // the format strings changes the appearance of the date.
-    const date_formats = [_][]const u8{
-        "dd/mm/yy",
-        "mm/dd/yy",
-        "dd m yy",
-        "d mm yy",
-        "d mmm yy",
-        "d mmmm yy",
-        "d mmmm yyy",
-        "d mmmm yyyy",
-        "dd/mm/yy hh:mm",
-        "dd/mm/yy hh:mm:ss",
-        "dd/mm/yy hh:mm:ss.000",
-        "hh:mm",
-        "hh:mm:ss",
-        "hh:mm:ss.000",
-    };
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times04.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Add a bold format.
-    const bold = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_bold(bold);
+    const bold = try workbook.addFormat();
+    bold.setBold();
 
     // Write the column headers.
-    _ = xlsxwriter.worksheet_write_string(worksheet, row, col, "Formatted date", bold);
-    _ = xlsxwriter.worksheet_write_string(worksheet, row, col + 1, "Format", bold);
+    try worksheet.writeString(0, 0, "Formatted date", bold);
+    try worksheet.writeString(0, 1, "Format", bold);
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 1, 20, null);
+    try worksheet.setColumn(0, 0, 20, .none);
 
     // Write the same date and time using each of the above formats.
-    for (date_formats) |date_format| {
-        row += 1;
+    for (date_formats, 1..) |date_format, row| {
 
         // Create a format for the date or time.
-        const format = xlsxwriter.workbook_add_format(workbook);
-        _ = xlsxwriter.format_set_num_format(format, date_format.ptr);
-        _ = xlsxwriter.format_set_align(format, xlsxwriter.LXW_ALIGN_LEFT);
+        const format = try workbook.addFormat();
+        format.setNumFormat(date_format.ptr);
+        format.setAlign(.left);
 
         // Write the datetime with each format.
-        _ = xlsxwriter.worksheet_write_datetime(worksheet, row, col, &datetime, format);
+        try worksheet.writeDateTime(@intCast(row), 0, datetime, format);
 
         // Also write the format string for comparison.
-        _ = xlsxwriter.worksheet_write_string(worksheet, row, col + 1, date_format.ptr, null);
+        try worksheet.writeString(@intCast(row), 1, date_format.ptr, .none);
     }
-
-    _ = xlsxwriter.workbook_close(workbook);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

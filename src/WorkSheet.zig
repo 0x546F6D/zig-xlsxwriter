@@ -199,6 +199,22 @@ pub inline fn writeDateTime(
 }
 
 // pub extern fn worksheet_write_unixtime(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, unixtime: i64, format: [*c]lxw_format) lxw_error;
+pub inline fn writeUnixTime(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    unixtime: i64,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_unixtime(
+        self.worksheet_c,
+        row,
+        col,
+        unixtime,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_write_url(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_url_opt(worksheet: [*c]lxw_worksheet, row_num: lxw_row_t, col_num: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format, string: [*c]const u8, tooltip: [*c]const u8) lxw_error;
 // pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
