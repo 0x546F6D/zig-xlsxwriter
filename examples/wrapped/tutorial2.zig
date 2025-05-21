@@ -1,30 +1,13 @@
 const Expense = struct {
     item: [*:0]const u8,
     cost: f64,
-    datetime: xlsxwriter.DateTime,
 };
 
 var expenses = [_]Expense{
-    .{
-        .item = "Rent",
-        .cost = 1000.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 13 },
-    },
-    .{
-        .item = "Gas",
-        .cost = 100.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 14 },
-    },
-    .{
-        .item = "Food",
-        .cost = 300.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 16 },
-    },
-    .{
-        .item = "Gym",
-        .cost = 50.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 20 },
-    },
+    .{ .item = "Rent", .cost = 1000.0 },
+    .{ .item = "Gas", .cost = 100.0 },
+    .{ .item = "Food", .cost = 300.0 },
+    .{ .item = "Gym", .cost = 50.0 },
 };
 
 pub fn main() !void {
@@ -46,27 +29,19 @@ pub fn main() !void {
     const money = try workbook.addFormat();
     money.setNumFormat("$#,##0");
 
-    // Add an Excel date format.
-    const date_format = try workbook.addFormat();
-    date_format.setNumFormat("mmmm d yyyy");
-
-    // Adjust the column width.
-    try worksheet.setColumn(0, 0, 15, .none);
-
     // Write some data header.
     try worksheet.writeString(0, 0, "Item", bold);
-    try worksheet.writeString(0, 2, "Cost", bold);
+    try worksheet.writeString(0, 1, "Cost", bold);
 
     // Iterate over the data and write it out element by element.
     for (expenses, 1..) |expense, row| {
         try worksheet.writeString(@intCast(row), 0, expense.item, .none);
-        try worksheet.writeDateTime(@intCast(row), 1, expense.datetime, date_format);
-        try worksheet.writeNumber(@intCast(row), 2, expense.cost, money);
+        try worksheet.writeNumber(@intCast(row), 1, expense.cost, money);
     }
 
     // Write a total using a formula.
-    try worksheet.writeString(expenses.len + 1, 0, "Total", .none);
-    try worksheet.writeFormula(expenses.len + 1, 2, "=SUM(C2:C5)", .none);
+    try worksheet.writeString(expenses.len + 1, 0, "Total", bold);
+    try worksheet.writeFormula(expenses.len + 1, 1, "=SUM(B2:B5)", money);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

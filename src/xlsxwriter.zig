@@ -15,8 +15,6 @@ pub const def_col_width = c.LXW_DEF_COL_WIDTH;
 pub const def_row_height = c.LXW_DEF_ROW_HEIGHT;
 pub const def_col_width_pixels = c.LXW_DEF_COL_WIDTH_PIXELS;
 pub const def_row_width_pixels = c.LXW_DEF_ROW_HEIGHT_PIXELS;
-pub const filter_or = c.LXW_FILTER_OR;
-pub const filter_and = c.LXW_FILTER_AND;
 
 pub const DateTime = c.lxw_datetime;
 
@@ -29,7 +27,11 @@ pub const initWorkBook = WorkBook.init;
 
 pub const WorkSheet = @import("WorkSheet.zig");
 pub const RowColOptions = WorkSheet.RowColOptions;
-pub const FilterRule = WorkSheet.FilterRule;
+
+pub const filter = @import("filter.zig");
+pub const FilterRule = filter.FilterRule;
+pub const filter_or = filter.filter_or;
+pub const filter_and = filter.filter_and;
 
 pub const Format = @import("Format.zig");
 pub const DefinedColor = Format.DefinedColor;
