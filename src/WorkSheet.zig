@@ -253,11 +253,34 @@ pub inline fn writeUrlOpt(
     ));
 }
 
+pub const RichStringTuple = struct {
+    format_c: ?*c.lxw_format,
+    string: [*c]const u8,
+};
+
+pub const RichStringType: type = [:null]const ?*const RichStringTuple;
+// pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_tuple, format: [*c]lxw_format) lxw_error;
+pub inline fn writeRichString(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    rich_string: RichStringType,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_rich_string(
+        self.worksheet_c,
+        row,
+        col,
+        @ptrCast(@constCast(rich_string)),
+        // @ptrCast(rich_string_copy),
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_blank(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_formula_str(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: [*c]const u8) lxw_error;
-// pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_tuple, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
 // pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
 

@@ -14,8 +14,8 @@ pub fn main() !void {
 
     // Create a user defined link format
     const red_format = try workbook.addFormat();
-    red_format.setUnderline(xlsxwriter.Underlines.single);
-    red_format.setFontColor(xlsxwriter.DefinedColors.red);
+    red_format.setUnderline(.single);
+    red_format.setFontColor(.red);
     // Or use an undefined color:
     red_format.setFontColor(@enumFromInt(0xFF0000));
 

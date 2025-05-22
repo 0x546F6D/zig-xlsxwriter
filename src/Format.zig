@@ -87,9 +87,18 @@ pub inline fn setFontColor(self: Format, color: DefinedColors) void {
     c.format_set_font_color(self.format_c, @intFromEnum(color));
 }
 
+pub const Scripts = enum(c_int) {
+    superscript = c.LXW_FONT_SUPERSCRIPT,
+    subscript = c.LXW_FONT_SUBSCRIPT,
+};
+
+// pub extern fn format_set_font_script(format: [*c]lxw_format, style: u8) void;
+pub inline fn setFontScript(self: Format, style: Scripts) void {
+    c.format_set_font_script(self.format_c, @intFromEnum(style));
+}
+
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
 // pub extern fn format_set_font_size(format: [*c]lxw_format, size: f64) void;
-// pub extern fn format_set_font_script(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_font_family(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_font_charset(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_num_format_index(format: [*c]lxw_format, index: u8) void;
@@ -126,10 +135,5 @@ pub inline fn setFontColor(self: Format, color: DefinedColors) void {
 // pub extern fn format_set_hyperlink(format: [*c]lxw_format) void;
 // pub extern fn format_set_color_indexed(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_font_only(format: [*c]lxw_format) void;
-
-pub const Scripts = enum(c_int) {
-    superscript = c.LXW_FONT_SUPERSCRIPT,
-    subscript = c.LXW_FONT_SUBSCRIPT,
-};
 
 const c = @import("xlsxwriter_c");

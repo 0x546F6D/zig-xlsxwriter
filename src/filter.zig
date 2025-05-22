@@ -78,22 +78,21 @@ pub inline fn filterColumn2(
     ));
 }
 
+pub const FilterListType: type = [:null]const ?[*:0]const u8;
 // pub extern fn worksheet_filter_list(worksheet: [*c]lxw_worksheet, col: lxw_col_t, list: [*c][*c]const u8) lxw_error;
 pub inline fn filterList(
     self: WorkSheet,
     col: u16,
-    list: []const [:0]const u8,
-) XlsxError!void {
-    var list_c: [64][*c]const u8 = undefined;
-    for (list, 0..) |item, i| list_c[i] = item.ptr;
-    list_c[list.len] = null;
+    list: FilterListType,
+) !void {
     try check(c.worksheet_filter_list(
         self.worksheet_c,
         col,
-        @ptrCast(&list_c),
+        @ptrCast(@constCast(list.ptr)),
     ));
 }
 
+const Allocator = @import("std").mem.Allocator;
 const c = @import("xlsxwriter_c");
 const WorkSheet = @import("WorkSheet.zig");
 const XlsxError = @import("errors.zig").XlsxError;

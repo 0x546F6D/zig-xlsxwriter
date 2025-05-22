@@ -161,8 +161,8 @@ pub fn main() !void {
     try prepWorkSheet(worksheet5, header);
 
     // Add the filter list
-    const list_rule5 = [_][:0]const u8{ "East", "North", "South" };
-    try worksheet5.filterList(0, &list_rule5);
+    const list_rule5: xlsxwriter.FilterListType = &.{ "East", "North", "South" };
+    try worksheet5.filterList(0, list_rule5);
 
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {

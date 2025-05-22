@@ -27,15 +27,20 @@ pub const initWorkBook = WorkBook.init;
 
 pub const WorkSheet = @import("WorkSheet.zig");
 pub const RowColOptions = WorkSheet.RowColOptions;
+pub const RichStringTuple = WorkSheet.RichStringTuple;
+pub const RichStringType = WorkSheet.RichStringType;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;
+pub const FilterListType = filter.FilterListType;
 pub const filter_or = filter.filter_or;
 pub const filter_and = filter.filter_and;
 
 pub const Format = @import("Format.zig");
 pub const DefinedColors = Format.DefinedColors;
+pub const Alignments = Format.Alignments;
 pub const Underlines = Format.Underlines;
+pub const Scripts = Format.Scripts;
 
 pub const Chart = @import("Chart.zig");
 
