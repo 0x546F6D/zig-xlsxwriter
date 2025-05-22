@@ -6,35 +6,17 @@ pub const none: Format = .{
     .format_c = null,
 };
 
-pub const DefinedColor = enum(c_int) {
-    black = c.LXW_COLOR_BLACK,
-    blue = c.LXW_COLOR_BLUE,
-    brown = c.LXW_COLOR_BROWN,
-    cyan = c.LXW_COLOR_CYAN,
-    gray = c.LXW_COLOR_GRAY,
-    green = c.LXW_COLOR_GREEN,
-    lime = c.LXW_COLOR_LIME,
-    magenta = c.LXW_COLOR_MAGENTA,
-    navy = c.LXW_COLOR_NAVY,
-    orange = c.LXW_COLOR_ORANGE,
-    // MAGENTA and PINK have the some color code
-    // pink = c.LXW_COLOR_PINK,
-    pink = 0xFFC0CB,
-    purple = c.LXW_COLOR_PURPLE,
-    red = c.LXW_COLOR_RED,
-    silver = c.LXW_COLOR_SILVER,
-    white = c.LXW_COLOR_WHITE,
-    yellow = c.LXW_COLOR_YELLOW,
-};
-
+// pub extern fn format_set_bold(format: [*c]lxw_format) void;
 pub inline fn setBold(self: Format) void {
     c.format_set_bold(self.format_c);
 }
 
+// pub extern fn format_set_italic(format: [*c]lxw_format) void;
 pub inline fn setItalic(self: Format) void {
     c.format_set_italic(self.format_c);
 }
 
+// pub extern fn format_set_num_format(format: [*c]lxw_format, num_format: [*c]const u8) void;
 pub inline fn setNumFormat(self: Format, num_format: [*c]const u8) void {
     c.format_set_num_format(self.format_c, num_format);
 }
@@ -60,17 +42,56 @@ pub inline fn setAlign(self: Format, alignment: Alignments) void {
     c.format_set_align(self.format_c, @intFromEnum(alignment));
 }
 
+// pub extern fn format_set_font_strikeout(format: [*c]lxw_format) void;
+pub inline fn setFontStrikeout(self: Format) void {
+    c.format_set_font_strikeout(self.format_c);
+}
+
+pub const Underlines = enum(c_int) {
+    none = c.LXW_UNDERLINE_NONE,
+    single = c.LXW_UNDERLINE_SINGLE,
+    double = c.LXW_UNDERLINE_DOUBLE,
+    single_accounting = c.LXW_UNDERLINE_SINGLE_ACCOUNTING,
+    double_accounting = c.LXW_UNDERLINE_DOUBLE_ACCOUNTING,
+};
+
+// pub extern fn format_set_underline(format: [*c]lxw_format, style: u8) void;
+pub inline fn setUnderline(self: Format, style: Underlines) void {
+    c.format_set_underline(self.format_c, @intFromEnum(style));
+}
+
+pub const DefinedColors = enum(c_int) {
+    black = c.LXW_COLOR_BLACK,
+    blue = c.LXW_COLOR_BLUE,
+    brown = c.LXW_COLOR_BROWN,
+    cyan = c.LXW_COLOR_CYAN,
+    gray = c.LXW_COLOR_GRAY,
+    green = c.LXW_COLOR_GREEN,
+    lime = c.LXW_COLOR_LIME,
+    magenta = c.LXW_COLOR_MAGENTA,
+    navy = c.LXW_COLOR_NAVY,
+    orange = c.LXW_COLOR_ORANGE,
+    // MAGENTA and PINK have the some color code
+    // pink = c.LXW_COLOR_PINK,
+    pink = 0xFFC0CB,
+    purple = c.LXW_COLOR_PURPLE,
+    red = c.LXW_COLOR_RED,
+    silver = c.LXW_COLOR_SILVER,
+    white = c.LXW_COLOR_WHITE,
+    yellow = c.LXW_COLOR_YELLOW,
+    _,
+};
+
+// pub extern fn format_set_font_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setFontColor(self: Format, color: DefinedColors) void {
+    c.format_set_font_color(self.format_c, @intFromEnum(color));
+}
+
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
 // pub extern fn format_set_font_size(format: [*c]lxw_format, size: f64) void;
-// pub extern fn format_set_font_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_bold(format: [*c]lxw_format) void;
-// pub extern fn format_set_italic(format: [*c]lxw_format) void;
-// pub extern fn format_set_underline(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_font_strikeout(format: [*c]lxw_format) void;
 // pub extern fn format_set_font_script(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_font_family(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_font_charset(format: [*c]lxw_format, value: u8) void;
-// pub extern fn format_set_num_format(format: [*c]lxw_format, num_format: [*c]const u8) void;
 // pub extern fn format_set_num_format_index(format: [*c]lxw_format, index: u8) void;
 // pub extern fn format_set_unlocked(format: [*c]lxw_format) void;
 // pub extern fn format_set_hidden(format: [*c]lxw_format) void;
@@ -105,5 +126,10 @@ pub inline fn setAlign(self: Format, alignment: Alignments) void {
 // pub extern fn format_set_hyperlink(format: [*c]lxw_format) void;
 // pub extern fn format_set_color_indexed(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_font_only(format: [*c]lxw_format) void;
+
+pub const Scripts = enum(c_int) {
+    superscript = c.LXW_FONT_SUPERSCRIPT,
+    subscript = c.LXW_FONT_SUBSCRIPT,
+};
 
 const c = @import("xlsxwriter_c");

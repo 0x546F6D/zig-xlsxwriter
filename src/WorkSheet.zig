@@ -216,7 +216,43 @@ pub inline fn writeUnixTime(
 }
 
 // pub extern fn worksheet_write_url(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn writeUrl(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    url: [*c]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_url(
+        self.worksheet_c,
+        row,
+        col,
+        url,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_write_url_opt(worksheet: [*c]lxw_worksheet, row_num: lxw_row_t, col_num: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format, string: [*c]const u8, tooltip: [*c]const u8) lxw_error;
+pub inline fn writeUrlOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    url: [*c]const u8,
+    format: Format,
+    string: [*c]const u8,
+    tooltip: [*c]const u8,
+) XlsxError!void {
+    try check(c.worksheet_write_url_opt(
+        self.worksheet_c,
+        row,
+        col,
+        url,
+        format.format_c,
+        string,
+        tooltip,
+    ));
+}
+
 // pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_blank(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;

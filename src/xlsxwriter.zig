@@ -34,7 +34,8 @@ pub const filter_or = filter.filter_or;
 pub const filter_and = filter.filter_and;
 
 pub const Format = @import("Format.zig");
-pub const DefinedColor = Format.DefinedColor;
+pub const DefinedColors = Format.DefinedColors;
+pub const Underlines = Format.Underlines;
 
 pub const Chart = @import("Chart.zig");
 
