@@ -25,17 +25,17 @@ const data = [_]WorksheetData{
     .{ .col1 = "South", .col2 = "Hector", .col3 = "Apple", .col4 = 9814 },
 };
 
-fn writeWorksheetData(worksheet: WorkSheet, header: Format) void {
-    worksheet.writeString(0, 0, "Region", header);
-    worksheet.writeString(0, 1, "Sales Rep", header);
-    worksheet.writeString(0, 2, "Product", header);
-    worksheet.writeString(0, 3, "Units", header);
+fn writeWorksheetData(worksheet: WorkSheet, header: Format) !void {
+    try worksheet.writeString(0, 0, "Region", header);
+    try worksheet.writeString(0, 1, "Sales Rep", header);
+    try worksheet.writeString(0, 2, "Product", header);
+    try worksheet.writeString(0, 3, "Units", header);
 
     for (data, 1..) |item, row| {
-        worksheet.writeString(@intCast(row), 0, item.col1.ptr, .none);
-        worksheet.writeString(@intCast(row), 1, item.col2.ptr, .none);
-        worksheet.writeString(@intCast(row), 2, item.col3.ptr, .none);
-        worksheet.writeNumber(@intCast(row), 3, @floatFromInt(item.col4), .none);
+        try worksheet.writeString(@intCast(row), 0, item.col1.ptr, .none);
+        try worksheet.writeString(@intCast(row), 1, item.col2.ptr, .none);
+        try worksheet.writeString(@intCast(row), 2, item.col3.ptr, .none);
+        try worksheet.writeNumber(@intCast(row), 3, @floatFromInt(item.col4), .none);
     }
 }
 
@@ -84,239 +84,224 @@ pub fn main() !void {
     try worksheet1.writeString(0, 7, "Product", header2);
     try worksheet1.writeString(0, 8, "Units", header2);
 
-    writeWorksheetData(worksheet1, header1);
+    try writeWorksheetData(worksheet1, header1);
     try worksheet1.setColumnPixels(4, 4, 20, .none);
     try worksheet1.setColumnPixels(9, 9, 20, .none);
 
     // WorkSheet2: Example of using the UNIQUE() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet2,
+    try worksheet2.writeDynamicFormula(
         1,
         5,
         "=_xlfn.UNIQUE(B2:B17)",
-        null,
+        .none,
     );
 
     // A more complex example combining SORT and UNIQUE.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet2,
+    try worksheet2.writeDynamicFormula(
         1,
         7,
         "=_xlfn._xlws.SORT(_xlfn.UNIQUE(B2:B17))",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet2, 0, 5, "Sales Rep", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet2, 0, 7, "Sales Rep", header2);
+    try worksheet2.writeString(0, 5, "Sales Rep", header2);
+    try worksheet2.writeString(0, 7, "Sales Rep", header2);
 
-    writeWorksheetData(worksheet2, header1);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet2, 4, 4, 20, null);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet2, 6, 6, 20, null);
+    try writeWorksheetData(worksheet2, header1);
+    try worksheet2.setColumnPixels(4, 4, 20, .none);
+    try worksheet2.setColumnPixels(6, 6, 20, .none);
 
-    // Example of using the SORT() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet3,
+    // WorkSheet3: Example of using the SORT() function.
+    try worksheet3.writeDynamicFormula(
         1,
         5,
         "=_xlfn._xlws.SORT(B2:B17)",
-        null,
+        .none,
     );
 
-    // WorkSheet3: A more complex example combining SORT and FILTER.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet3,
+    // A more complex example combining SORT and FILTER.
+    try worksheet3.writeDynamicFormula(
         1,
         7,
         "=_xlfn._xlws.SORT(_xlfn._xlws.FILTER(C2:D17,D2:D17>5000,\"\"),2,1)",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 0, 5, "Sales Rep", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 0, 7, "Product", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 0, 8, "Units", header2);
+    try worksheet3.writeString(0, 5, "Sales Rep", header2);
+    try worksheet3.writeString(0, 7, "Product", header2);
+    try worksheet3.writeString(0, 8, "Units", header2);
 
-    writeWorksheetData(worksheet3, header1);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet3, 4, 4, 20, null);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet3, 6, 6, 20, null);
+    try writeWorksheetData(worksheet3, header1);
+    try worksheet3.setColumnPixels(4, 4, 20, .none);
+    try worksheet3.setColumnPixels(6, 6, 20, .none);
 
     // WorkSheet4: Example of using the SORTBY() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet4,
+    try worksheet4.writeDynamicFormula(
         1,
         3,
         "=_xlfn.SORTBY(A2:B9,B2:B9)",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 0, "Name", header1);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 1, "Age", header1);
+    try worksheet4.writeString(0, 0, "Name", header1);
+    try worksheet4.writeString(0, 1, "Age", header1);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 1, 0, "Tom", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 2, 0, "Fred", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 3, 0, "Amy", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 4, 0, "Sal", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 5, 0, "Fritz", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 6, 0, "Srivan", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 7, 0, "Xi", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 8, 0, "Hector", null);
+    try worksheet4.writeString(1, 0, "Tom", .none);
+    try worksheet4.writeString(2, 0, "Fred", .none);
+    try worksheet4.writeString(3, 0, "Amy", .none);
+    try worksheet4.writeString(4, 0, "Sal", .none);
+    try worksheet4.writeString(5, 0, "Fritz", .none);
+    try worksheet4.writeString(6, 0, "Srivan", .none);
+    try worksheet4.writeString(7, 0, "Xi", .none);
+    try worksheet4.writeString(8, 0, "Hector", .none);
 
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 1, 1, 52, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 2, 1, 65, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 3, 1, 22, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 4, 1, 73, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 5, 1, 19, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 6, 1, 39, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 7, 1, 19, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet4, 8, 1, 66, null);
+    try worksheet4.writeNumber(1, 1, 52, .none);
+    try worksheet4.writeNumber(2, 1, 65, .none);
+    try worksheet4.writeNumber(3, 1, 22, .none);
+    try worksheet4.writeNumber(4, 1, 73, .none);
+    try worksheet4.writeNumber(5, 1, 19, .none);
+    try worksheet4.writeNumber(6, 1, 39, .none);
+    try worksheet4.writeNumber(7, 1, 19, .none);
+    try worksheet4.writeNumber(8, 1, 66, .none);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 3, "Name", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 4, "Age", header2);
+    try worksheet4.writeString(0, 3, "Name", header2);
+    try worksheet4.writeString(0, 4, "Age", header2);
 
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet4, 2, 2, 20, null);
+    try worksheet4.setColumnPixels(2, 2, 20, .none);
 
     // WorkSheet5: Example of using the XLOOKUP() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet5,
+    try worksheet5.writeDynamicFormula(
         0,
         5,
         "=_xlfn.XLOOKUP(E1,A2:A9,C2:C9)",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 0, 0, "Country", header1);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 0, 1, "Abr", header1);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 0, 2, "Prefix", header1);
+    try worksheet5.writeString(0, 0, "Country", header1);
+    try worksheet5.writeString(0, 1, "Abr", header1);
+    try worksheet5.writeString(0, 2, "Prefix", header1);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 1, 0, "China", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 2, 0, "India", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 3, 0, "United States", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 4, 0, "Indonesia", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 5, 0, "Brazil", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 6, 0, "Pakistan", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 7, 0, "Nigeria", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 8, 0, "Bangladesh", null);
+    try worksheet5.writeString(1, 0, "China", .none);
+    try worksheet5.writeString(2, 0, "India", .none);
+    try worksheet5.writeString(3, 0, "United States", .none);
+    try worksheet5.writeString(4, 0, "Indonesia", .none);
+    try worksheet5.writeString(5, 0, "Brazil", .none);
+    try worksheet5.writeString(6, 0, "Pakistan", .none);
+    try worksheet5.writeString(7, 0, "Nigeria", .none);
+    try worksheet5.writeString(8, 0, "Bangladesh", .none);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 1, 1, "CN", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 2, 1, "IN", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 3, 1, "US", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 4, 1, "ID", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 5, 1, "BR", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 6, 1, "PK", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 7, 1, "NG", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 8, 1, "BD", null);
+    try worksheet5.writeString(1, 1, "CN", .none);
+    try worksheet5.writeString(2, 1, "IN", .none);
+    try worksheet5.writeString(3, 1, "US", .none);
+    try worksheet5.writeString(4, 1, "ID", .none);
+    try worksheet5.writeString(5, 1, "BR", .none);
+    try worksheet5.writeString(6, 1, "PK", .none);
+    try worksheet5.writeString(7, 1, "NG", .none);
+    try worksheet5.writeString(8, 1, "BD", .none);
 
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 1, 2, 86, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 2, 2, 91, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 3, 2, 1, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 4, 2, 62, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 5, 2, 55, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 6, 2, 92, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 7, 2, 234, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet5, 8, 2, 880, null);
+    try worksheet5.writeNumber(1, 2, 86, .none);
+    try worksheet5.writeNumber(2, 2, 91, .none);
+    try worksheet5.writeNumber(3, 2, 1, .none);
+    try worksheet5.writeNumber(4, 2, 62, .none);
+    try worksheet5.writeNumber(5, 2, 55, .none);
+    try worksheet5.writeNumber(6, 2, 92, .none);
+    try worksheet5.writeNumber(7, 2, 234, .none);
+    try worksheet5.writeNumber(8, 2, 880, .none);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 0, 4, "Brazil", header2);
+    try worksheet5.writeString(0, 4, "Brazil", header2);
 
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet5, 0, 0, 100, null);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet5, 3, 3, 20, null);
+    try worksheet5.setColumnPixels(0, 0, 100, .none);
+    try worksheet5.setColumnPixels(3, 3, 20, .none);
 
-    // Example of using the XMATCH() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet6,
+    // WorkSheet6: Example of using the XMATCH() function.
+    try worksheet6.writeDynamicFormula(
         1,
         3,
         "=_xlfn.XMATCH(C2,A2:A6)",
-        null,
-    );
-
-    // WorkSheet6: Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 0, 0, "Product", header1);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 1, 0, "Apple", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 2, 0, "Grape", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 3, 0, "Pear", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 4, 0, "Banana", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 5, 0, "Cherry", null);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 0, 2, "Product", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 0, 3, "Position", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 1, 2, "Grape", null);
-
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet6, 1, 1, 20, null);
-
-    // WorkSheet7: Example of using the RANDARRAY() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet7,
-        0,
-        0,
-        "=_xlfn.RANDARRAY(5,3,1,100, TRUE)",
-        null,
-    );
-
-    // WorkSheet8: Example of using the SEQUENCE() function.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet8,
-        0,
-        0,
-        "=_xlfn.SEQUENCE(4,5)",
-        null,
-    );
-
-    // WorkSheet9: Example of using the Spill range operator.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet9,
-        1,
-        7,
-        "=_xlfn.ANCHORARRAY(F2)",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet9,
-        1,
-        9,
-        "=COUNTA(_xlfn.ANCHORARRAY(F2))",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_dynamic_formula(
-        worksheet9,
+    try worksheet6.writeString(0, 0, "Product", header1);
+
+    try worksheet6.writeString(1, 0, "Apple", .none);
+    try worksheet6.writeString(2, 0, "Grape", .none);
+    try worksheet6.writeString(3, 0, "Pear", .none);
+    try worksheet6.writeString(4, 0, "Banana", .none);
+    try worksheet6.writeString(5, 0, "Cherry", .none);
+
+    try worksheet6.writeString(0, 2, "Product", header2);
+    try worksheet6.writeString(0, 3, "Position", header2);
+    try worksheet6.writeString(1, 2, "Grape", .none);
+
+    try worksheet6.setColumnPixels(1, 1, 20, .none);
+
+    // WorkSheet7: Example of using the RANDARRAY() function.
+    try worksheet7.writeDynamicFormula(
+        0,
+        0,
+        "=_xlfn.RANDARRAY(5,3,1,100, TRUE)",
+        .none,
+    );
+
+    // WorkSheet8: Example of using the SEQUENCE() function.
+    try worksheet8.writeDynamicFormula(
+        0,
+        0,
+        "=_xlfn.SEQUENCE(4,5)",
+        .none,
+    );
+
+    // WorkSheet9: Example of using the Spill range operator.
+    try worksheet9.writeDynamicFormula(
+        1,
+        7,
+        "=_xlfn.ANCHORARRAY(F2)",
+        .none,
+    );
+
+    try worksheet9.writeDynamicFormula(
+        1,
+        9,
+        "=COUNTA(_xlfn.ANCHORARRAY(F2))",
+        .none,
+    );
+
+    // Write the data the function will work on.
+    try worksheet9.writeDynamicFormula(
         1,
         5,
         "=_xlfn.UNIQUE(B2:B17)",
-        null,
+        .none,
     );
 
-    _ = xlsxwriter.worksheet_write_string(worksheet9, 0, 5, "Unique", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet9, 0, 7, "Spill", header2);
-    _ = xlsxwriter.worksheet_write_string(worksheet9, 0, 9, "Spill", header2);
+    try worksheet9.writeString(0, 5, "Unique", header2);
+    try worksheet9.writeString(0, 7, "Spill", header2);
+    try worksheet9.writeString(0, 9, "Spill", header2);
 
-    writeWorksheetData(worksheet9, header1);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet9, 4, 4, 20, null);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet9, 6, 6, 20, null);
-    _ = xlsxwriter.worksheet_set_column_pixels(worksheet9, 8, 8, 20, null);
+    try writeWorksheetData(worksheet9, header1);
+    try worksheet9.setColumnPixels(4, 4, 20, .none);
+    try worksheet9.setColumnPixels(6, 6, 20, .none);
+    try worksheet9.setColumnPixels(8, 8, 20, .none);
 
     // WorkSheet10: Example of using dynamic ranges with older Excel functions.
-    _ = xlsxwriter.worksheet_write_dynamic_array_formula(
-        worksheet10,
+    try worksheet10.writeDynamicArrayFormula(
         0,
         1,
         2,
         1,
         "=LEN(A1:A3)",
-        null,
+        .none,
     );
 
     // Write the data the function will work on.
-    _ = xlsxwriter.worksheet_write_string(worksheet10, 0, 0, "Foo", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet10, 1, 0, "Food", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet10, 2, 0, "Frood", null);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet10.writeString(0, 0, "Foo", .none);
+    try worksheet10.writeString(1, 0, "Food", .none);
+    try worksheet10.writeString(2, 0, "Frood", .none);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

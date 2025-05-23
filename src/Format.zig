@@ -115,8 +115,9 @@ pub const DefinedColors = enum(c_int) {
     white_d15 = 0xD9D9D9,
     white_d25 = 0xBFBFBF,
     white_d35 = 0xA6A6A6,
-    white_d50 = 0x808080,
-    black_l50 = 0x808080,
+    // they are both equivalent to gray
+    // white_d50 = 0x808080,
+    // black_l50 = 0x808080,
     black_l35 = 0x595959,
     black_l25 = 0x404040,
     black_l15 = 0x262626,

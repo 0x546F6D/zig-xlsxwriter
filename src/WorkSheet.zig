@@ -77,7 +77,7 @@ pub inline fn setColumnOpt(
 }
 
 // pub extern fn worksheet_set_column_pixels(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format) lxw_error;
-pub inline fn setColumn(
+pub inline fn setColumnPixels(
     self: WorkSheet,
     first_col: u16,
     last_col: u16,
@@ -94,7 +94,7 @@ pub inline fn setColumn(
 }
 
 // pub extern fn worksheet_set_column_pixels_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
-pub inline fn setColumnOpt(
+pub inline fn setColumnPixelsOpt(
     self: WorkSheet,
     first_col: u16,
     last_col: u16,
@@ -227,6 +227,26 @@ pub inline fn writeDynamicFormula(
 }
 
 // pub extern fn worksheet_write_dynamic_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn writeDynamicArrayFormula(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    last_row: u32,
+    last_col: u16,
+    formula: [*c]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_array_formula(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        last_row,
+        last_col,
+        formula,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_write_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_dynamic_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_dynamic_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
