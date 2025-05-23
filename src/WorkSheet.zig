@@ -77,7 +77,41 @@ pub inline fn setColumnOpt(
 }
 
 // pub extern fn worksheet_set_column_pixels(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format) lxw_error;
+pub inline fn setColumn(
+    self: WorkSheet,
+    first_col: u16,
+    last_col: u16,
+    pixels: u32,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_set_column_pixels(
+        self.worksheet_c,
+        first_col,
+        last_col,
+        pixels,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_set_column_pixels_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
+pub inline fn setColumnOpt(
+    self: WorkSheet,
+    first_col: u16,
+    last_col: u16,
+    pixels: u32,
+    format: Format,
+    options: RowColOptions,
+) XlsxError!void {
+    try check(c.worksheet_set_column_pixels_opt(
+        self.worksheet_c,
+        first_col,
+        last_col,
+        pixels,
+        format.format_c,
+        @constCast(&options),
+    ));
+}
+
 // pub extern fn worksheet_set_background(worksheet: [*c]lxw_worksheet, filename: [*c]const u8) lxw_error;
 // pub extern fn worksheet_set_background_buffer(worksheet: [*c]lxw_worksheet, image_buffer: [*c]const u8, image_size: usize) lxw_error;
 // pub extern fn worksheet_set_selection(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) lxw_error;
@@ -175,8 +209,24 @@ pub inline fn writeArrayFormula(
     ));
 }
 
-// pub extern fn worksheet_write_dynamic_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_dynamic_formula(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn writeDynamicFormula(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    formula: [*c]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_formula(
+        self.worksheet_c,
+        row,
+        col,
+        formula,
+        format.format_c,
+    ));
+}
+
+// pub extern fn worksheet_write_dynamic_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_dynamic_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_dynamic_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
