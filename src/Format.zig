@@ -198,6 +198,29 @@ pub inline fn setFontScript(self: Format, style: Scripts) void {
     c.format_set_font_script(self.format_c, @intFromEnum(style));
 }
 
+pub const Borders = enum(c_int) {
+    none = c.LXW_BORDER_NONE,
+    thin = c.LXW_BORDER_THIN,
+    medium = c.LXW_BORDER_MEDIUM,
+    dashed = c.LXW_BORDER_DASHED,
+    dotted = c.LXW_BORDER_DOTTED,
+    thick = c.LXW_BORDER_THICK,
+    double = c.LXW_BORDER_DOUBLE,
+    hair = c.LXW_BORDER_HAIR,
+    medium_dashed = c.LXW_BORDER_MEDIUM_DASHED,
+    dash_dot = c.LXW_BORDER_DASH_DOT,
+    medium_dash_dot = c.LXW_BORDER_MEDIUM_DASH_DOT,
+    dash_dot_dot = c.LXW_BORDER_DASH_DOT_DOT,
+    medium_dash_dot_dot = c.LXW_BORDER_MEDIUM_DASH_DOT_DOT,
+    slant_dash_dot = c.LXW_BORDER_SLANT_DASH_DOT,
+};
+
+// pub extern fn format_set_border(format: [*c]lxw_format, style: u8) void;
+pub inline fn setBorder(self: Format, style: Borders) void {
+    c.format_set_border(self.format_c, @intFromEnum(style));
+}
+
+// pub extern fn format_set_border_color(format: [*c]lxw_format, color: lxw_color_t) void;
 //
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
 // pub extern fn format_set_font_size(format: [*c]lxw_format, size: f64) void;
@@ -211,12 +234,10 @@ pub inline fn setFontScript(self: Format, style: Scripts) void {
 // pub extern fn format_set_indent(format: [*c]lxw_format, level: u8) void;
 // pub extern fn format_set_shrink(format: [*c]lxw_format) void;
 // pub extern fn format_set_pattern(format: [*c]lxw_format, index: u8) void;
-// pub extern fn format_set_border(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_bottom(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_top(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_left(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_right(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_border_color(format: [*c]lxw_format, color: lxw_color_t) void;
 // pub extern fn format_set_bottom_color(format: [*c]lxw_format, color: lxw_color_t) void;
 // pub extern fn format_set_top_color(format: [*c]lxw_format, color: lxw_color_t) void;
 // pub extern fn format_set_left_color(format: [*c]lxw_format, color: lxw_color_t) void;

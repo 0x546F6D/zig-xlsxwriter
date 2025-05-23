@@ -436,9 +436,44 @@ pub inline fn insertImageBufferOpt(
 }
 
 // pub extern fn worksheet_embed_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
+
 // pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
+
 // pub extern fn worksheet_embed_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+pub inline fn embedImageBuffer(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    image_buffer: [*c]const u8,
+    image_size: usize,
+) XlsxError!void {
+    try check(c.worksheet_embed_image_buffer(
+        self.worksheet_c,
+        row,
+        col,
+        image_buffer,
+        image_size,
+    ));
+}
+
 // pub extern fn worksheet_embed_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
+pub inline fn embedImageBufferOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    image_buffer: [*c]const u8,
+    image_size: usize,
+    options: ImageOptions,
+) XlsxError!void {
+    try check(c.worksheet_embed_image_buffer_opt(
+        self.worksheet_c,
+        row,
+        col,
+        image_buffer,
+        image_size,
+        @ptrCast(@constCast(&options)),
+    ));
+}
 
 // chart functions
 // pub extern fn worksheet_insert_chart(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart) lxw_error;
@@ -472,6 +507,26 @@ pub const filterList = filter.filterList;
 
 // other functions
 // pub extern fn worksheet_merge_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, string: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn mergeRange(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    last_row: u32,
+    last_col: u16,
+    string: [*c]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_merge_range(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        last_row,
+        last_col,
+        string,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_data_validation_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_conditional_format_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;

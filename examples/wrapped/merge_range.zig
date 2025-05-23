@@ -1,29 +1,40 @@
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-merge_range.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const merge_format = xlsxwriter.workbook_add_format(workbook);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add worksheets.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet = try workbook.addWorkSheet(null);
+
+    const merge_format = try workbook.addFormat();
 
     // Configure a format for the merged range.
-    _ = xlsxwriter.format_set_align(merge_format, xlsxwriter.LXW_ALIGN_CENTER);
-    _ = xlsxwriter.format_set_align(merge_format, xlsxwriter.LXW_ALIGN_VERTICAL_CENTER);
-    _ = xlsxwriter.format_set_bold(merge_format);
-    _ = xlsxwriter.format_set_bg_color(merge_format, xlsxwriter.LXW_COLOR_YELLOW);
-    _ = xlsxwriter.format_set_border(merge_format, xlsxwriter.LXW_BORDER_THIN);
+    merge_format.setAlign(.center);
+    merge_format.setAlign(.vertical_center);
+    merge_format.setBold();
+    merge_format.setBgColor(.yellow);
+    merge_format.setBorder(.thin);
 
     // Increase the cell size of the merged cells to highlight the formatting.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 1, 3, 12, null);
-    _ = xlsxwriter.worksheet_set_row(worksheet, 3, 30, null);
-    _ = xlsxwriter.worksheet_set_row(worksheet, 6, 30, null);
-    _ = xlsxwriter.worksheet_set_row(worksheet, 7, 30, null);
+    try worksheet.setColumn(1, 3, 12, .none);
+    try worksheet.setRow(3, 30, .none);
+    try worksheet.setRow(6, 30, .none);
+    try worksheet.setRow(7, 30, .none);
 
     // Merge 3 cells.
-    _ = xlsxwriter.worksheet_merge_range(worksheet, 3, 1, 3, 3, "Merged Range", merge_format);
+    try worksheet.mergeRange(3, 1, 3, 3, "Merged Range", merge_format);
 
     // Merge 3 cells over two rows.
-    _ = xlsxwriter.worksheet_merge_range(worksheet, 6, 1, 7, 3, "Merged Range", merge_format);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.mergeRange(6, 1, 7, 3, "Merged Range", merge_format);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");
+const WorkSheet = @import("xlsxwriter").WorkSheet;
+const Format = @import("xlsxwriter").Format;
