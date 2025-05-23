@@ -29,7 +29,7 @@ pub fn main() !void {
     try worksheet.writeNumber(3, 0, 123.456, .none);
 
     // Insert an image.
-    const use_buffer = false;
+    const use_buffer = true;
     if (use_buffer) {
         // using embed + insertImageBuffer
         const logo_data = @import("assets").logo_data;

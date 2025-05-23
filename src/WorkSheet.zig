@@ -323,8 +323,8 @@ pub inline fn writeUrlOpt(
     ));
 }
 
-pub const RichStringTuple = struct {
-    format_c: ?*c.lxw_format,
+pub const RichStringTuple = extern struct {
+    format_c: ?*c.lxw_format = null,
     string: [*c]const u8,
 };
 
@@ -370,7 +370,35 @@ pub inline fn insertImage(
     ));
 }
 
+pub const ImageOptions = extern struct {
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+    x_scale: f64 = 0,
+    y_scale: f64 = 0,
+    object_position: u8 = 0,
+    description: [*c]const u8 = null,
+    decorative: u8 = 0,
+    url: [*c]const u8 = null,
+    tip: [*c]const u8 = null,
+    cell_format_c: ?*c.lxw_format = null,
+};
 // pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
+pub inline fn insertImageOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    filename: [*c]const u8,
+    options: ImageOptions,
+) XlsxError!void {
+    try check(c.worksheet_insert_image(
+        self.worksheet_c,
+        row,
+        col,
+        filename,
+        @ptrCast(@constCast(&options)),
+    ));
+}
+
 // pub extern fn worksheet_insert_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
 pub inline fn insertImageBuffer(
     self: WorkSheet,
@@ -389,6 +417,24 @@ pub inline fn insertImageBuffer(
 }
 
 // pub extern fn worksheet_insert_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
+pub inline fn insertImageBufferOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    image_buffer: [*c]const u8,
+    image_size: usize,
+    options: ImageOptions,
+) XlsxError!void {
+    try check(c.worksheet_insert_image_buffer_opt(
+        self.worksheet_c,
+        row,
+        col,
+        image_buffer,
+        image_size,
+        @ptrCast(@constCast(&options)),
+    ));
+}
+
 // pub extern fn worksheet_embed_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
 // pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 // pub extern fn worksheet_embed_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;

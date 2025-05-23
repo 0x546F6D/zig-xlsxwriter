@@ -1,14 +1,3 @@
-//
-// An example of inserting an image from a memory buffer into a worksheet
-// using the libxlsxwriter library.
-//
-// Copyright 2014-2025 John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 // Simple array with some PNG data
 const image_buffer = [_]u8{
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -33,49 +22,55 @@ const image_buffer = [_]u8{
 const image_size = 200;
 
 pub fn main() !void {
-    // Create a new workbook and add a worksheet
-    const workbook = xlsxwriter.workbook_new("zig-image_buffer.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add worksheets.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet = try workbook.addWorkSheet(null);
 
     // In Zig, we need to convert the cell reference to row and column
-    const row_b3 = xlsxwriter.lxw_name_to_row("B3");
-    const col_b3 = xlsxwriter.lxw_name_to_col("B3");
-    const row_b7 = xlsxwriter.lxw_name_to_row("B7");
-    const col_b7 = xlsxwriter.lxw_name_to_col("B7");
+    const row_b3 = xlsxwriter.nameToRow("B3");
+    const col_b3 = xlsxwriter.nameToCol("B3");
+    const row_b7 = xlsxwriter.nameToRow("B7");
+    const col_b7 = xlsxwriter.nameToCol("B7");
 
     // Get a pointer to the image buffer
-    const image_ptr = @as([*c]const u8, &image_buffer);
+    // const image_ptr = @as([*c]const u8, &image_buffer);
 
     // Insert the image from the buffer
-    _ = xlsxwriter.worksheet_insert_image_buffer(
-        worksheet,
+    try worksheet.insertImageBuffer(
         row_b3,
         col_b3,
-        image_ptr,
+        &image_buffer,
         image_size,
     );
 
     // Create options for the second image
-    var options = xlsxwriter.lxw_image_options{
+    const options: xlsxwriter.ImageOptions = .{
         .x_offset = 34,
         .y_offset = 4,
         .x_scale = 2,
         .y_scale = 1,
-        .object_position = 0,
-        .description = null,
-        .url = null,
-        .tip = null,
     };
 
     // Insert the image from the same buffer, with some options
-    _ = xlsxwriter.worksheet_insert_image_buffer_opt(
-        worksheet,
+    try worksheet.insertImageBufferOpt(
         row_b7,
         col_b7,
-        image_ptr,
+        &image_buffer,
         image_size,
-        &options,
+        options,
     );
-
-    _ = xlsxwriter.workbook_close(workbook);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");
+const WorkSheet = @import("xlsxwriter").WorkSheet;
+const Format = @import("xlsxwriter").Format;

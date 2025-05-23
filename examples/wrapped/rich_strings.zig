@@ -34,7 +34,6 @@ pub fn main() !void {
     // Example 1: Bold and italic text
     // Write individual cells with appropriate formatting
     const fragment11: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = "This is ",
     };
     const fragment12: xlsxwriter.RichStringTuple = .{
@@ -42,7 +41,6 @@ pub fn main() !void {
         .string = "bold",
     };
     const fragment13: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = " and this is ",
     };
     const fragment14: xlsxwriter.RichStringTuple = .{
@@ -60,7 +58,6 @@ pub fn main() !void {
     // Example 2: Red and blue text
 
     const fragment21: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = "This is ",
     };
     const fragment22: xlsxwriter.RichStringTuple = .{
@@ -68,7 +65,6 @@ pub fn main() !void {
         .string = "red",
     };
     const fragment23: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = " and this is ",
     };
     const fragment24: xlsxwriter.RichStringTuple = .{
@@ -85,7 +81,6 @@ pub fn main() !void {
 
     // Example 3. A rich string plus cell formatting.
     const fragment31: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = "Some ",
     };
     const fragment32: xlsxwriter.RichStringTuple = .{
@@ -93,7 +88,6 @@ pub fn main() !void {
         .string = "bold text",
     };
     const fragment33: xlsxwriter.RichStringTuple = .{
-        .format_c = null,
         .string = " centered",
     };
     const rich_string3: xlsxwriter.RichStringType = &.{

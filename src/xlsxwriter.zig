@@ -31,6 +31,7 @@ pub const WorkSheet = @import("WorkSheet.zig");
 pub const RowColOptions = WorkSheet.RowColOptions;
 pub const RichStringTuple = WorkSheet.RichStringTuple;
 pub const RichStringType = WorkSheet.RichStringType;
+pub const ImageOptions = WorkSheet.ImageOptions;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;
