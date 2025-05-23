@@ -23,7 +23,9 @@ pub const cell = c.CELL;
 pub const cols = c.COLS;
 
 pub const WorkBook = @import("WorkBook.zig");
-pub const initWorkBook = WorkBook.init;
+pub const initWorkBook = WorkBook.new;
+pub const WorkBookOptions = WorkBook.WorkBookOptions;
+pub const initWorkBookOpt = WorkBook.newOpt;
 
 pub const WorkSheet = @import("WorkSheet.zig");
 pub const RowColOptions = WorkSheet.RowColOptions;

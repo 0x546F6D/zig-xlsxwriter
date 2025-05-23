@@ -3,13 +3,19 @@ const WorkBook = @This();
 workbook_c: ?*c.lxw_workbook,
 
 // pub extern fn workbook_new(filename: [*c]const u8) [*c]lxw_workbook;
-pub inline fn init(filename: [*c]const u8) XlsxError!WorkBook {
+pub inline fn new(filename: [*c]const u8) XlsxError!WorkBook {
     return WorkBook{
         .workbook_c = c.workbook_new(filename) orelse return XlsxError.NewWorkBook,
     };
 }
 
+pub const WorkBookOptions = c.lxw_workbook_options;
 // pub extern fn workbook_new_opt(filename: [*c]const u8, options: [*c]lxw_workbook_options) [*c]lxw_workbook;
+pub inline fn newOpt(filename: [*c]const u8, options: WorkBookOptions) XlsxError!WorkBook {
+    return WorkBook{
+        .workbook_c = c.workbook_new_opt(filename, @ptrCast(@constCast(&options))) orelse return XlsxError.NewWorkBook,
+    };
+}
 
 // pub extern fn workbook_close(workbook: [*c]lxw_workbook) lxw_error;
 pub inline fn deinit(self: WorkBook) XlsxError!void {
