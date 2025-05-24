@@ -1,81 +1,80 @@
-// An a simple example of how to add conditional formatting to an
-// libxlsxwriter file.
-//
-// See conditional_format.c for a more comprehensive example.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-conditional_format1.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add worksheets.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Write some sample data.
-    const row_b1 = xlsxwriter.lxw_name_to_row("B1");
-    const col_b1 = xlsxwriter.lxw_name_to_col("B1");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b1, col_b1, 34, null);
+    const row_b1 = xlsxwriter.nameToRow("B1");
+    const col_b1 = xlsxwriter.nameToCol("B1");
+    try worksheet.writeNumber(row_b1, col_b1, 34, .none);
 
-    const row_b2 = xlsxwriter.lxw_name_to_row("B2");
-    const col_b2 = xlsxwriter.lxw_name_to_col("B2");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b2, col_b2, 32, null);
+    const row_b2 = xlsxwriter.nameToRow("B2");
+    const col_b2 = xlsxwriter.nameToCol("B2");
+    try worksheet.writeNumber(row_b2, col_b2, 32, .none);
 
-    const row_b3 = xlsxwriter.lxw_name_to_row("B3");
-    const col_b3 = xlsxwriter.lxw_name_to_col("B3");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b3, col_b3, 31, null);
+    const row_b3 = xlsxwriter.nameToRow("B3");
+    const col_b3 = xlsxwriter.nameToCol("B3");
+    try worksheet.writeNumber(row_b3, col_b3, 31, .none);
 
-    const row_b4 = xlsxwriter.lxw_name_to_row("B4");
-    const col_b4 = xlsxwriter.lxw_name_to_col("B4");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b4, col_b4, 35, null);
+    const row_b4 = xlsxwriter.nameToRow("B4");
+    const col_b4 = xlsxwriter.nameToCol("B4");
+    try worksheet.writeNumber(row_b4, col_b4, 35, .none);
 
-    const row_b5 = xlsxwriter.lxw_name_to_row("B5");
-    const col_b5 = xlsxwriter.lxw_name_to_col("B5");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b5, col_b5, 36, null);
+    const row_b5 = xlsxwriter.nameToRow("B5");
+    const col_b5 = xlsxwriter.nameToCol("B5");
+    try worksheet.writeNumber(row_b5, col_b5, 36, .none);
 
-    const row_b6 = xlsxwriter.lxw_name_to_row("B6");
-    const col_b6 = xlsxwriter.lxw_name_to_col("B6");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b6, col_b6, 30, null);
+    const row_b6 = xlsxwriter.nameToRow("B6");
+    const col_b6 = xlsxwriter.nameToCol("B6");
+    try worksheet.writeNumber(row_b6, col_b6, 30, .none);
 
-    const row_b7 = xlsxwriter.lxw_name_to_row("B7");
-    const col_b7 = xlsxwriter.lxw_name_to_col("B7");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b7, col_b7, 38, null);
+    const row_b7 = xlsxwriter.nameToRow("B7");
+    const col_b7 = xlsxwriter.nameToCol("B7");
+    try worksheet.writeNumber(row_b7, col_b7, 38, .none);
 
-    const row_b8 = xlsxwriter.lxw_name_to_row("B8");
-    const col_b8 = xlsxwriter.lxw_name_to_col("B8");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b8, col_b8, 38, null);
+    const row_b8 = xlsxwriter.nameToRow("B8");
+    const col_b8 = xlsxwriter.nameToCol("B8");
+    try worksheet.writeNumber(row_b8, col_b8, 38, .none);
 
-    const row_b9 = xlsxwriter.lxw_name_to_row("B9");
-    const col_b9 = xlsxwriter.lxw_name_to_col("B9");
-    _ = xlsxwriter.worksheet_write_number(worksheet, row_b9, col_b9, 32, null);
+    const row_b9 = xlsxwriter.nameToRow("B9");
+    const col_b9 = xlsxwriter.nameToCol("B9");
+    try worksheet.writeNumber(row_b9, col_b9, 32, .none);
 
     // Add a format with red text.
-    const custom_format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_font_color(custom_format, xlsxwriter.LXW_COLOR_RED);
+    const custom_format = try workbook.addFormat();
+    custom_format.setFontColor(.red);
 
     // Create a conditional format object.
-    var conditional_format: xlsxwriter.lxw_conditional_format = std.mem.zeroes(xlsxwriter.lxw_conditional_format);
-
-    // Set the format type: a cell conditional:
-    conditional_format.type = xlsxwriter.LXW_CONDITIONAL_TYPE_CELL;
-
-    // Set the criteria to use:
-    conditional_format.criteria = xlsxwriter.LXW_CONDITIONAL_CRITERIA_LESS_THAN;
-
-    // Set the value to which the criteria will be applied:
-    conditional_format.value = 33;
-
-    // Set the format to use if the criteria/value applies:
-    conditional_format.format = custom_format;
+    const conditional_format: xlsxwriter.ConditionalFormat = .{
+        // Set the format type: a cell conditional:
+        .type = .cell,
+        // Set the criteria to use:
+        .criteria = .less_than,
+        // Set the value to which the criteria will be applied:
+        .value = 33,
+        // Set the format to use if the criteria/value applies:
+        .format_c = custom_format.format_c,
+    };
 
     // Now apply the format to data range.
     // RANGE("B1:B9") expands to first_row, first_col, last_row, last_col
-    const first_row = xlsxwriter.lxw_name_to_row("B1");
-    const first_col = xlsxwriter.lxw_name_to_col("B1");
-    const last_row = xlsxwriter.lxw_name_to_row("B9");
-    const last_col = xlsxwriter.lxw_name_to_col("B9");
-    _ = xlsxwriter.worksheet_conditional_format_range(worksheet, first_row, first_col, last_row, last_col, &conditional_format);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    const first_row = xlsxwriter.nameToRow("B1");
+    const first_col = xlsxwriter.nameToCol("B1");
+    const last_row = xlsxwriter.nameToRow("B9");
+    const last_col = xlsxwriter.nameToCol("B9");
+    try worksheet.conditionalFormatRange(first_row, first_col, last_row, last_col, conditional_format);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");
+const WorkSheet = @import("xlsxwriter").WorkSheet;
+const Format = @import("xlsxwriter").Format;
