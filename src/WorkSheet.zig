@@ -527,7 +527,108 @@ pub inline fn mergeRange(
     ));
 }
 
+pub const ValidationBoolean = enum(u8) {
+    default = c.LXW_VALIDATION_DEFAULT,
+    off = c.LXW_VALIDATION_OFF,
+    on = c.LXW_VALIDATION_ON,
+};
+pub const ValidationTypes = enum(u8) {
+    none = c.LXW_VALIDATION_TYPE_NONE,
+    integer = c.LXW_VALIDATION_TYPE_INTEGER,
+    integer_formula = c.LXW_VALIDATION_TYPE_INTEGER_FORMULA,
+    decimal = c.LXW_VALIDATION_TYPE_DECIMAL,
+    decimal_formula = c.LXW_VALIDATION_TYPE_DECIMAL_FORMULA,
+    list = c.LXW_VALIDATION_TYPE_LIST,
+    list_formula = c.LXW_VALIDATION_TYPE_LIST_FORMULA,
+    date = c.LXW_VALIDATION_TYPE_DATE,
+    date_formula = c.LXW_VALIDATION_TYPE_DATE_FORMULA,
+    date_number = c.LXW_VALIDATION_TYPE_DATE_NUMBER,
+    time = c.LXW_VALIDATION_TYPE_TIME,
+    time_formula = c.LXW_VALIDATION_TYPE_TIME_FORMULA,
+    time_number = c.LXW_VALIDATION_TYPE_TIME_NUMBER,
+    length = c.LXW_VALIDATION_TYPE_LENGTH,
+    length_formula = c.LXW_VALIDATION_TYPE_LENGTH_FORMULA,
+    custom_formula = c.LXW_VALIDATION_TYPE_CUSTOM_FORMULA,
+    any = c.LXW_VALIDATION_TYPE_ANY,
+};
+pub const ValidationCriterias = enum(u8) {
+    none = c.LXW_VALIDATION_CRITERIA_NONE,
+    between = c.LXW_VALIDATION_CRITERIA_BETWEEN,
+    not_between = c.LXW_VALIDATION_CRITERIA_NOT_BETWEEN,
+    equal_to = c.LXW_VALIDATION_CRITERIA_EQUAL_TO,
+    not_equal_to = c.LXW_VALIDATION_CRITERIA_NOT_EQUAL_TO,
+    greater_than = c.LXW_VALIDATION_CRITERIA_GREATER_THAN,
+    less_than = c.LXW_VALIDATION_CRITERIA_LESS_THAN,
+    greater_than_or_equal_to = c.LXW_VALIDATION_CRITERIA_GREATER_THAN_OR_EQUAL_TO,
+    less_than_or_equal_to = c.LXW_VALIDATION_CRITERIA_LESS_THAN_OR_EQUAL_TO,
+};
+pub const ValidationErrorTypes = enum(u8) {
+    stop = c.LXW_VALIDATION_ERROR_TYPE_STOP,
+    warning = c.LXW_VALIDATION_ERROR_TYPE_WARNING,
+    information = c.LXW_VALIDATION_ERROR_TYPE_INFORMATION,
+};
+pub const DataValidation = struct {
+    validate: ValidationTypes = .none,
+    criteria: ValidationCriterias = .none,
+    ignore_blank: u8 = 0,
+    show_input: u8 = 0,
+    show_error: u8 = 0,
+    error_type: ValidationErrorTypes = .stop,
+    dropdown: u8 = 0,
+    value_number: f64 = 0,
+    value_formula: [*c]const u8 = null,
+    value_list: filter.FilterListType = &.{},
+    value_datetime: c.lxw_datetime = .{},
+    minimum_number: f64 = 0,
+    minimum_formula: [*c]const u8 = null,
+    minimum_datetime: c.lxw_datetime = .{},
+    maximum_number: f64 = 0,
+    maximum_formula: [*c]const u8 = null,
+    maximum_datetime: c.lxw_datetime = .{},
+    input_title: [*c]const u8 = null,
+    input_message: [*c]const u8 = null,
+    error_title: [*c]const u8 = null,
+    error_message: [*c]const u8 = null,
+};
+
 // pub extern fn worksheet_data_validation_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
+pub inline fn dataValidationCell(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    validation: DataValidation,
+) XlsxError!void {
+    var data_validation: c.lxw_data_validation = .{
+        .validate = @intFromEnum(validation.validate),
+        .criteria = @intFromEnum(validation.criteria),
+        .ignore_blank = validation.ignore_blank,
+        .show_input = validation.show_input,
+        .show_error = validation.show_error,
+        .error_type = @intFromEnum(validation.error_type),
+        .dropdown = validation.dropdown,
+        .value_number = validation.value_number,
+        .value_formula = validation.value_formula,
+        .value_list = @ptrCast(@constCast(validation.value_list)),
+        .value_datetime = validation.value_datetime,
+        .minimum_number = validation.minimum_number,
+        .minimum_formula = validation.minimum_formula,
+        .minimum_datetime = validation.minimum_datetime,
+        .maximum_number = validation.maximum_number,
+        .maximum_formula = validation.maximum_formula,
+        .maximum_datetime = validation.maximum_datetime,
+        .input_title = validation.input_title,
+        .input_message = validation.input_message,
+        .error_title = validation.error_title,
+        .error_message = validation.error_message,
+    };
+    try check(c.worksheet_data_validation_cell(
+        self.worksheet_c,
+        row,
+        col,
+        &data_validation,
+    ));
+}
+
 // pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_conditional_format_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
 // pub extern fn worksheet_conditional_format_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
@@ -560,3 +661,4 @@ const check = @import("errors.zig").checkResult;
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
 const filter = @import("filter.zig");
+const std = @import("std");

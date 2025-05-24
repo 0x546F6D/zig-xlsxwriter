@@ -221,7 +221,20 @@ pub inline fn setBorder(self: Format, style: Borders) void {
 }
 
 // pub extern fn format_set_border_color(format: [*c]lxw_format, color: lxw_color_t) void;
-//
+pub inline fn setBorderColor(self: Format, color: DefinedColors) void {
+    c.format_set_border_color(self.format_c, @intFromEnum(color));
+}
+
+// pub extern fn format_set_text_wrap(format: [*c]lxw_format) void;
+pub inline fn setTextWrap(self: Format) void {
+    c.format_set_text_wrap(self.format_c);
+}
+
+// pub extern fn format_set_indent(format: [*c]lxw_format, level: u8) void;
+pub inline fn setIndent(self: Format, level: u8) void {
+    c.format_set_indent(self.format_c, level);
+}
+
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
 // pub extern fn format_set_font_size(format: [*c]lxw_format, size: f64) void;
 // pub extern fn format_set_font_family(format: [*c]lxw_format, value: u8) void;
@@ -229,9 +242,7 @@ pub inline fn setBorder(self: Format, style: Borders) void {
 // pub extern fn format_set_num_format_index(format: [*c]lxw_format, index: u8) void;
 // pub extern fn format_set_unlocked(format: [*c]lxw_format) void;
 // pub extern fn format_set_hidden(format: [*c]lxw_format) void;
-// pub extern fn format_set_text_wrap(format: [*c]lxw_format) void;
 // pub extern fn format_set_rotation(format: [*c]lxw_format, angle: i16) void;
-// pub extern fn format_set_indent(format: [*c]lxw_format, level: u8) void;
 // pub extern fn format_set_shrink(format: [*c]lxw_format) void;
 // pub extern fn format_set_pattern(format: [*c]lxw_format, index: u8) void;
 // pub extern fn format_set_bottom(format: [*c]lxw_format, style: u8) void;
