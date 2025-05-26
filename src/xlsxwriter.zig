@@ -35,6 +35,10 @@ pub const ConditionalFormat = WorkSheet.ConditionalFormat;
 pub const TableColumn = WorkSheet.TableColumn;
 pub const TableColumnArray = WorkSheet.TableColumnArray;
 pub const TableOptions = WorkSheet.TableOptions;
+pub const HeaderFooterOptions = WorkSheet.HeaderFooterOptions;
+pub const RowBreaks = WorkSheet.RowBreaks;
+pub const ColBreaks = WorkSheet.ColBreaks;
+pub const Margins = WorkSheet.Margins;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;

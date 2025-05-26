@@ -1,6 +1,3 @@
-// Embed the logo image directly into the executable
-const logo_data = @import("assets").logo_data;
-
 pub fn main() !void {
     defer _ = dbga.deinit();
 
@@ -12,6 +9,10 @@ pub fn main() !void {
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
+    // get image path
+    const asset_path = try h.getAssetPath(alloc, "logo.png");
+    defer alloc.free(asset_path);
+
     // Change some of the column widths for clarity.
     const cols = xlsxwriter.cols("A:A");
     try worksheet.setColumn(cols.first_col, cols.last_col, 30, .none);
@@ -21,8 +22,6 @@ pub fn main() !void {
     try worksheet.writeString(cell.row, cell.col, "Insert an image in a cell:", .none);
 
     cell = xlsxwriter.cell("B2");
-    const asset_path = try h.getAssetPath(alloc, "logo.png");
-    defer alloc.free(asset_path);
     try worksheet.insertImage(cell.row, cell.col, asset_path);
 
     // Insert an image offset in the cell.

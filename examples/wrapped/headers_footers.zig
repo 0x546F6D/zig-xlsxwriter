@@ -1,135 +1,127 @@
+// Control Characters used in the header/footer:
+//    Control             Category            Description
+//    =======             ========            ===========
+//    &L                  Justification       Left
+//    &C                                      Center
+//    &R                                      Right
 //
-// This program shows several examples of how to set up headers and
-// footers with libxlsxwriter.
+//    &P                  Information         Page number
+//    &N                                      Total number of pages
+//    &D                                      Date
+//    &T                                      Time
+//    &F                                      File name
+//    &A                                      Worksheet name
 //
-// The control characters used in the header/footer strings are:
+//    &fontsize           Font                Font size
+//    &"font,style"                           Font name and style
+//    &U                                      Single underline
+//    &E                                      Double underline
+//    &S                                      Strikethrough
+//    &X                                      Superscript
+//    &Y                                      Subscript
 //
-// Control             Category            Description
-// =======             ========            ===========
-// &L                  Justification       Left
-// &C                                      Center
-// &R                                      Right
+//    &[Picture]          Images              Image placeholder
+//    &G                                      Same as &[Picture]
 //
-// &P                  Information         Page number
-// &N                                      Total number of pages
-// &D                                      Date
-// &T                                      Time
-// &F                                      File name
-// &A                                      Worksheet name
-//
-// &fontsize           Font                Font size
-// &"font,style"                           Font name and style
-// &U                                      Single underline
-// &E                                      Double underline
-// &S                                      Strikethrough
-// &X                                      Superscript
-// &Y                                      Subscript
-//
-// &[Picture]          Images              Image placeholder
-// &G                                      Same as &[Picture]
-//
-// &&                  Miscellaneous       Literal ampersand &
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-const mktmp = @import("mktmp");
-
-// Embed the logo image directly into the executable
-const logo_data = @embedFile("logo_small.png");
+//    &&                  Miscellaneous       Literal ampersand &
 
 pub fn main() !void {
-    // Create a temporary file for the logo using the TmpFile API
-    var arena = std.heap.ArenaAllocator.init(
-        std.heap.page_allocator,
-    );
-    defer arena.deinit();
-    const allocator = arena.allocator();
+    defer _ = dbga.deinit();
 
-    var tmp_file = try mktmp.TmpFile.create(
-        allocator,
-        "logo_small_",
-    );
-    defer tmp_file.cleanUp();
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    // Write the embedded data to the temporary file
-    try tmp_file.write(logo_data);
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
 
-    const workbook = xlsxwriter.workbook_new("zig-headers_footers.xlsx");
+    // get image path
+    const asset_path = try h.getAssetPath(alloc, "logo_small.png");
+    defer alloc.free(asset_path);
 
     const preview = "Select Print Preview to see the header and footer";
 
+    var worksheet: xlsxwriter.WorkSheet = undefined;
+    var header: [*:0]const u8 = undefined;
+    var footer: [*:0]const u8 = undefined;
+
     // A simple example to start
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, "Simple");
-    const header1 = "&CHere is some centered text.";
-    const footer1 = "&LHere is some left aligned text.";
+    const worksheet1 = try workbook.addWorkSheet("Simple");
+    worksheet = worksheet1;
+    header = "&CHere is some centered text.";
+    footer = "&LHere is some left aligned text.";
 
-    _ = xlsxwriter.worksheet_set_header(worksheet1, header1);
-    _ = xlsxwriter.worksheet_set_footer(worksheet1, footer1);
+    try worksheet.setHeader(header);
+    try worksheet.setFooter(footer);
 
-    _ = xlsxwriter.worksheet_set_column(worksheet1, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet1, 0, 0, preview, null);
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
 
     // An example with an image
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, "Image");
-    var header_options = xlsxwriter.lxw_header_footer_options{
-        .image_left = @as([*c]const u8, @ptrCast(tmp_file.path.ptr)),
-        .image_center = null,
-        .image_right = null,
+    const worksheet2 = try workbook.addWorkSheet("Image");
+    worksheet = worksheet2;
+    const header_options = xlsxwriter.HeaderFooterOptions{
+        .image_left = asset_path,
     };
 
-    _ = xlsxwriter.worksheet_set_header_opt(worksheet2, "&L&[Picture]", &header_options);
+    try worksheet.setHeaderOpt("&L&[Picture]", header_options);
 
-    _ = xlsxwriter.worksheet_set_margins(worksheet2, -1, -1, 1.3, -1);
-    _ = xlsxwriter.worksheet_set_column(worksheet2, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet2, 0, 0, preview, null);
+    const margins: xlsxwriter.Margins = .{
+        .left = -1,
+        .right = -1,
+        .top = 1.3,
+        .bottom = -1,
+    };
+    worksheet.setMargins(margins);
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
 
     // This is an example of some of the header/footer variables
-    const worksheet3 = xlsxwriter.workbook_add_worksheet(workbook, "Variables");
-    const header3 = "&LPage &P of &N" ++ "&CFilename: &F" ++ "&RSheetname: &A";
-    const footer3 = "&LCurrent date: &D" ++ "&RCurrent time: &T";
-    var breaks = [_]xlsxwriter.lxw_row_t{ 20, 0 };
+    const worksheet3 = try workbook.addWorkSheet("Variables");
+    worksheet = worksheet3;
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.writeString(20, 0, "Next page", .none);
 
-    _ = xlsxwriter.worksheet_set_header(worksheet3, header3);
-    _ = xlsxwriter.worksheet_set_footer(worksheet3, footer3);
+    header = "&LPage &P of &N" ++ "&CFilename: &F" ++ "&RSheetname: &A";
+    footer = "&LCurrent date: &D" ++ "&RCurrent time: &T";
+    try worksheet.setHeader(header);
+    try worksheet.setFooter(footer);
 
-    _ = xlsxwriter.worksheet_set_column(worksheet3, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 0, 0, preview, null);
-
-    _ = xlsxwriter.worksheet_set_h_pagebreaks(worksheet3, @ptrCast(&breaks));
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 20, 0, "Next page", null);
+    const breaks: xlsxwriter.RowBreaks = &.{20};
+    try worksheet.setHPageBreaks(breaks);
 
     // This example shows how to use more than one font
-    const worksheet4 = xlsxwriter.workbook_add_worksheet(workbook, "Mixed fonts");
-    const header4 = "&C&\"Courier New,Bold\"Hello &\"Arial,Italic\"World";
-    const footer4 = "&C&\"Symbol\"e&\"Arial\" = mc&X2";
+    const worksheet4 = try workbook.addWorkSheet("Mixed fonts");
+    worksheet = worksheet4;
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
 
-    _ = xlsxwriter.worksheet_set_header(worksheet4, header4);
-    _ = xlsxwriter.worksheet_set_footer(worksheet4, footer4);
-
-    _ = xlsxwriter.worksheet_set_column(worksheet4, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 0, preview, null);
+    header = "&C&\"Courier New,Bold\"Hello &\"Arial,Italic\"World";
+    footer = "&C&\"Symbol\"e&\"Arial\" = mc&X2";
+    try worksheet.setHeader(header);
+    try worksheet.setFooter(footer);
 
     // Example of line wrapping
-    const worksheet5 = xlsxwriter.workbook_add_worksheet(workbook, "Word wrap");
-    const header5 = "&CHeading 1\nHeading 2";
+    const worksheet5 = try workbook.addWorkSheet("Word wrap");
+    worksheet = worksheet5;
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
 
-    _ = xlsxwriter.worksheet_set_header(worksheet5, header5);
-
-    _ = xlsxwriter.worksheet_set_column(worksheet5, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet5, 0, 0, preview, null);
+    header = "&CHeading 1\nHeading 2";
+    try worksheet.setHeader(header);
 
     // Example of inserting a literal ampersand &
-    const worksheet6 = xlsxwriter.workbook_add_worksheet(workbook, "Ampersand");
-    const header6 = "&CCuriouser && Curiouser - Attorneys at Law";
+    const worksheet6 = try workbook.addWorkSheet("Ampersand");
+    worksheet = worksheet6;
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, preview, .none);
 
-    _ = xlsxwriter.worksheet_set_header(worksheet6, header6);
-
-    _ = xlsxwriter.worksheet_set_column(worksheet6, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet6, 0, 0, preview, null);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    header = "&CCuriouser && Curiouser - Attorneys at Law";
+    try worksheet.setHeader(header);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

@@ -1,108 +1,49 @@
-//
-// An example of embedding images into a worksheet using the libxlsxwriter
-// library.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-const mktmp = @import("mktmp");
-
-// Embed the logo image directly into the executable
-const logo_data = @embedFile("logo.png");
-
 pub fn main() !void {
-    // Create a temporary file for the logo using the TmpFile API
-    var arena = std.heap.ArenaAllocator.init(
-        std.heap.page_allocator,
-    );
-    defer arena.deinit();
-    const allocator = arena.allocator();
+    defer _ = dbga.deinit();
 
-    var tmp_file = try mktmp.TmpFile.create(
-        allocator,
-        "logo_",
-    );
-    defer tmp_file.cleanUp();
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    // Write the embedded data to the temporary file
-    try tmp_file.write(logo_data);
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
 
-    // Create a new workbook and add a worksheet
-    const workbook = xlsxwriter.workbook_new("zig-embed_images.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    // get image path
+    const asset_path = try h.getAssetPath(alloc, "logo.png");
+    defer alloc.free(asset_path);
 
     // Change some of the column widths for clarity
-    // COLS("A:B") expands to first_col, last_col
-    const first_col = xlsxwriter.lxw_name_to_col("A:B");
-    const last_col = xlsxwriter.lxw_name_to_col_2("A:B");
-    _ = xlsxwriter.worksheet_set_column(worksheet, first_col, last_col, 30, null);
+    const cols = xlsxwriter.cols("A:B");
+    try worksheet.setColumn(cols.first_col, cols.last_col, 30, .none);
 
     // Embed an image
-    const row_a2 = xlsxwriter.lxw_name_to_row("A2");
-    const col_a2 = xlsxwriter.lxw_name_to_col("A2");
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        row_a2,
-        col_a2,
-        "Embed an image in a cell:",
-        null,
-    );
+    var cell = xlsxwriter.cell("A2");
+    try worksheet.writeString(cell.row, cell.col, "Embed an image in a cell:", .none);
 
-    const row_b2 = xlsxwriter.lxw_name_to_row("B2");
-    const col_b2 = xlsxwriter.lxw_name_to_col("B2");
-    _ = xlsxwriter.worksheet_embed_image(
-        worksheet,
-        row_b2,
-        col_b2,
-        tmp_file.path.ptr,
-    );
+    cell = xlsxwriter.cell("B2");
+    try worksheet.embedImage(cell.row, cell.col, asset_path);
 
     // Make a row bigger and embed the image
-    _ = xlsxwriter.worksheet_set_row(worksheet, 3, 72, null);
+    try worksheet.setRow(3, 72, .none);
 
-    const row_a4 = xlsxwriter.lxw_name_to_row("A4");
-    const col_a4 = xlsxwriter.lxw_name_to_col("A4");
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        row_a4,
-        col_a4,
-        "Embed an image in a cell:",
-        null,
-    );
+    cell = xlsxwriter.cell("A4");
+    try worksheet.writeString(cell.row, cell.col, "Embed an image in a cell:", .none);
 
-    const row_b4 = xlsxwriter.lxw_name_to_row("B4");
-    const col_b4 = xlsxwriter.lxw_name_to_col("B4");
-    _ = xlsxwriter.worksheet_embed_image(
-        worksheet,
-        row_b4,
-        col_b4,
-        tmp_file.path.ptr,
-    );
+    cell = xlsxwriter.cell("B4");
+    try worksheet.embedImage(cell.row, cell.col, asset_path);
 
     // Make a row bigger and embed the image
-    _ = xlsxwriter.worksheet_set_row(worksheet, 5, 150, null);
+    try worksheet.setRow(5, 150, .none);
 
-    const row_a6 = xlsxwriter.lxw_name_to_row("A6");
-    const col_a6 = xlsxwriter.lxw_name_to_col("A6");
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        row_a6,
-        col_a6,
-        "Embed an image in a cell:",
-        null,
-    );
+    cell = xlsxwriter.cell("A6");
+    try worksheet.writeString(cell.row, cell.col, "Embed an image in a cell:", .none);
 
-    const row_b6 = xlsxwriter.lxw_name_to_row("B6");
-    const col_b6 = xlsxwriter.lxw_name_to_col("B6");
-    _ = xlsxwriter.worksheet_embed_image(
-        worksheet,
-        row_b6,
-        col_b6,
-        tmp_file.path.ptr,
-    );
-
-    _ = xlsxwriter.workbook_close(workbook);
+    cell = xlsxwriter.cell("B6");
+    try worksheet.embedImage(cell.row, cell.col, asset_path);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");
