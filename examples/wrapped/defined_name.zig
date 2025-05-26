@@ -1,112 +1,39 @@
-//
-// Example of how to create defined names using libxlsxwriter. This method is
-// used to define a user friendly name to represent a value, a single cell or
-// a range of cells in a workbook.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-defined_name.xlsx");
+    defer _ = dbga.deinit();
 
-    // Add two worksheets
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+    // We don't use the returned worksheets in this example and use a generic
+    // loop below instead.
+    _ = try workbook.addWorkSheet(null);
+    _ = try workbook.addWorkSheet(null);
 
     // Define some global/workbook names
-    _ = xlsxwriter.workbook_define_name(workbook, "Exchange_rate", "=0.96");
-    _ = xlsxwriter.workbook_define_name(workbook, "Sales", "=Sheet1!$G$1:$H$10");
+    try workbook.defineName("Exchange_rate", "=0.96");
+    try workbook.defineName("Sales", "=Sheet1!$G$1:$H$10");
 
     // Define a local/worksheet name. This overrides the global "Sales" name
     // with a local defined name.
-    _ = xlsxwriter.workbook_define_name(workbook, "Sheet2!Sales", "=Sheet2!$G$1:$G$10");
+    try workbook.defineName("Sheet2!Sales", "=Sheet2!$G$1:$G$10");
 
     // Write some text to the worksheets and one of the defined names in a formula
-    // Process worksheet1
-    _ = xlsxwriter.worksheet_set_column(
-        worksheet1,
-        0,
-        0,
-        45,
-        null,
-    );
+    const worksheets = try workbook.getWorkSheets(alloc);
+    defer alloc.free(worksheets);
 
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet1,
-        0,
-        0,
-        "This worksheet contains some defined names.",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet1,
-        1,
-        0,
-        "See Formulas -> Name Manager above.",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet1,
-        2,
-        0,
-        "Example formula in cell B3 ->",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_formula(
-        worksheet1,
-        2,
-        1,
-        "=Exchange_rate",
-        null,
-    );
-
-    // Process worksheet2
-    _ = xlsxwriter.worksheet_set_column(
-        worksheet2,
-        0,
-        0,
-        45,
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet2,
-        0,
-        0,
-        "This worksheet contains some defined names.",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet2,
-        1,
-        0,
-        "See Formulas -> Name Manager above.",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet2,
-        2,
-        0,
-        "Example formula in cell B3 ->",
-        null,
-    );
-
-    _ = xlsxwriter.worksheet_write_formula(
-        worksheet2,
-        2,
-        1,
-        "=Exchange_rate",
-        null,
-    );
-
-    _ = xlsxwriter.workbook_close(workbook);
+    for (worksheets) |worksheet| {
+        try worksheet.setColumn(0, 1, 45, .none);
+        try worksheet.writeString(0, 0, "This worksheet contains some defined names.", .none);
+        try worksheet.writeString(1, 0, "See Formulas -> Name Manager above.", .none);
+        try worksheet.writeString(2, 0, "Example formula in cell B3 ->", .none);
+        try worksheet.writeFormula(2, 1, "=Exchange_rate", .none);
+    }
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");

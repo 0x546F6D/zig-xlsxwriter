@@ -50,6 +50,52 @@ pub inline fn getDefaultUrlFormat(self: WorkBook) XlsxError!Format {
     };
 }
 
+// pub extern fn workbook_get_worksheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_worksheet;
+pub inline fn getWorkSheetByName(self: WorkBook, name: [*c]const u8) WorkSheet {
+    return WorkSheet{
+        .worksheet_c = c.workbook_get_worksheet_by_name(self.workbook_c, name),
+    };
+}
+
+// Get the list of worksheets
+pub inline fn getWorkSheets(self: WorkBook, allocator: std.mem.Allocator) ![]WorkSheet {
+    const nb_worksheet = self.workbook_c.?.num_worksheets;
+    if (nb_worksheet == 0) return error.NoWorksheet;
+
+    var worksheet_array = try std.ArrayListUnmanaged(WorkSheet).initCapacity(
+        allocator,
+        nb_worksheet,
+    );
+    // var worksheet_array: std.ArrayListUnmanaged(WorkSheet) = .empty;
+    defer worksheet_array.deinit(allocator);
+
+    var worksheet_c: ?*c.lxw_worksheet = self.workbook_c.?.worksheets.*.stqh_first;
+    while (worksheet_c != null) {
+        try worksheet_array.append(
+            allocator,
+            WorkSheet{
+                .worksheet_c = worksheet_c,
+            },
+        );
+        worksheet_c = worksheet_c.?.list_pointers.stqe_next;
+    }
+
+    return try worksheet_array.toOwnedSlice(allocator);
+}
+
+// pub extern fn workbook_define_name(workbook: [*c]lxw_workbook, name: [*c]const u8, formula: [*c]const u8) lxw_error;
+pub inline fn defineName(
+    self: WorkBook,
+    name: [*c]const u8,
+    formula: [*c]const u8,
+) XlsxError!void {
+    try check(c.workbook_define_name(
+        self.workbook_c,
+        name,
+        formula,
+    ));
+}
+
 // pub extern fn workbook_add_chartsheet(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) [*c]lxw_chartsheet;
 
 // pub extern fn workbook_set_properties(workbook: [*c]lxw_workbook, properties: [*c]lxw_doc_properties) lxw_error;
@@ -58,7 +104,6 @@ pub inline fn getDefaultUrlFormat(self: WorkBook) XlsxError!Format {
 // pub extern fn workbook_set_custom_property_integer(workbook: [*c]lxw_workbook, name: [*c]const u8, value: i32) lxw_error;
 // pub extern fn workbook_set_custom_property_boolean(workbook: [*c]lxw_workbook, name: [*c]const u8, value: u8) lxw_error;
 // pub extern fn workbook_set_custom_property_datetime(workbook: [*c]lxw_workbook, name: [*c]const u8, datetime: [*c]lxw_datetime) lxw_error;
-// pub extern fn workbook_define_name(workbook: [*c]lxw_workbook, name: [*c]const u8, formula: [*c]const u8) lxw_error;
 // pub extern fn workbook_get_worksheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_worksheet;
 // pub extern fn workbook_get_chartsheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_chartsheet;
 // pub extern fn workbook_validate_sheet_name(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) lxw_error;
