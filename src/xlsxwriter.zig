@@ -20,10 +20,6 @@ pub const def_row_width_pixels = c.LXW_DEF_ROW_HEIGHT_PIXELS;
 
 pub const DateTime = c.lxw_datetime;
 
-pub const range = c.RANGE;
-pub const cell = c.CELL;
-pub const cols = c.COLS;
-
 pub const WorkBook = @import("WorkBook.zig");
 pub const initWorkBook = WorkBook.new;
 pub const WorkBookOptions = WorkBook.WorkBookOptions;
@@ -69,3 +65,6 @@ pub const nameToRow = utility.nameToRow;
 pub const nameToRow2 = utility.nameToRow2;
 pub const nameToCol = utility.nameToCol;
 pub const nameToCol2 = utility.nameToCol2;
+pub const range = utility.range;
+pub const cell = utility.cell;
+pub const cols = utility.cols;
