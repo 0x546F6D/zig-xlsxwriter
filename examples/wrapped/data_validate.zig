@@ -103,7 +103,7 @@ pub fn main() !void {
     // Example 6. Limiting input to a value in a dropdown list.
     try worksheet.writeString(12, 0, "Select a value from a dropdown list", .none);
 
-    const list: xlsxwriter.FilterListType = &.{ "open", "high", "close" };
+    const list: xlsxwriter.StringArray = &.{ "open", "high", "close" };
     data_validation.validate = .list;
     data_validation.value_list = list;
 

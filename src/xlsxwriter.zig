@@ -1,3 +1,5 @@
+pub const StringArray: type = [:null]const ?[*:0]const u8;
+
 pub const c = @import("xlsxwriter_c");
 pub const xw_true = c.LXW_TRUE;
 pub const xw_false = c.LXW_FALSE;
@@ -34,10 +36,12 @@ pub const RichStringType = WorkSheet.RichStringType;
 pub const ImageOptions = WorkSheet.ImageOptions;
 pub const DataValidation = WorkSheet.DataValidation;
 pub const ConditionalFormat = WorkSheet.ConditionalFormat;
+pub const TableColumn = WorkSheet.TableColumn;
+pub const TableColumnArray = WorkSheet.TableColumnArray;
+pub const TableOptions = WorkSheet.TableOptions;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;
-pub const FilterListType = filter.FilterListType;
 pub const filter_or = filter.filter_or;
 pub const filter_and = filter.filter_and;
 

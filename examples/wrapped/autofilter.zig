@@ -161,7 +161,7 @@ pub fn main() !void {
     try prepWorkSheet(worksheet5, header);
 
     // Add the filter list
-    const list_rule5: xlsxwriter.FilterListType = &.{ "East", "North", "South" };
+    const list_rule5: xlsxwriter.StringArray = &.{ "East", "North", "South" };
     try worksheet5.filterList(0, list_rule5);
 
     // Hide rows that don't match the filter

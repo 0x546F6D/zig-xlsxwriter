@@ -577,7 +577,7 @@ pub const DataValidation = struct {
     dropdown: u8 = 0,
     value_number: f64 = 0,
     value_formula: [*c]const u8 = null,
-    value_list: filter.FilterListType = &.{},
+    value_list: StringArray = &.{},
     value_datetime: c.lxw_datetime = .{},
     minimum_number: f64 = 0,
     minimum_formula: [*c]const u8 = null,
@@ -829,9 +829,106 @@ pub inline fn conditionalFormatRange(
 
 // pub extern fn worksheet_conditional_format_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
 
+pub const TableStyleType = enum(u8) {
+    default = c.LXW_TABLE_STYLE_TYPE_DEFAULT,
+    light = c.LXW_TABLE_STYLE_TYPE_LIGHT,
+    medium = c.LXW_TABLE_STYLE_TYPE_MEDIUM,
+    dark = c.LXW_TABLE_STYLE_TYPE_DARK,
+};
+pub const TableTotalFunctions = enum(u8) {
+    none = c.LXW_TABLE_FUNCTION_NONE,
+    average = c.LXW_TABLE_FUNCTION_AVERAGE,
+    count_nums = c.LXW_TABLE_FUNCTION_COUNT_NUMS,
+    count = c.LXW_TABLE_FUNCTION_COUNT,
+    max = c.LXW_TABLE_FUNCTION_MAX,
+    min = c.LXW_TABLE_FUNCTION_MIN,
+    std_dev = c.LXW_TABLE_FUNCTION_STD_DEV,
+    sum = c.LXW_TABLE_FUNCTION_SUM,
+    variance = c.LXW_TABLE_FUNCTION_VAR,
+};
+
+pub const TableColumn = extern struct {
+    header: [*c]const u8 = null,
+    formula: [*c]const u8 = null,
+    total_string: [*c]const u8 = null,
+    total_function: TableTotalFunctions = .none,
+    header_format_c: ?*c.lxw_format = null,
+    format_c: ?*c.lxw_format = null,
+    total_value: f64 = 0,
+
+    pub const empty: TableColumn = .{
+        .header = null,
+        .formula = null,
+        .total_string = null,
+        .total_function = .none,
+        .header_format_c = null,
+        .format_c = null,
+        .total_value = 0,
+    };
+};
+pub const TableColumnArray = [:null]const ?*TableColumn;
+pub const TableOptions = struct {
+    name: [*c]const u8 = null,
+    no_header_row: u8 = 0,
+    no_autofilter: u8 = 0,
+    no_banded_rows: u8 = 0,
+    banded_columns: u8 = 0,
+    first_column: u8 = 0,
+    last_column: u8 = 0,
+    style_type: TableStyleType = .default,
+    style_type_number: u8 = 0,
+    total_row: u8 = 0,
+    columns: TableColumnArray = &.{},
+
+    pub const empty: TableOptions = .{
+        .name = null,
+        .no_header_row = 0,
+        .no_autofilter = 0,
+        .no_banded_rows = 0,
+        .banded_columns = 0,
+        .first_column = 0,
+        .last_column = 0,
+        .style_type = .default,
+        .style_type_number = 0,
+        .total_row = 0,
+        .columns = &.{},
+    };
+};
+
+// pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, options: [*c]lxw_table_options) lxw_error;
+pub inline fn addTable(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    last_row: u32,
+    last_col: u16,
+    options: TableOptions,
+) XlsxError!void {
+    var table_options: c.lxw_table_options = .{
+        .name = options.name,
+        .no_header_row = options.no_header_row,
+        .no_autofilter = options.no_autofilter,
+        .no_banded_rows = options.no_banded_rows,
+        .banded_columns = options.banded_columns,
+        .first_column = options.first_column,
+        .last_column = options.last_column,
+        .style_type = @intFromEnum(options.style_type),
+        .style_type_number = options.style_type_number,
+        .total_row = options.total_row,
+        .columns = @ptrCast(@constCast(options.columns)),
+    };
+    try check(c.worksheet_add_table(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        last_row,
+        last_col,
+        &table_options,
+    ));
+}
+
 // pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_insert_button(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, options: [*c]lxw_button_options) lxw_error;
-// pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, options: [*c]lxw_table_options) lxw_error;
 // pub extern fn worksheet_activate(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_select(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_hide(worksheet: [*c]lxw_worksheet) void;
@@ -854,6 +951,7 @@ pub inline fn conditionalFormatRange(
 // pub extern fn worksheet_ignore_errors(worksheet: [*c]lxw_worksheet, @"type": u8, range: [*c]const u8) lxw_error;
 
 const c = @import("xlsxwriter_c");
+const StringArray = @import("xlsxwriter").StringArray;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const Format = @import("Format.zig");

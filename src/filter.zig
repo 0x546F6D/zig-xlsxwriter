@@ -78,12 +78,11 @@ pub inline fn filterColumn2(
     ));
 }
 
-pub const FilterListType: type = [:null]const ?[*:0]const u8;
 // pub extern fn worksheet_filter_list(worksheet: [*c]lxw_worksheet, col: lxw_col_t, list: [*c][*c]const u8) lxw_error;
 pub inline fn filterList(
     self: WorkSheet,
     col: u16,
-    list: FilterListType,
+    list: StringArray,
 ) !void {
     try check(c.worksheet_filter_list(
         self.worksheet_c,
@@ -94,6 +93,7 @@ pub inline fn filterList(
 
 const Allocator = @import("std").mem.Allocator;
 const c = @import("xlsxwriter_c");
+const StringArray = @import("xlsxwriter").StringArray;
 const WorkSheet = @import("WorkSheet.zig");
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
