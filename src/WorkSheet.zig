@@ -390,7 +390,7 @@ pub inline fn insertImageOpt(
     filename: [*c]const u8,
     options: ImageOptions,
 ) XlsxError!void {
-    try check(c.worksheet_insert_image(
+    try check(c.worksheet_insert_image_opt(
         self.worksheet_c,
         row,
         col,
