@@ -21,11 +21,12 @@ pub fn main() !void {
     try workbook.defineName("Sheet2!Sales", "=Sheet2!$G$1:$G$10");
 
     // Write some text to the worksheets and one of the defined names in a formula
-    const worksheets = try workbook.getWorkSheets(alloc);
+    const worksheets_o = try workbook.getWorkSheets(alloc);
+    const worksheets = if (worksheets_o) |worksheets| worksheets else return;
     defer alloc.free(worksheets);
 
     for (worksheets) |worksheet| {
-        try worksheet.setColumn(0, 1, 45, .none);
+        try worksheet.setColumn(0, 0, 45, .none);
         try worksheet.writeString(0, 0, "This worksheet contains some defined names.", .none);
         try worksheet.writeString(1, 0, "See Formulas -> Name Manager above.", .none);
         try worksheet.writeString(2, 0, "Example formula in cell B3 ->", .none);

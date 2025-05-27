@@ -1,116 +1,23 @@
-//
-// Example of how use libxlsxwriter to generate Excel outlines and grouping.
-//
-// These examples focus mainly on collapsed outlines. See also the outlines.c
-// example program for more general examples.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
-// This function will generate the same data and sub-totals on each worksheet.
-// Used in the examples 1-4.
-fn createRowExampleData(worksheet: *xlsxwriter.lxw_worksheet, bold: *xlsxwriter.lxw_format) void {
-    // Set the column width for clarity.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
-
-    // Add data and formulas to the worksheet.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Region", bold);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 0, "North", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 0, "North", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 3, 0, "North", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 4, 0, "North", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 5, 0, "North Total", bold);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 1, "Sales", bold);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 1, 1000, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 1, 1200, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 1, 900, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 1, 1200, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 5, 1, "=SUBTOTAL(9,B2:B5)", bold);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 6, 0, "South", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 7, 0, "South", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 8, 0, "South", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 9, 0, "South", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 10, 0, "South Total", bold);
-
-    _ = xlsxwriter.worksheet_write_number(worksheet, 6, 1, 400, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 7, 1, 600, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 8, 1, 500, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 9, 1, 600, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 10, 1, "=SUBTOTAL(9,B7:B10)", bold);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 11, 0, "Grand Total", bold);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 11, 1, "=SUBTOTAL(9,B2:B10)", bold);
-}
-
-// This function will generate the same data and sub-totals on each worksheet.
-// Used in the examples 5-6.
-fn createColExampleData(worksheet: *xlsxwriter.lxw_worksheet, bold: *xlsxwriter.lxw_format) void {
-    // Add data and formulas to the worksheet.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Month", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 1, "Jan", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 2, "Feb", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 3, "Mar", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 4, "Apr", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 5, "May", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 6, "Jun", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 7, "Total", null);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 0, "North", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 1, 50, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 2, 20, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 3, 15, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 4, 25, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 5, 65, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 6, 80, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 1, 7, "=SUM(B2:G2)", null);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 0, "South", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 1, 10, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 2, 20, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 3, 30, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 4, 50, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 5, 50, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 6, 50, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 2, 7, "=SUM(B3:G3)", null);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 3, 0, "East", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 1, 45, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 2, 75, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 3, 50, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 4, 15, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 5, 75, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 6, 100, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 3, 7, "=SUM(B4:G4)", null);
-
-    _ = xlsxwriter.worksheet_write_string(worksheet, 4, 0, "West", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 1, 15, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 2, 15, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 3, 55, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 4, 35, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 5, 20, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 4, 6, 50, null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 4, 7, "=SUM(B5:G5)", null);
-
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 5, 7, "=SUM(H2:H5)", bold);
-}
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-outline_collapsed.xlsx");
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, "Outlined Rows");
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, "Collapsed Rows 1");
-    const worksheet3 = xlsxwriter.workbook_add_worksheet(workbook, "Collapsed Rows 2");
-    const worksheet4 = xlsxwriter.workbook_add_worksheet(workbook, "Collapsed Rows 3");
-    const worksheet5 = xlsxwriter.workbook_add_worksheet(workbook, "Outline Columns");
-    const worksheet6 = xlsxwriter.workbook_add_worksheet(workbook, "Collapsed Columns");
+    defer _ = dbga.deinit();
 
-    const bold = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_bold(bold);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet1 = try workbook.addWorkSheet("Outlined Rows");
+    const worksheet2 = try workbook.addWorkSheet("Collapsed Rows 1");
+    const worksheet3 = try workbook.addWorkSheet("Collapsed Rows 2");
+    const worksheet4 = try workbook.addWorkSheet("Collapsed Rows 3");
+    const worksheet5 = try workbook.addWorkSheet("Outline Columns");
+    const worksheet6 = try workbook.addWorkSheet("Collapsed Columns");
+    var worksheet: xlsxwriter.WorkSheet = undefined;
+
+    const bold = try workbook.addFormat();
+    bold.setBold();
 
     // Example 1: Create a worksheet with outlined rows. It also includes
     // SUBTOTAL() functions so that it looks like the type of automatic
@@ -119,174 +26,233 @@ pub fn main() !void {
     // For outlines the important parameters are 'hidden' and 'level'. Rows
     // with the same 'level' are grouped together. The group will be collapsed
     // if 'hidden' is non-zero.
+    worksheet = worksheet1;
 
     // The option structs with the outline level set.
-    var options1 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 2,
-        .collapsed = 0,
-    };
-    var options2 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 1,
-        .collapsed = 0,
-    };
+    const options1 = xlsxwriter.RowColOptions{ .level = 2 };
+    const options2 = xlsxwriter.RowColOptions{ .level = 1 };
 
     // Set the row outline properties.
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 1, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 2, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 3, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 4, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 5, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options2);
+    try worksheet.setRowOpt(1, def_row_height, .none, options1);
+    try worksheet.setRowOpt(2, def_row_height, .none, options1);
+    try worksheet.setRowOpt(3, def_row_height, .none, options1);
+    try worksheet.setRowOpt(4, def_row_height, .none, options1);
+    try worksheet.setRowOpt(5, def_row_height, .none, options2);
 
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 6, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 7, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 8, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 9, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options1);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet1, 10, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options2);
+    try worksheet.setRowOpt(6, def_row_height, .none, options1);
+    try worksheet.setRowOpt(7, def_row_height, .none, options1);
+    try worksheet.setRowOpt(8, def_row_height, .none, options1);
+    try worksheet.setRowOpt(9, def_row_height, .none, options1);
+    try worksheet.setRowOpt(10, def_row_height, .none, options2);
 
     // Write the sub-total data that is common to the row examples.
-    createRowExampleData(worksheet1, bold);
+    try createRowExampleData(worksheet, bold);
 
     // Example 2: Create a worksheet with collapsed outlined rows.
+    worksheet = worksheet2;
     // This is the same as the example 1 except that all rows are collapsed.
-    var options3 = xlsxwriter.lxw_row_col_options{
-        .hidden = 1,
-        .level = 2,
-        .collapsed = 0,
-    };
-    var options4 = xlsxwriter.lxw_row_col_options{
-        .hidden = 1,
-        .level = 1,
-        .collapsed = 0,
-    };
-    var options5 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 0,
-        .collapsed = 1,
-    };
+    const options3 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
+    const options4 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 1 };
+    const options5 = xlsxwriter.RowColOptions{ .collapsed = xw_true };
 
     // Set the row options with the outline level.
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 1, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 2, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 3, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 4, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 5, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options4);
+    try worksheet.setRowOpt(1, def_row_height, .none, options3);
+    try worksheet.setRowOpt(2, def_row_height, .none, options3);
+    try worksheet.setRowOpt(3, def_row_height, .none, options3);
+    try worksheet.setRowOpt(4, def_row_height, .none, options3);
+    try worksheet.setRowOpt(5, def_row_height, .none, options4);
 
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 6, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 7, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 8, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 9, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options3);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 10, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options4);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet2, 11, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options5);
+    try worksheet.setRowOpt(6, def_row_height, .none, options3);
+    try worksheet.setRowOpt(7, def_row_height, .none, options3);
+    try worksheet.setRowOpt(8, def_row_height, .none, options3);
+    try worksheet.setRowOpt(9, def_row_height, .none, options3);
+    try worksheet.setRowOpt(10, def_row_height, .none, options4);
+    try worksheet.setRowOpt(11, def_row_height, .none, options5);
 
     // Write the sub-total data that is common to the row examples.
-    createRowExampleData(worksheet2, bold);
+    try createRowExampleData(worksheet, bold);
 
     // Example 3: Create a worksheet with collapsed outlined rows. Same as the
     // example 1 except that the two sub-totals are collapsed.
-    var options6 = xlsxwriter.lxw_row_col_options{
-        .hidden = 1,
-        .level = 2,
-        .collapsed = 0,
-    };
-    var options7 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 1,
-        .collapsed = 1,
-    };
+    worksheet = worksheet3;
+    const options6 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
+    const options7 = xlsxwriter.RowColOptions{ .level = 1, .collapsed = xw_true };
 
     // Set the row options with the outline level.
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 1, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 2, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 3, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 4, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 5, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options7);
+    try worksheet.setRowOpt(1, def_row_height, .none, options6);
+    try worksheet.setRowOpt(2, def_row_height, .none, options6);
+    try worksheet.setRowOpt(3, def_row_height, .none, options6);
+    try worksheet.setRowOpt(4, def_row_height, .none, options6);
+    try worksheet.setRowOpt(5, def_row_height, .none, options7);
 
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 6, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 7, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 8, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 9, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options6);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet3, 10, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options7);
+    try worksheet.setRowOpt(6, def_row_height, .none, options6);
+    try worksheet.setRowOpt(7, def_row_height, .none, options6);
+    try worksheet.setRowOpt(8, def_row_height, .none, options6);
+    try worksheet.setRowOpt(9, def_row_height, .none, options6);
+    try worksheet.setRowOpt(10, def_row_height, .none, options7);
 
     // Write the sub-total data that is common to the row examples.
-    createRowExampleData(worksheet3, bold);
+    try createRowExampleData(worksheet, bold);
 
     // Example 4: Create a worksheet with outlined rows. Same as the example 1
     // except that the two sub-totals are collapsed.
-    var options8 = xlsxwriter.lxw_row_col_options{
-        .hidden = 1,
-        .level = 2,
-        .collapsed = 0,
-    };
-    var options9 = xlsxwriter.lxw_row_col_options{
-        .hidden = 1,
-        .level = 1,
-        .collapsed = 1,
-    };
-    var options10 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 0,
-        .collapsed = 1,
-    };
+    worksheet = worksheet4;
+    const options8 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
+    const options9 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 1, .collapsed = xw_true };
+    const options10 = xlsxwriter.RowColOptions{ .collapsed = xw_true };
 
     // Set the row options with the outline level.
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 1, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 2, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 3, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 4, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 5, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options9);
+    try worksheet.setRowOpt(1, def_row_height, .none, options8);
+    try worksheet.setRowOpt(2, def_row_height, .none, options8);
+    try worksheet.setRowOpt(3, def_row_height, .none, options8);
+    try worksheet.setRowOpt(4, def_row_height, .none, options8);
+    try worksheet.setRowOpt(5, def_row_height, .none, options9);
 
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 6, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 7, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 8, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 9, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options8);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 10, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options9);
-    _ = xlsxwriter.worksheet_set_row_opt(worksheet4, 11, xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &options10);
+    try worksheet.setRowOpt(6, def_row_height, .none, options8);
+    try worksheet.setRowOpt(7, def_row_height, .none, options8);
+    try worksheet.setRowOpt(8, def_row_height, .none, options8);
+    try worksheet.setRowOpt(9, def_row_height, .none, options8);
+    try worksheet.setRowOpt(10, def_row_height, .none, options9);
+    try worksheet.setRowOpt(11, def_row_height, .none, options10);
 
     // Write the sub-total data that is common to the row examples.
-    createRowExampleData(worksheet4, bold);
+    try createRowExampleData(worksheet, bold);
 
     // Example 5: Create a worksheet with outlined columns.
-    var options11 = xlsxwriter.lxw_row_col_options{
-        .hidden = 0,
-        .level = 1,
-        .collapsed = 0,
-    };
+    worksheet = worksheet5;
+    const options11 = xlsxwriter.RowColOptions{ .level = 1 };
 
     // Write the sub-total data that is common to the column examples.
-    createColExampleData(worksheet5, bold);
+    try createColExampleData(worksheet5, bold);
 
     // Add bold format to the first row.
-    _ = xlsxwriter.worksheet_set_row(worksheet5, 0, xlsxwriter.LXW_DEF_ROW_HEIGHT, bold);
+    try worksheet.setRow(0, def_row_height, bold);
 
     // Set column formatting and the outline level.
-    _ = xlsxwriter.worksheet_set_column(worksheet5, 0, 0, 10, bold);
-    _ = xlsxwriter.worksheet_set_column_opt(worksheet5, 1, 6, 5, null, &options11);
-    _ = xlsxwriter.worksheet_set_column(worksheet5, 7, 7, 10, null);
+    try worksheet.setColumn(0, 0, 10, bold);
+    try worksheet.setColumnOpt(1, 6, 5, .none, options11);
+    try worksheet.setColumn(7, 7, 10, .none);
 
     // Example 6: Create a worksheet with outlined columns.
-    var options12 = xlsxwriter.lxw_row_col_options{
+    worksheet = worksheet6;
+    const options12 = xlsxwriter.RowColOptions{
         .hidden = 1,
         .level = 1,
         .collapsed = 0,
     };
-    var options13 = xlsxwriter.lxw_row_col_options{
+    const options13 = xlsxwriter.RowColOptions{
         .hidden = 0,
         .level = 0,
         .collapsed = 1,
     };
 
     // Write the sub-total data that is common to the column examples.
-    createColExampleData(worksheet6, bold);
+    try createColExampleData(worksheet6, bold);
 
     // Add bold format to the first row.
-    _ = xlsxwriter.worksheet_set_row(worksheet6, 0, xlsxwriter.LXW_DEF_ROW_HEIGHT, bold);
+    try worksheet.setRow(0, def_row_height, bold);
 
     // Set column formatting and the outline level.
-    _ = xlsxwriter.worksheet_set_column(worksheet6, 0, 0, 10, bold);
-    _ = xlsxwriter.worksheet_set_column_opt(worksheet6, 1, 6, 5, null, &options12);
-    _ = xlsxwriter.worksheet_set_column_opt(worksheet6, 7, 7, 10, null, &options13);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.setColumn(0, 0, 10, bold);
+    try worksheet.setColumnOpt(1, 6, 5, .none, options12);
+    try worksheet.setColumnOpt(7, 7, 10, .none, options13);
 }
+
+// This function will generate the same data and sub-totals on each worksheet.
+// Used in the examples 1-4.
+fn createRowExampleData(worksheet: WorkSheet, bold: Format) !void {
+    // Set the column width for clarity.
+    try worksheet.setColumn(0, 0, 20, .none);
+
+    // Add data and formulas to the worksheet.
+    try worksheet.writeString(0, 0, "Region", bold);
+    try worksheet.writeString(1, 0, "North", .none);
+    try worksheet.writeString(2, 0, "North", .none);
+    try worksheet.writeString(3, 0, "North", .none);
+    try worksheet.writeString(4, 0, "North", .none);
+    try worksheet.writeString(5, 0, "North Total", bold);
+
+    try worksheet.writeString(0, 1, "Sales", bold);
+    try worksheet.writeNumber(1, 1, 1000, .none);
+    try worksheet.writeNumber(2, 1, 1200, .none);
+    try worksheet.writeNumber(3, 1, 900, .none);
+    try worksheet.writeNumber(4, 1, 1200, .none);
+    try worksheet.writeFormula(5, 1, "=SUBTOTAL(9,B2:B5)", bold);
+
+    try worksheet.writeString(6, 0, "South", .none);
+    try worksheet.writeString(7, 0, "South", .none);
+    try worksheet.writeString(8, 0, "South", .none);
+    try worksheet.writeString(9, 0, "South", .none);
+    try worksheet.writeString(10, 0, "South Total", bold);
+
+    try worksheet.writeNumber(6, 1, 400, .none);
+    try worksheet.writeNumber(7, 1, 600, .none);
+    try worksheet.writeNumber(8, 1, 500, .none);
+    try worksheet.writeNumber(9, 1, 600, .none);
+    try worksheet.writeFormula(10, 1, "=SUBTOTAL(9,B7:B10)", bold);
+
+    try worksheet.writeString(11, 0, "Grand Total", bold);
+    try worksheet.writeFormula(11, 1, "=SUBTOTAL(9,B2:B10)", bold);
+}
+
+// This function will generate the same data and sub-totals on each worksheet.
+// Used in the examples 5-6.
+fn createColExampleData(worksheet: WorkSheet, bold: Format) !void {
+    // Add data and formulas to the worksheet.
+    try worksheet.writeString(0, 0, "Month", .none);
+    try worksheet.writeString(0, 1, "Jan", .none);
+    try worksheet.writeString(0, 2, "Feb", .none);
+    try worksheet.writeString(0, 3, "Mar", .none);
+    try worksheet.writeString(0, 4, "Apr", .none);
+    try worksheet.writeString(0, 5, "May", .none);
+    try worksheet.writeString(0, 6, "Jun", .none);
+    try worksheet.writeString(0, 7, "Total", .none);
+
+    try worksheet.writeString(1, 0, "North", .none);
+    try worksheet.writeNumber(1, 1, 50, .none);
+    try worksheet.writeNumber(1, 2, 20, .none);
+    try worksheet.writeNumber(1, 3, 15, .none);
+    try worksheet.writeNumber(1, 4, 25, .none);
+    try worksheet.writeNumber(1, 5, 65, .none);
+    try worksheet.writeNumber(1, 6, 80, .none);
+    try worksheet.writeFormula(1, 7, "=SUM(B2:G2)", .none);
+
+    try worksheet.writeString(2, 0, "South", .none);
+    try worksheet.writeNumber(2, 1, 10, .none);
+    try worksheet.writeNumber(2, 2, 20, .none);
+    try worksheet.writeNumber(2, 3, 30, .none);
+    try worksheet.writeNumber(2, 4, 50, .none);
+    try worksheet.writeNumber(2, 5, 50, .none);
+    try worksheet.writeNumber(2, 6, 50, .none);
+    try worksheet.writeFormula(2, 7, "=SUM(B3:G3)", .none);
+
+    try worksheet.writeString(3, 0, "East", .none);
+    try worksheet.writeNumber(3, 1, 45, .none);
+    try worksheet.writeNumber(3, 2, 75, .none);
+    try worksheet.writeNumber(3, 3, 50, .none);
+    try worksheet.writeNumber(3, 4, 15, .none);
+    try worksheet.writeNumber(3, 5, 75, .none);
+    try worksheet.writeNumber(3, 6, 100, .none);
+    try worksheet.writeFormula(3, 7, "=SUM(B4:G4)", .none);
+
+    try worksheet.writeString(4, 0, "West", .none);
+    try worksheet.writeNumber(4, 1, 15, .none);
+    try worksheet.writeNumber(4, 2, 15, .none);
+    try worksheet.writeNumber(4, 3, 55, .none);
+    try worksheet.writeNumber(4, 4, 35, .none);
+    try worksheet.writeNumber(4, 5, 20, .none);
+    try worksheet.writeNumber(4, 6, 50, .none);
+    try worksheet.writeFormula(4, 7, "=SUM(B5:G5)", .none);
+
+    try worksheet.writeFormula(5, 7, "=SUM(H2:H5)", bold);
+}
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xlsxwriter = @import("xlsxwriter");
+const WorkSheet = xlsxwriter.WorkSheet;
+const Format = xlsxwriter.Format;
+const xw_true = xlsxwriter.xw_true;
+const xw_false = xlsxwriter.xw_false;
+const def_row_height = xlsxwriter.def_row_height;

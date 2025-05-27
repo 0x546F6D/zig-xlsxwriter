@@ -58,9 +58,9 @@ pub inline fn getWorkSheetByName(self: WorkBook, name: [*c]const u8) WorkSheet {
 }
 
 // Get the list of worksheets
-pub inline fn getWorkSheets(self: WorkBook, allocator: std.mem.Allocator) ![]WorkSheet {
+pub inline fn getWorkSheets(self: WorkBook, allocator: std.mem.Allocator) !?[]WorkSheet {
     const nb_worksheet = self.workbook_c.?.num_worksheets;
-    if (nb_worksheet == 0) return error.NoWorksheet;
+    if (nb_worksheet == 0) return null;
 
     var worksheet_array = try std.ArrayListUnmanaged(WorkSheet).initCapacity(
         allocator,
