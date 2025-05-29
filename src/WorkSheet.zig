@@ -386,6 +386,11 @@ pub const RichStringTuple = struct {
     format: Format = .none,
     string: ?CString,
 
+    pub const default = RichStringTuple{
+        .format = .none,
+        .string = null,
+    };
+
     inline fn toC(self: RichStringTuple) c.lxw_rich_string_tuple {
         return c.lxw_rich_string_tuple{
             .format = self.format.format_c,
@@ -422,6 +427,29 @@ pub inline fn writeRichString(
         row,
         col,
         @ptrCast(rich_string_c),
+        format.format_c,
+    ));
+}
+
+pub const RichStringTupleNoAlloc = extern struct {
+    format_c: ?*c.lxw_format = null,
+    string: [*c]const u8,
+};
+
+pub const RichStringNoAllocArray: type = [:null]const ?*const RichStringTupleNoAlloc;
+// pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_t uple, format: [*c]lxw_format) lxw_error;
+pub inline fn writeRichStringNoAlloc(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    rich_string: RichStringNoAllocArray,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_rich_string(
+        self.worksheet_c,
+        row,
+        col,
+        @ptrCast(@constCast(rich_string)),
         format.format_c,
     ));
 }
@@ -1221,7 +1249,7 @@ pub const TableOptions = struct {
     total_row: bool = false,
     columns: []const TableColumn = &.{},
 
-    pub const empty: TableOptions = .{
+    pub const default: TableOptions = .{
         .name = null,
         .no_header_row = false,
         .no_autofilter = false,
@@ -1265,6 +1293,7 @@ pub inline fn addTable(
         allocator
     else
         return XlsxError.AddTable;
+
     // convert table_columns to [*c][*c]lxw_table_column
     var table_column_array = try allocator.alloc(c.lxw_table_column, options.columns.len);
     defer allocator.free(table_column_array);
@@ -1283,6 +1312,90 @@ pub inline fn addTable(
         last_row,
         last_col,
         @constCast(&options.toC(table_column_c)),
+    ));
+}
+
+pub const TableColumnNoAlloc = extern struct {
+    header: ?CString = null,
+    formula: ?CString = null,
+    total_string: ?CString = null,
+    total_function: TableTotalFunctions = .none,
+    header_format_c: ?*c.lxw_format = null,
+    format_c: ?*c.lxw_format = null,
+    total_value: f64 = 0,
+
+    pub const default: TableColumnNoAlloc = .{
+        .header = null,
+        .formula = null,
+        .total_string = null,
+        .total_function = .none,
+        .header_format_c = null,
+        .format_c = null,
+        .total_value = 0,
+    };
+};
+pub const TableColumnNoAllocArray = [:null]const ?*const TableColumnNoAlloc;
+
+pub const TableOptionsNoAlloc = struct {
+    name: ?CString = null,
+    no_header_row: Bool = Bool.false,
+    no_autofilter: Bool = Bool.false,
+    no_banded_rows: Bool = Bool.false,
+    banded_columns: Bool = Bool.false,
+    first_column: Bool = Bool.false,
+    last_column: Bool = Bool.false,
+    style_type: TableStyleType = .default,
+    style_type_number: u8 = 0,
+    total_row: Bool = Bool.false,
+    columns: TableColumnNoAllocArray = &.{},
+
+    pub const default: TableOptionsNoAlloc = .{
+        .name = null,
+        .no_header_row = Bool.false,
+        .no_autofilter = Bool.false,
+        .no_banded_rows = Bool.false,
+        .banded_columns = Bool.false,
+        .first_column = Bool.false,
+        .last_column = Bool.false,
+        .style_type = .default,
+        .style_type_number = 0,
+        .total_row = Bool.false,
+        .columns = &.{},
+    };
+
+    inline fn toC(self: TableOptionsNoAlloc) c.lxw_table_options {
+        return c.lxw_table_options{
+            .name = self.name,
+            .no_header_row = @intFromEnum(self.no_header_row),
+            .no_autofilter = @intFromEnum(self.no_autofilter),
+            .no_banded_rows = @intFromEnum(self.no_banded_rows),
+            .banded_columns = @intFromEnum(self.banded_columns),
+            .first_column = @intFromEnum(self.first_column),
+            .last_column = @intFromEnum(self.last_column),
+            .style_type = @intFromEnum(self.style_type),
+            .style_type_number = self.style_type_number,
+            .total_row = @intFromEnum(self.total_row),
+            .columns = @ptrCast(@constCast(self.columns)),
+        };
+    }
+};
+
+// pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw _col_t, options: [*c]lxw_table_options) lxw_error;
+pub inline fn addTableNoAlloc(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    last_row: u32,
+    last_col: u16,
+    options: TableOptionsNoAlloc,
+) XlsxError!void {
+    try check(c.worksheet_add_table(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        last_row,
+        last_col,
+        @constCast(&options.toC()),
     ));
 }
 
@@ -1427,8 +1540,10 @@ pub inline fn protect(
 
 const std = @import("std");
 const c = @import("lxw");
-const CString = @import("xlsxwriter.zig").CString;
-const CStringArray = @import("xlsxwriter.zig").CStringArray;
+const xwz = @import("xlsxwriter.zig");
+const CString = xwz.CString;
+const CStringArray = xwz.CStringArray;
+const Bool = xwz.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const Format = @import("Format.zig");
