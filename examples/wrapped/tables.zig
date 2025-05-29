@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet(null);
@@ -31,7 +31,10 @@ pub fn main() !void {
         worksheet1,
         "Default table with no data.",
     );
-    try worksheet1.addTable(2, 1, 6, 5, .empty);
+    worksheet1.addTable(2, 1, 6, 5, .empty) catch |err| {
+        std.debug.print("addTable error: {s}\n", .{xwz.strError(err)});
+        return err;
+    };
 
     // Example 2: Default table with data
     try write_worksheet(
@@ -391,6 +394,7 @@ fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {
     }
 }
 
+const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");

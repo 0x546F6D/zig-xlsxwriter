@@ -1,6 +1,6 @@
 const WorkSheet = @This();
 
-alloc: std.mem.Allocator,
+alloc: ?std.mem.Allocator,
 worksheet_c: ?*c.lxw_worksheet,
 
 // set functions
@@ -402,10 +402,15 @@ pub inline fn writeRichString(
     rich_string: []const RichStringTuple,
     format: Format,
 ) !void {
-    var rich_string_array = try self.alloc.alloc(c.lxw_rich_string_tuple, rich_string.len);
-    defer self.alloc.free(rich_string_array);
-    var rich_string_c = try self.alloc.allocSentinel(?*c.lxw_rich_string_tuple, rich_string.len, null);
-    defer self.alloc.free(rich_string_c);
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.WriteRichString;
+
+    var rich_string_array = try allocator.alloc(c.lxw_rich_string_tuple, rich_string.len);
+    defer allocator.free(rich_string_array);
+    var rich_string_c = try allocator.allocSentinel(?*c.lxw_rich_string_tuple, rich_string.len, null);
+    defer allocator.free(rich_string_c);
 
     for (rich_string, 0..) |tuple, i| {
         rich_string_array[i] = tuple.toC();
@@ -421,12 +426,60 @@ pub inline fn writeRichString(
     ));
 }
 
+// pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
+pub inline fn writeComment(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    string: ?CString,
+) XlsxError!void {
+    try check(c.worksheet_write_comment(
+        self.worksheet_c,
+        row,
+        col,
+        string,
+    ));
+}
+
+// pub const struct_lxw_comment_options = extern struct {
+//     visible: u8 = @import("std").mem.zeroes(u8),
+//     author: [*c]const u8 = @import("std").mem.zeroes([*c]const u8),
+//     width: u16 = @import("std").mem.zeroes(u16),
+//     height: u16 = @import("std").mem.zeroes(u16),
+//     x_scale: f64 = @import("std").mem.zeroes(f64),
+//     y_scale: f64 = @import("std").mem.zeroes(f64),
+//     color: lxw_color_t = @import("std").mem.zeroes(lxw_color_t),
+//     font_name: [*c]const u8 = @import("std").mem.zeroes([*c]const u8),
+//     font_size: f64 = @import("std").mem.zeroes(f64),
+//     font_family: u8 = @import("std").mem.zeroes(u8),
+//     start_row: lxw_row_t = @import("std").mem.zeroes(lxw_row_t),
+//     start_col: lxw_col_t = @import("std").mem.zeroes(lxw_col_t),
+//     x_offset: i32 = @import("std").mem.zeroes(i32),
+//     y_offset: i32 = @import("std").mem.zeroes(i32),
+// };
+// pub const lxw_comment_options = struct_lxw_comment_options;
+
+// pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
+pub inline fn writeCommentOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    string: ?CString,
+    options: ?CString,
+) XlsxError!void {
+    try check(c.worksheet_write_comment_opt(
+        self.worksheet_c,
+        row,
+        col,
+        string,
+        options,
+    ));
+}
+
 // pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_blank(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_write_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
 // pub extern fn worksheet_write_formula_str(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: [*c]const u8) lxw_error;
-// pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
-// pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
 
 // image functions
 pub const ImageOptions = struct {
@@ -1208,11 +1261,15 @@ pub inline fn addTable(
     last_col: u16,
     options: TableOptions,
 ) !void {
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.AddTable;
     // convert table_columns to [*c][*c]lxw_table_column
-    var table_column_array = try self.alloc.alloc(c.lxw_table_column, options.columns.len);
-    defer self.alloc.free(table_column_array);
-    var table_column_c = try self.alloc.allocSentinel(?*c.lxw_table_column, options.columns.len, null);
-    defer self.alloc.free(table_column_c);
+    var table_column_array = try allocator.alloc(c.lxw_table_column, options.columns.len);
+    defer allocator.free(table_column_array);
+    var table_column_c = try allocator.allocSentinel(?*c.lxw_table_column, options.columns.len, null);
+    defer allocator.free(table_column_c);
 
     for (options.columns, 0..) |column, i| {
         table_column_array[i] = column.toC();

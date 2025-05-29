@@ -64,6 +64,9 @@ pub const XlsxError = error{
     AddFormat,
     AddChart,
     ChartAddSeries,
+    GetWorkSheets,
+    WriteRichString,
+    AddTable,
 };
 
 pub inline fn checkResult(error_code: c_uint) XlsxError!void {
@@ -101,7 +104,7 @@ pub inline fn checkResult(error_code: c_uint) XlsxError!void {
     };
 }
 
-pub inline fn strError(err: XlsxError) []const u8 {
+pub inline fn strError(err: anyerror) []const u8 {
     const error_code: ?result_enum = switch (err) {
         error.MemoryMallocFailed => .memory_malloc_failed,
         error.CreatingXlsxFile => .creating_xlsx_file,
@@ -140,7 +143,16 @@ pub inline fn strError(err: XlsxError) []const u8 {
         error.AddFormat => "add_format() returned a null pointer.",
         error.AddChart => "add_chart() returned a null pointer.",
         error.ChartAddSeries => "chart_add_series() returned a null pointer.",
-        else => "xlsxwriter returned an unknown error",
+        error.GetWorkSheets => "No Allocator provided to initWorkBook(), getWorkSheets() cannot be called.",
+        error.WriteRichString =>
+        \\No Allocator provided to initWorkBook(), writeRichString() cannot be called,
+        \\ > Provide Allocator or use writeRichStringNoAlloc() instead.
+        ,
+        error.AddTable =>
+        \\No Allocator provided to initWorkBook(), addTables() cannot be called,
+        \\ > Provide Allocator or use addTablesNoAlloc() instead.
+        ,
+        else => "unknown error, might not be an xlsxwriter error",
     };
 }
 

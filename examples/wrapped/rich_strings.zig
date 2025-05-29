@@ -5,7 +5,9 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    // pass an 'Allocator' to initWorkBook() because we use the writeRichString() function
+    // Use writeRichStringNoAlloc() if you do not want to use allocation
+    const workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -53,7 +55,10 @@ pub fn main() !void {
         fragment13,
         fragment14,
     };
-    try worksheet.writeRichString(0, 0, rich_string1, .none);
+    worksheet.writeRichString(0, 0, rich_string1, .none) catch |err| {
+        std.debug.print("writeSrichString error: {s}\n", .{xwz.strError(err)});
+        return err;
+    };
 
     // Example 2: Red and blue text
 
@@ -113,6 +118,7 @@ pub fn main() !void {
     try worksheet.writeRichString(6, 0, rich_string4, center);
 }
 
+const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");

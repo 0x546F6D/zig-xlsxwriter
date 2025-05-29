@@ -1,20 +1,21 @@
-//
-// An example of writing cell comments to a worksheet using libxlsxwriter.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-comments1.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
 
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Hello", null);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    _ = xlsxwriter.worksheet_write_comment(worksheet, 0, 0, "This is a comment");
+    // Create a workbook and add a worksheet.
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    defer workbook.deinit() catch {};
 
-    _ = xlsxwriter.workbook_close(workbook);
+    const worksheet = try workbook.addWorkSheet(null);
+
+    try worksheet.writeString(0, 0, "Hello", null);
+
+    try worksheet.writeComment(0, 0, "This is a comment");
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");

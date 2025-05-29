@@ -19,7 +19,7 @@ pub fn main() !void {
     };
 
     // Create a new workbook with options
-    var workbook = try xwz.initWorkBookOpt(alloc, null, options);
+    const workbook = try xwz.initWorkBookOpt(null, null, options);
     const worksheet = try workbook.addWorkSheet(null);
 
     try worksheet.writeString(0, 0, "Hello", .none);

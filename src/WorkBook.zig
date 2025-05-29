@@ -1,11 +1,11 @@
 const WorkBook = @This();
 
-alloc: std.mem.Allocator,
+alloc: ?std.mem.Allocator = null,
 workbook_c: ?*c.lxw_workbook,
 worksheets: ?[]WorkSheet = null,
 
 // pub extern fn workbook_new(filename: [*c]const u8) [*c]lxw_workbook;
-pub inline fn new(alloc: std.mem.Allocator, filename: ?CString) XlsxError!WorkBook {
+pub inline fn new(alloc: ?std.mem.Allocator, filename: ?CString) XlsxError!WorkBook {
     return WorkBook{
         .alloc = alloc,
         .workbook_c = c.workbook_new(filename) orelse return XlsxError.NewWorkBook,
@@ -42,7 +42,7 @@ pub const WorkBookOptions = struct {
 
 // pub extern fn workbook_new_opt(filename: [*c]const u8, options: [*c]lxw_workbook_options) [*c]lxw_workbook;
 pub inline fn newOpt(
-    alloc: std.mem.Allocator,
+    alloc: ?std.mem.Allocator,
     filename: ?CString,
     options: WorkBookOptions,
 ) XlsxError!WorkBook {
@@ -57,7 +57,7 @@ pub inline fn newOpt(
 
 // pub extern fn workbook_close(workbook: [*c]lxw_workbook) lxw_error;
 pub inline fn deinit(self: WorkBook) XlsxError!void {
-    if (self.worksheets) |worksheets| self.alloc.free(worksheets);
+    if (self.worksheets) |worksheets| self.alloc.?.free(worksheets);
     try check(c.workbook_close(self.workbook_c));
 }
 
@@ -100,15 +100,20 @@ pub inline fn getWorkSheetByName(self: WorkBook, name: ?CString) WorkSheet {
 
 // Get the list of worksheets
 pub inline fn getWorkSheets(self: *WorkBook) !?[]WorkSheet {
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.GetWorkSheets;
     // clean-up previous list of worksheets
     if (self.worksheets) |worksheets| {
-        self.alloc.free(worksheets);
+        allocator.free(worksheets);
         self.worksheets = null;
     }
     const nb_worksheet = self.workbook_c.?.num_worksheets;
     if (nb_worksheet == 0) return null;
 
-    var worksheet_array = try self.alloc.alloc(WorkSheet, nb_worksheet);
+    var worksheet_array = try allocator.alloc(WorkSheet, nb_worksheet);
+    // var worksheet_array = try self.alloc.alloc(WorkSheet, nb_worksheet);
 
     var worksheet_c: ?*c.lxw_worksheet = self.workbook_c.?.worksheets.*.stqh_first;
     for (0..nb_worksheet) |i| {

@@ -5,7 +5,9 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    // pass an 'Allocator' to initWorkBook() because we use the writeRichString() function
+    // Use writeRichStringNoAlloc() if you do not want to use allocation
+    const workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -54,9 +56,13 @@ pub fn main() !void {
     // We then overwrite the first merged cell with a rich string. Note that
     // we must also pass the cell format used in the merged cells format at
     // the end.
-    try worksheet.writeRichString(1, 1, rich_string, merge_format);
+    worksheet.writeRichString(1, 1, rich_string, merge_format) catch |err| {
+        std.debug.print("writeSrichString error: {s}\n", .{xwz.strError(err)});
+        return err;
+    };
 }
 
+const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");

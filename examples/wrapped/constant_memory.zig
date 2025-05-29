@@ -17,7 +17,7 @@ pub fn main() !void {
     };
 
     // Create a new workbook with options
-    var workbook = try xwz.initWorkBookOpt(alloc, xlsx_path.ptr, options);
+    const workbook = try xwz.initWorkBookOpt(null, xlsx_path.ptr, options);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);

@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
 
     // Add a worksheet with a user defined sheet name
     const worksheet1 = try workbook.addWorkSheet("Demo");

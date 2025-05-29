@@ -32,7 +32,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     // get image path
