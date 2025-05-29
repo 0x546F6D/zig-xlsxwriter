@@ -1,6 +1,7 @@
-pub const StringArray: type = [:null]const ?[*:0]const u8;
+pub const CString = [*:0]const u8;
+pub const CStringArray: type = [:null]const ?CString;
 
-pub const c = @import("xlsxwriter_c");
+pub const c = @import("lxw");
 pub const xw_true = c.LXW_TRUE;
 pub const xw_false = c.LXW_FALSE;
 pub const explicit_false = c.LXW_EXPLICIT_FALSE;
@@ -24,16 +25,15 @@ pub const WorkBook = @import("WorkBook.zig");
 pub const initWorkBook = WorkBook.new;
 pub const WorkBookOptions = WorkBook.WorkBookOptions;
 pub const initWorkBookOpt = WorkBook.newOpt;
+pub const DocProperties = WorkBook.DocProperties;
 
 pub const WorkSheet = @import("WorkSheet.zig");
 pub const RowColOptions = WorkSheet.RowColOptions;
 pub const RichStringTuple = WorkSheet.RichStringTuple;
-pub const RichStringType = WorkSheet.RichStringType;
 pub const ImageOptions = WorkSheet.ImageOptions;
 pub const DataValidation = WorkSheet.DataValidation;
 pub const ConditionalFormat = WorkSheet.ConditionalFormat;
 pub const TableColumn = WorkSheet.TableColumn;
-pub const TableColumnArray = WorkSheet.TableColumnArray;
 pub const TableOptions = WorkSheet.TableOptions;
 pub const HeaderFooterOptions = WorkSheet.HeaderFooterOptions;
 pub const RowBreaks = WorkSheet.RowBreaks;

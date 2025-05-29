@@ -25,20 +25,6 @@ const data = [_]WorksheetData{
     .{ .col1 = "South", .col2 = "Hector", .col3 = "Apple", .col4 = 9814 },
 };
 
-fn writeWorksheetData(worksheet: WorkSheet, header: Format) !void {
-    try worksheet.writeString(0, 0, "Region", header);
-    try worksheet.writeString(0, 1, "Sales Rep", header);
-    try worksheet.writeString(0, 2, "Product", header);
-    try worksheet.writeString(0, 3, "Units", header);
-
-    for (data, 1..) |item, row| {
-        try worksheet.writeString(@intCast(row), 0, item.col1.ptr, .none);
-        try worksheet.writeString(@intCast(row), 1, item.col2.ptr, .none);
-        try worksheet.writeString(@intCast(row), 2, item.col3.ptr, .none);
-        try worksheet.writeNumber(@intCast(row), 3, @floatFromInt(item.col4), .none);
-    }
-}
-
 pub fn main() !void {
     defer _ = dbga.deinit();
 
@@ -46,7 +32,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Filter");
@@ -304,9 +290,23 @@ pub fn main() !void {
     try worksheet10.writeString(2, 0, "Frood", .none);
 }
 
+fn writeWorksheetData(worksheet: WorkSheet, header: Format) !void {
+    try worksheet.writeString(0, 0, "Region", header);
+    try worksheet.writeString(0, 1, "Sales Rep", header);
+    try worksheet.writeString(0, 2, "Product", header);
+    try worksheet.writeString(0, 3, "Units", header);
+
+    for (data, 1..) |item, row| {
+        try worksheet.writeString(@intCast(row), 0, item.col1.ptr, .none);
+        try worksheet.writeString(@intCast(row), 1, item.col2.ptr, .none);
+        try worksheet.writeString(@intCast(row), 2, item.col3.ptr, .none);
+        try worksheet.writeNumber(@intCast(row), 3, @floatFromInt(item.col4), .none);
+    }
+}
+
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;
+const Format = xwz.Format;

@@ -101,7 +101,7 @@ pub inline fn checkResult(error_code: c_uint) XlsxError!void {
     };
 }
 
-pub inline fn strError(err: XlsxError) [*c]const u8 {
+pub inline fn strError(err: XlsxError) []const u8 {
     const error_code: ?result_enum = switch (err) {
         error.MemoryMallocFailed => .memory_malloc_failed,
         error.CreatingXlsxFile => .creating_xlsx_file,
@@ -133,7 +133,7 @@ pub inline fn strError(err: XlsxError) [*c]const u8 {
         else => null,
     };
     if (error_code) |code| {
-        return c.lxw_strerror(@intCast(@intFromEnum(code)));
+        return std.mem.span(c.lxw_strerror(@intCast(@intFromEnum(code))));
     } else return switch (err) {
         error.NewWorkBook => "new_workbook() returned a null pointer.",
         error.AddWorkSheet => "add_worksheet() returned a null pointer.",
@@ -144,4 +144,7 @@ pub inline fn strError(err: XlsxError) [*c]const u8 {
     };
 }
 
-const c = @import("xlsxwriter_c");
+const std = @import("std");
+const c = @import("lxw");
+const CString = @import("xlsxwriter.zig").CString;
+const CStringArray = @import("xlsxwriter.zig").CStringArray;

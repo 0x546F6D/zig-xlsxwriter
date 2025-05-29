@@ -7,11 +7,11 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
     // A datetime to display.
-    var datetime = xlsxwriter.lxw_datetime{
+    var datetime = lxw.lxw_datetime{
         .year = 2013,
         .month = 2,
         .day = 28,
@@ -20,21 +20,21 @@ pub fn main() !void {
         .sec = 0.0,
     };
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times02.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-dates_and_times02.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Add a format with date formatting.
-    const format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
+    const format = lxw.workbook_add_format(workbook);
+    _ = lxw.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 0, 20, null);
 
     // Write the datetime without formatting.
-    _ = xlsxwriter.worksheet_write_datetime(worksheet, 0, 0, &datetime, null); // 41333.5
+    _ = lxw.worksheet_write_datetime(worksheet, 0, 0, &datetime, null); // 41333.5
 
     // Write the datetime with formatting.
-    _ = xlsxwriter.worksheet_write_datetime(worksheet, 1, 0, &datetime, format); // Feb 28 2013 12:00 PM
+    _ = lxw.worksheet_write_datetime(worksheet, 1, 0, &datetime, format); // Feb 28 2013 12:00 PM
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

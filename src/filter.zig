@@ -15,7 +15,7 @@ pub const FilterCriteria = enum(c_int) {
 
 pub const FilterRule = struct {
     criteria: FilterCriteria,
-    value_string: [*c]const u8 = null,
+    value_string: ?CString = null,
     value: f64 = 0,
 };
 
@@ -82,7 +82,7 @@ pub inline fn filterColumn2(
 pub inline fn filterList(
     self: WorkSheet,
     col: u16,
-    list: StringArray,
+    list: CStringArray,
 ) !void {
     try check(c.worksheet_filter_list(
         self.worksheet_c,
@@ -92,8 +92,9 @@ pub inline fn filterList(
 }
 
 const Allocator = @import("std").mem.Allocator;
-const c = @import("xlsxwriter_c");
-const StringArray = @import("xlsxwriter").StringArray;
+const c = @import("lxw");
+const CString = @import("xlsxwriter.zig").CString;
+const CStringArray = @import("xlsxwriter.zig").CStringArray;
 const WorkSheet = @import("WorkSheet.zig");
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;

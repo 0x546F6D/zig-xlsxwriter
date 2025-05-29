@@ -65,7 +65,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     // set header format
@@ -81,7 +81,7 @@ pub fn main() !void {
     const worksheet6 = try workbook.addWorkSheet(null);
     const worksheet7 = try workbook.addWorkSheet(null);
 
-    const hidden: xlsxwriter.RowColOptions = .{ .hidden = xlsxwriter.xw_true };
+    const hidden: xwz.RowColOptions = .{ .hidden = true };
 
     // Example 1. Autofilter without conditions.
     try prepWorkSheet(worksheet1, header);
@@ -90,7 +90,7 @@ pub fn main() !void {
     try prepWorkSheet(worksheet2, header);
 
     // Add the filter criteria
-    const filter_rule2: xlsxwriter.FilterRule = .{
+    const filter_rule2: xwz.FilterRule = .{
         .criteria = .equal_to,
         .value_string = "East",
     };
@@ -102,7 +102,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "East")) {
-            try worksheet2.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet2.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 
@@ -110,22 +110,22 @@ pub fn main() !void {
     try prepWorkSheet(worksheet3, header);
 
     // Add the filter criterias
-    const filter_rule3a: xlsxwriter.FilterRule = .{
+    const filter_rule3a: xwz.FilterRule = .{
         .criteria = .equal_to,
         .value_string = "East",
     };
-    const filter_rule3b: xlsxwriter.FilterRule = .{
+    const filter_rule3b: xwz.FilterRule = .{
         .criteria = .equal_to,
         .value_string = "South",
     };
-    try worksheet3.filterColumn2(0, filter_rule3a, filter_rule3b, xlsxwriter.filter_or);
+    try worksheet3.filterColumn2(0, filter_rule3a, filter_rule3b, xwz.filter_or);
 
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "East") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet3.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet3.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 
@@ -133,27 +133,27 @@ pub fn main() !void {
     try prepWorkSheet(worksheet4, header);
 
     // Add the filter criteria
-    const filter_rule4a: xlsxwriter.FilterRule = .{
+    const filter_rule4a: xwz.FilterRule = .{
         .criteria = .equal_to,
         .value_string = "East",
     };
-    const filter_rule4b: xlsxwriter.FilterRule = .{
+    const filter_rule4b: xwz.FilterRule = .{
         .criteria = .greater_than,
         .value = 3000,
     };
-    const filter_rule4c: xlsxwriter.FilterRule = .{
+    const filter_rule4c: xwz.FilterRule = .{
         .criteria = .less_than,
         .value = 8000,
     };
     try worksheet4.filterColumn(0, filter_rule4a);
-    try worksheet4.filterColumn2(2, filter_rule4b, filter_rule4c, xlsxwriter.filter_and);
+    try worksheet4.filterColumn2(2, filter_rule4b, filter_rule4c, xwz.filter_and);
 
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "East") or
             row.volume < 3000 or row.volume > 8000)
         {
-            try worksheet4.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet4.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 
@@ -161,7 +161,7 @@ pub fn main() !void {
     try prepWorkSheet(worksheet5, header);
 
     // Add the filter list
-    const list_rule5: xlsxwriter.StringArray = &.{ "East", "North", "South" };
+    const list_rule5: xwz.CStringArray = &.{ "East", "North", "South" };
     try worksheet5.filterList(0, list_rule5);
 
     // Hide rows that don't match the filter
@@ -170,7 +170,7 @@ pub fn main() !void {
             !std.mem.eql(u8, row.region, "North") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet5.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet5.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 
@@ -180,14 +180,14 @@ pub fn main() !void {
     try prepWorkSheet(worksheet6, header);
 
     // Add the filter criteria
-    const filter_rule6: xlsxwriter.FilterRule = .{ .criteria = .blanks };
+    const filter_rule6: xwz.FilterRule = .{ .criteria = .blanks };
 
     try worksheet6.filterColumn(0, filter_rule6);
 
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "")) {
-            try worksheet6.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet6.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 
@@ -195,13 +195,13 @@ pub fn main() !void {
     try prepWorkSheet(worksheet7, header);
 
     // Add the filter criteria
-    const filter_rule7: xlsxwriter.FilterRule = .{ .criteria = .non_blanks };
+    const filter_rule7: xwz.FilterRule = .{ .criteria = .non_blanks };
     try worksheet7.filterColumn(0, filter_rule7);
 
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (std.mem.eql(u8, row.region, "")) {
-            try worksheet7.setRowOpt(@intCast(i), xlsxwriter.def_row_height, .none, hidden);
+            try worksheet7.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
         }
     }
 }
@@ -240,6 +240,6 @@ const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;
+const Format = xwz.Format;

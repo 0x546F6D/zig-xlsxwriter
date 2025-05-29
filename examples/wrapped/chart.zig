@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -21,26 +21,21 @@ pub fn main() !void {
     _ = try chart.addSeries(null, "Sheet1!$B$1:$B$5");
     _ = try chart.addSeries(null, "Sheet1!$C$1:$C$5");
 
-    var font: ChartFont = .{
-        .name = @constCast("Chart example"),
-        .bold = xlsxwriter.explicit_false,
-        .color = @intFromEnum(xlsxwriter.DefinedColor.blue),
-        .italic = xlsxwriter.explicit_false,
-        .size = 16,
-        .rotation = 0,
-        .underline = 0,
-        .charset = 0,
-        .pitch_family = 0,
-        .baseline = 0,
+    const font: ChartFont = .{
+        .bold = false,
+        .color = @enumFromInt(0x0000FF),
     };
 
-    chart.titleSetName("Year End Results", &font);
+    chart.titleSetName("Year End Results");
+    chart.titleSetNameFont(font);
 
     // Insert the chart into the worksheet.
-    try worksheet.insertChart(xlsxwriter.nameToRow("B7"), xlsxwriter.nameToCol("B7"), chart);
+    const cell = xwz.cell("B7");
+    try worksheet.insertChart(cell.row, cell.col, chart);
+    // try worksheet.insertChart(xwz.nameToRow("B7"), xlsxwriter.nameToCol("B7"), chart);
 }
 
-fn write_worksheet_data(worksheet: xlsxwriter.WorkSheet) !void {
+fn write_worksheet_data(worksheet: xwz.WorkSheet) !void {
     const data: [5][3]f64 = .{
         [3]f64{ 1, 2, 3 },
         [3]f64{ 2, 4, 6 },
@@ -59,6 +54,6 @@ fn write_worksheet_data(worksheet: xlsxwriter.WorkSheet) !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const ChartType = xlsxwriter.ChartType;
-const ChartFont = xlsxwriter.ChartFont;
+const xwz = @import("xlsxwriter");
+const ChartType = xwz.ChartType;
+const ChartFont = xwz.ChartFont;

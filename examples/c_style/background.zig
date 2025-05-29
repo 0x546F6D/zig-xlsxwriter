@@ -6,7 +6,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 const mktmp = @import("mktmp");
 
 // Embed the logo image directly into the executable
@@ -31,12 +31,12 @@ pub fn main() !void {
 
     // Create the workbook and add a worksheet
     const workbook =
-        xlsxwriter.workbook_new(
+        lxw.workbook_new(
             "zig-background.xlsx",
         );
 
     const worksheet =
-        xlsxwriter.workbook_add_worksheet(
+        lxw.workbook_add_worksheet(
             workbook,
             null,
         );
@@ -47,13 +47,13 @@ pub fn main() !void {
         [*c]const u8,
         @ptrCast(tmp_file.path.ptr),
     );
-    _ = xlsxwriter.worksheet_set_background(
+    _ = lxw.worksheet_set_background(
         worksheet,
         c_path,
     );
 
     // Close the workbook
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 
     // The temporary file will be automatically cleaned up by the defer statement
 }

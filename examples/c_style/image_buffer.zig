@@ -7,7 +7,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 // Simple array with some PNG data
 const image_buffer = [_]u8{
@@ -34,20 +34,20 @@ const image_size = 200;
 
 pub fn main() !void {
     // Create a new workbook and add a worksheet
-    const workbook = xlsxwriter.workbook_new("zig-image_buffer.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-image_buffer.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // In Zig, we need to convert the cell reference to row and column
-    const row_b3 = xlsxwriter.lxw_name_to_row("B3");
-    const col_b3 = xlsxwriter.lxw_name_to_col("B3");
-    const row_b7 = xlsxwriter.lxw_name_to_row("B7");
-    const col_b7 = xlsxwriter.lxw_name_to_col("B7");
+    const row_b3 = lxw.lxw_name_to_row("B3");
+    const col_b3 = lxw.lxw_name_to_col("B3");
+    const row_b7 = lxw.lxw_name_to_row("B7");
+    const col_b7 = lxw.lxw_name_to_col("B7");
 
     // Get a pointer to the image buffer
     const image_ptr = @as([*c]const u8, &image_buffer);
 
     // Insert the image from the buffer
-    _ = xlsxwriter.worksheet_insert_image_buffer(
+    _ = lxw.worksheet_insert_image_buffer(
         worksheet,
         row_b3,
         col_b3,
@@ -56,7 +56,7 @@ pub fn main() !void {
     );
 
     // Create options for the second image
-    var options = xlsxwriter.lxw_image_options{
+    var options = lxw.lxw_image_options{
         .x_offset = 34,
         .y_offset = 4,
         .x_scale = 2,
@@ -68,7 +68,7 @@ pub fn main() !void {
     };
 
     // Insert the image from the same buffer, with some options
-    _ = xlsxwriter.worksheet_insert_image_buffer_opt(
+    _ = lxw.worksheet_insert_image_buffer_opt(
         worksheet,
         row_b7,
         col_b7,
@@ -77,5 +77,5 @@ pub fn main() !void {
         &options,
     );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
 
     // Add a worksheet with a user defined sheet name
     const worksheet1 = try workbook.addWorkSheet("Demo");
@@ -45,7 +45,7 @@ pub fn main() !void {
 
     // Close the workbook, save the file and free any memory
     workbook.deinit() catch |err| {
-        std.debug.print("Error in workbook.deinit().\nError = {s}\n", .{xlsxwriter.strError(err)});
+        std.debug.print("Error in workbook.deinit().\nError = {s}\n", .{xwz.strError(err)});
         return err;
     };
 }
@@ -54,4 +54,4 @@ const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

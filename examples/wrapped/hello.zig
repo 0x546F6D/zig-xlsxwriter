@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -16,4 +16,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

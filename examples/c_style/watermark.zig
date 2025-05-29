@@ -7,7 +7,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 const mktmp = @import("mktmp");
 
 const watermarkImageData = @embedFile("watermark.png");
@@ -36,28 +36,28 @@ pub fn main() !void {
         @ptrCast(tmp_file.path.ptr),
     );
     const workbook =
-        xlsxwriter.workbook_new(
+        lxw.workbook_new(
             "zig-watermark.xlsx",
         );
     const worksheet =
-        xlsxwriter.workbook_add_worksheet(
+        lxw.workbook_add_worksheet(
             workbook,
             null,
         );
 
     // Set a worksheet header with the watermark image.
     var header_options =
-        xlsxwriter.lxw_header_footer_options{
+        lxw.lxw_header_footer_options{
             .image_left = null,
             .image_center = c_path,
             .image_right = null,
         };
 
-    _ = xlsxwriter.worksheet_set_header_opt(
+    _ = lxw.worksheet_set_header_opt(
         worksheet,
         "&C&[Picture]",
         &header_options,
     );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

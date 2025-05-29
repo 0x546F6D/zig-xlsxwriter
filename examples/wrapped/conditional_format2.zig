@@ -1,25 +1,3 @@
-// Write some data to the worksheet.
-fn writeWorksheetData(worksheet: WorkSheet) !void {
-    const data = [_][10]u8{
-        .{ 34, 72, 38, 30, 75, 48, 75, 66, 84, 86 },
-        .{ 6, 24, 1, 84, 54, 62, 60, 3, 26, 59 },
-        .{ 28, 79, 97, 13, 85, 93, 93, 22, 5, 14 },
-        .{ 27, 71, 40, 17, 18, 79, 90, 93, 29, 47 },
-        .{ 88, 25, 33, 23, 67, 1, 59, 79, 47, 36 },
-        .{ 24, 100, 20, 88, 29, 33, 38, 54, 54, 88 },
-        .{ 6, 57, 88, 28, 10, 26, 37, 7, 41, 48 },
-        .{ 52, 78, 1, 96, 26, 45, 47, 33, 96, 36 },
-        .{ 60, 54, 81, 66, 81, 90, 80, 93, 12, 55 },
-        .{ 70, 5, 46, 14, 71, 19, 66, 36, 41, 21 },
-    };
-
-    for (data, 0..) |array, row| {
-        for (array, 0..) |val, col| {
-            try worksheet.writeNumber(@intCast(row + 2), @intCast(col + 1), @floatFromInt(val), .none);
-        }
-    }
-}
-
 pub fn main() !void {
     defer _ = dbga.deinit();
 
@@ -27,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet(null);
@@ -51,7 +29,7 @@ pub fn main() !void {
     format2.setFontColor(@enumFromInt(0x006100));
 
     // Create a single conditional format object to reuse in the examples.
-    var conditional_format: xlsxwriter.ConditionalFormat = .empty;
+    var conditional_format: xwz.ConditionalFormat = .none;
 
     // Example 1. Conditional formatting based on simple cell based criteria.
     try writeWorksheetData(worksheet1);
@@ -66,11 +44,11 @@ pub fn main() !void {
     conditional_format.type = .cell;
     conditional_format.criteria = .greater_than_or_equal_to;
     conditional_format.value = 50;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     try worksheet1.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.criteria = .less_than;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     try worksheet1.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     // Example 2. Conditional formatting based on max and min values.
@@ -86,13 +64,13 @@ pub fn main() !void {
     conditional_format.criteria = .between;
     conditional_format.min_value = 30;
     conditional_format.max_value = 70;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     try worksheet2.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.criteria = .not_between;
     conditional_format.min_value = 30;
     conditional_format.max_value = 70;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     try worksheet2.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     // Example 3. Conditional formatting with duplicate and unique values.
@@ -106,11 +84,11 @@ pub fn main() !void {
     );
 
     conditional_format.type = .duplicate;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     try worksheet3.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.type = .unique;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     try worksheet3.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     // Example 4. Conditional formatting with above and below average values.
@@ -125,16 +103,16 @@ pub fn main() !void {
 
     conditional_format.type = .average;
     conditional_format.criteria = .average_above;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     try worksheet4.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.criteria = .average_below;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     try worksheet4.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     // Example 5. Conditional formatting with top and bottom values.
     try writeWorksheetData(worksheet5);
-    conditional_format = .empty;
+    conditional_format = .none;
 
     try worksheet5.writeString(
         0,
@@ -145,12 +123,12 @@ pub fn main() !void {
 
     conditional_format.type = .top;
     conditional_format.value = 10;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     try worksheet5.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.type = .bottom;
     conditional_format.value = 10;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     try worksheet5.conditionalFormatRange(2, 5, 11, 10, conditional_format);
 
     // Example 6. Conditional formatting with multiple ranges.
@@ -166,18 +144,18 @@ pub fn main() !void {
     conditional_format.type = .cell;
     conditional_format.criteria = .greater_than_or_equal_to;
     conditional_format.value = 50;
-    conditional_format.format_c = format1.format_c;
+    conditional_format.format = format1;
     conditional_format.multi_range = "B3:K6 B9:K12";
     try worksheet6.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     conditional_format.criteria = .less_than;
     conditional_format.value = 50;
-    conditional_format.format_c = format2.format_c;
+    conditional_format.format = format2;
     conditional_format.multi_range = "B3:K6 B9:K12";
     try worksheet6.conditionalFormatRange(2, 1, 11, 10, conditional_format);
 
     // Reset the options before the next example.
-    conditional_format = .empty;
+    conditional_format = .none;
 
     // Example 7. Conditional formatting with 2 color scales.
     // Write the worksheet data.
@@ -211,7 +189,7 @@ pub fn main() !void {
     try worksheet7.conditionalFormatRange(2, 3, 13, 3, conditional_format);
 
     // Reset the colors before the next example.
-    conditional_format = .empty;
+    conditional_format = .none;
 
     // 3 color scale with standard colors.
     conditional_format.type = .color_3_scale;
@@ -260,40 +238,40 @@ pub fn main() !void {
     try worksheet8.conditionalFormatRange(2, 1, 13, 1, conditional_format);
 
     // Data bars with border.
-    conditional_format.bar_only = xlsxwriter.xw_true;
+    conditional_format.bar_only = true;
     // conditional_format.bar_border_color = .black;
     try worksheet8.conditionalFormatRange(2, 3, 13, 3, conditional_format);
 
     // User defined color.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .data_bar;
     conditional_format.bar_color = @enumFromInt(0x63C384);
     try worksheet8.conditionalFormatRange(2, 5, 13, 5, conditional_format);
 
     // Same color for negative values.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .data_bar;
-    conditional_format.bar_solid = xlsxwriter.xw_true;
+    conditional_format.bar_solid = true;
     // conditional_format.bar_negative_color_same = 1;
     try worksheet8.conditionalFormatRange(2, 7, 13, 7, conditional_format);
 
     // Right to left.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .data_bar;
     conditional_format.bar_direction = .right_to_left;
     try worksheet8.conditionalFormatRange(2, 9, 13, 9, conditional_format);
 
     // Excel 2010 style.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .data_bar;
-    conditional_format.data_bar_2010 = 1;
+    conditional_format.data_bar_2010 = true;
     try worksheet8.conditionalFormatRange(2, 11, 13, 11, conditional_format);
 
     // Zero axis.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .data_bar;
-    conditional_format.bar_negative_color_same = xlsxwriter.xw_true;
-    conditional_format.bar_negative_border_color_same = xlsxwriter.xw_true;
+    conditional_format.bar_negative_color_same = true;
+    conditional_format.bar_negative_border_color_same = true;
     try worksheet8.conditionalFormatRange(2, 13, 13, 13, conditional_format);
 
     // Example 9. Conditional formatting with icon sets.
@@ -322,7 +300,7 @@ pub fn main() !void {
     try worksheet9.writeNumber(8, 5, 5, .none);
 
     // Reset the conditional format.
-    conditional_format = .empty;
+    conditional_format = .none;
 
     // Three traffic lights (default style).
     conditional_format.type = .icon_sets;
@@ -330,19 +308,19 @@ pub fn main() !void {
     try worksheet9.conditionalFormatRange(2, 1, 2, 3, conditional_format);
 
     // Three traffic lights (unrimmed style).
-    conditional_format.reverse_icons = xlsxwriter.xw_true;
+    conditional_format.reverse_icons = true;
     try worksheet9.conditionalFormatRange(3, 1, 3, 3, conditional_format);
 
     // Three traffic lights (unrimmed style).
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .icon_sets;
     conditional_format.icon_style = .icons_3_traffic_lights_unrimmed;
-    conditional_format.icons_only = xlsxwriter.xw_true;
+    conditional_format.icons_only = true;
     // conditional_format.icon_style = .icons_3_traffic_lights_unrimmed;
     try worksheet9.conditionalFormatRange(4, 1, 4, 3, conditional_format);
 
     // Three arrows.
-    conditional_format = .empty;
+    conditional_format = .none;
     conditional_format.type = .icon_sets;
     conditional_format.icon_style = .icons_3_arrows_colored;
     try worksheet9.conditionalFormatRange(5, 1, 5, 3, conditional_format);
@@ -360,9 +338,30 @@ pub fn main() !void {
     try worksheet9.conditionalFormatRange(8, 1, 8, 5, conditional_format);
 }
 
+// Write some data to the worksheet.
+fn writeWorksheetData(worksheet: WorkSheet) !void {
+    const data = [_][10]u8{
+        .{ 34, 72, 38, 30, 75, 48, 75, 66, 84, 86 },
+        .{ 6, 24, 1, 84, 54, 62, 60, 3, 26, 59 },
+        .{ 28, 79, 97, 13, 85, 93, 93, 22, 5, 14 },
+        .{ 27, 71, 40, 17, 18, 79, 90, 93, 29, 47 },
+        .{ 88, 25, 33, 23, 67, 1, 59, 79, 47, 36 },
+        .{ 24, 100, 20, 88, 29, 33, 38, 54, 54, 88 },
+        .{ 6, 57, 88, 28, 10, 26, 37, 7, 41, 48 },
+        .{ 52, 78, 1, 96, 26, 45, 47, 33, 96, 36 },
+        .{ 60, 54, 81, 66, 81, 90, 80, 93, 12, 55 },
+        .{ 70, 5, 46, 14, 71, 19, 66, 36, 41, 21 },
+    };
+
+    for (data, 0..) |array, row| {
+        for (array, 0..) |val, col| {
+            try worksheet.writeNumber(@intCast(row + 2), @intCast(col + 1), @floatFromInt(val), .none);
+        }
+    }
+}
+
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;

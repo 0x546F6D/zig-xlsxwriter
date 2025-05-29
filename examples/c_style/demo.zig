@@ -6,7 +6,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 const mktmp = @import("mktmp");
 
 // Embed the logo image directly into the executable
@@ -30,27 +30,27 @@ pub fn main() !void {
     try tmp_file.write(logo_data);
 
     // Create a new workbook and add a worksheet.
-    const workbook = xlsxwriter.workbook_new("zig-demo.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-demo.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Add a format.
-    const format = xlsxwriter.workbook_add_format(workbook);
+    const format = lxw.workbook_add_format(workbook);
 
     // Set the bold property for the format
-    _ = xlsxwriter.format_set_bold(format);
+    _ = lxw.format_set_bold(format);
 
     // Change the column width for clarity.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 0, 20, null);
 
     // Write some simple text.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Hello", null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 0, "Hello", null);
 
     // Text with formatting.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 0, "World", format);
+    _ = lxw.worksheet_write_string(worksheet, 1, 0, "World", format);
 
     // Write some numbers.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 2, 0, 123, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 3, 0, 123.456, null);
+    _ = lxw.worksheet_write_number(worksheet, 2, 0, 123, null);
+    _ = lxw.worksheet_write_number(worksheet, 3, 0, 123.456, null);
 
     // Insert an image using the temporary file path
     // Convert the path to a null-terminated C string pointer
@@ -58,7 +58,7 @@ pub fn main() !void {
         [*c]const u8,
         @ptrCast(tmp_file.path.ptr),
     );
-    _ = xlsxwriter.worksheet_insert_image(worksheet, 1, 2, c_path);
+    _ = lxw.worksheet_insert_image(worksheet, 1, 2, c_path);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

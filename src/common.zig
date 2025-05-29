@@ -32,4 +32,4 @@ const schema_package = c.LXW_SCHEMA_PACKAGE;
 const schema_document = c.LXW_SCHEMA_DOCUMENT;
 const schema_content = c.LXW_SCHEMA_CONTENT;
 
-const c = @import("xlsxwriter_c");
+const c = @import("lxw");

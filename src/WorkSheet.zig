@@ -1,14 +1,27 @@
 const WorkSheet = @This();
 
+alloc: std.mem.Allocator,
 worksheet_c: ?*c.lxw_worksheet,
 
 // set functions
-pub const RowColOptions = c.lxw_row_col_options;
+pub const RowColOptions = struct {
+    hidden: bool = false,
+    level: u8 = 0,
+    collapsed: bool = false,
+
+    inline fn toC(self: RowColOptions) c.lxw_row_col_options {
+        return c.lxw_row_col_options{
+            .hidden = @intFromBool(self.hidden),
+            .level = self.level,
+            .collapsed = @intFromBool(self.collapsed),
+        };
+    }
+};
 
 // pub extern fn worksheet_set_row(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format) lxw_error;
 pub inline fn setRow(
     self: WorkSheet,
-    row: u16,
+    row: u32,
     height: f64,
     format: Format,
 ) XlsxError!void {
@@ -33,7 +46,7 @@ pub inline fn setRowOpt(
         row,
         height,
         format.format_c,
-        @constCast(&options),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -72,7 +85,7 @@ pub inline fn setColumnOpt(
         last_col,
         width,
         format.format_c,
-        @constCast(&options),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -108,7 +121,7 @@ pub inline fn setColumnPixelsOpt(
         last_col,
         pixels,
         format.format_c,
-        @constCast(&options),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -156,8 +169,19 @@ pub inline fn setMargins(
     );
 }
 
-// pub extern fn worksheet_set_background(worksheet: [*c]lxw_worksheet, filename: [*c]const u8) lxw_error;
-// pub extern fn worksheet_set_background_buffer(worksheet: [*c]lxw_worksheet, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+// pub extern fn worksheet_set_default_row(worksheet: [*c]lxw_worksheet, height: f64, hide_unused_rows: u8) void;
+pub inline fn setDefaultRow(
+    self: WorkSheet,
+    height: f64,
+    hide_unused_rows: bool,
+) void {
+    c.worksheet_set_default_row(
+        self.worksheet_c,
+        height,
+        @intFromBool(hide_unused_rows),
+    );
+}
+
 // pub extern fn worksheet_set_selection(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) lxw_error;
 // pub extern fn worksheet_set_top_left_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t) void;
 // pub extern fn worksheet_set_landscape(worksheet: [*c]lxw_worksheet) void;
@@ -167,8 +191,6 @@ pub inline fn setMargins(
 // pub extern fn worksheet_set_zoom(worksheet: [*c]lxw_worksheet, scale: u16) void;
 // pub extern fn worksheet_set_start_page(worksheet: [*c]lxw_worksheet, start_page: u16) void;
 // pub extern fn worksheet_set_print_scale(worksheet: [*c]lxw_worksheet, scale: u16) void;
-// pub extern fn worksheet_set_tab_color(worksheet: [*c]lxw_worksheet, color: lxw_color_t) void;
-// pub extern fn worksheet_set_default_row(worksheet: [*c]lxw_worksheet, height: f64, hide_unused_rows: u8) void;
 // pub extern fn worksheet_set_vba_name(worksheet: [*c]lxw_worksheet, name: [*c]const u8) lxw_error;
 // pub extern fn worksheet_set_comments_author(worksheet: [*c]lxw_worksheet, author: [*c]const u8) void;
 // pub extern fn worksheet_set_error_cell(worksheet: [*c]lxw_worksheet, object_props: [*c]lxw_object_properties, ref_id: u32) void;
@@ -196,7 +218,7 @@ pub inline fn writeString(
     self: WorkSheet,
     row: u32,
     col: u16,
-    string: [*c]const u8,
+    string: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_string(
@@ -213,7 +235,7 @@ pub inline fn writeFormula(
     self: WorkSheet,
     row: u32,
     col: u16,
-    formula: [*c]const u8,
+    formula: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_formula(
@@ -232,7 +254,7 @@ pub inline fn writeArrayFormula(
     first_col: u16,
     last_row: u32,
     last_col: u16,
-    formula: [*c]const u8,
+    formula: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_array_formula(
@@ -251,7 +273,7 @@ pub inline fn writeDynamicFormula(
     self: WorkSheet,
     row: u32,
     col: u16,
-    formula: [*c]const u8,
+    formula: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_dynamic_formula(
@@ -270,7 +292,7 @@ pub inline fn writeDynamicArrayFormula(
     first_col: u16,
     last_row: u32,
     last_col: u16,
-    formula: [*c]const u8,
+    formula: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_dynamic_array_formula(
@@ -327,7 +349,7 @@ pub inline fn writeUrl(
     self: WorkSheet,
     row: u32,
     col: u16,
-    url: [*c]const u8,
+    url: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_url(
@@ -344,10 +366,10 @@ pub inline fn writeUrlOpt(
     self: WorkSheet,
     row: u32,
     col: u16,
-    url: [*c]const u8,
+    url: ?CString,
     format: Format,
-    string: [*c]const u8,
-    tooltip: [*c]const u8,
+    string: ?CString,
+    tooltip: ?CString,
 ) XlsxError!void {
     try check(c.worksheet_write_url_opt(
         self.worksheet_c,
@@ -360,26 +382,41 @@ pub inline fn writeUrlOpt(
     ));
 }
 
-pub const RichStringTuple = extern struct {
-    format_c: ?*c.lxw_format = null,
-    string: [*c]const u8,
+pub const RichStringTuple = struct {
+    format: Format = .none,
+    string: ?CString,
+
+    inline fn toC(self: RichStringTuple) c.lxw_rich_string_tuple {
+        return c.lxw_rich_string_tuple{
+            .format = self.format.format_c,
+            .string = self.string,
+        };
+    }
 };
 
-pub const RichStringType: type = [:null]const ?*const RichStringTuple;
 // pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_tuple, format: [*c]lxw_format) lxw_error;
 pub inline fn writeRichString(
     self: WorkSheet,
     row: u32,
     col: u16,
-    rich_string: RichStringType,
+    rich_string: []const RichStringTuple,
     format: Format,
-) XlsxError!void {
+) !void {
+    var rich_string_array = try self.alloc.alloc(c.lxw_rich_string_tuple, rich_string.len);
+    defer self.alloc.free(rich_string_array);
+    var rich_string_c = try self.alloc.allocSentinel(?*c.lxw_rich_string_tuple, rich_string.len, null);
+    defer self.alloc.free(rich_string_c);
+
+    for (rich_string, 0..) |tuple, i| {
+        rich_string_array[i] = tuple.toC();
+        rich_string_c[i] = &rich_string_array[i];
+    }
+
     try check(c.worksheet_write_rich_string(
         self.worksheet_c,
         row,
         col,
-        @ptrCast(@constCast(rich_string)),
-        // @ptrCast(rich_string_copy),
+        @ptrCast(rich_string_c),
         format.format_c,
     ));
 }
@@ -392,12 +429,53 @@ pub inline fn writeRichString(
 // pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
 
 // image functions
+pub const ImageOptions = struct {
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+    x_scale: f64 = 0,
+    y_scale: f64 = 0,
+    object_position: u8 = 0,
+    description: ?CString = null,
+    decorative: bool = false,
+    url: ?CString = null,
+    tip: ?CString = null,
+    cell_format: Format = .none,
+
+    pub const default = ImageOptions{
+        .x_offset = 0,
+        .y_offset = 0,
+        .x_scale = 0,
+        .y_scale = 0,
+        .object_position = 0,
+        .description = null,
+        .decorative = false,
+        .url = null,
+        .tip = null,
+        .cell_format = .none,
+    };
+
+    inline fn toC(self: ImageOptions) c.lxw_image_options {
+        return c.lxw_image_options{
+            .x_offset = self.x_offset,
+            .y_offset = self.y_offset,
+            .x_scale = self.x_scale,
+            .y_scale = self.y_scale,
+            .object_position = self.object_position,
+            .description = self.description,
+            .decorative = @intFromBool(self.decorative),
+            .url = self.url,
+            .tip = self.tip,
+            .cell_format = self.cell_format.format_c,
+        };
+    }
+};
+
 // pub extern fn worksheet_insert_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
 pub inline fn insertImage(
     self: WorkSheet,
     row: u32,
     col: u16,
-    filename: [*c]const u8,
+    filename: ?CString,
 ) XlsxError!void {
     try check(c.worksheet_insert_image(
         self.worksheet_c,
@@ -407,24 +485,12 @@ pub inline fn insertImage(
     ));
 }
 
-pub const ImageOptions = extern struct {
-    x_offset: i32 = 0,
-    y_offset: i32 = 0,
-    x_scale: f64 = 0,
-    y_scale: f64 = 0,
-    object_position: u8 = 0,
-    description: [*c]const u8 = null,
-    decorative: u8 = 0,
-    url: [*c]const u8 = null,
-    tip: [*c]const u8 = null,
-    cell_format_c: ?*c.lxw_format = null,
-};
 // pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 pub inline fn insertImageOpt(
     self: WorkSheet,
     row: u32,
     col: u16,
-    filename: [*c]const u8,
+    filename: ?CString,
     options: ImageOptions,
 ) XlsxError!void {
     try check(c.worksheet_insert_image_opt(
@@ -432,7 +498,7 @@ pub inline fn insertImageOpt(
         row,
         col,
         filename,
-        @ptrCast(@constCast(&options)),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -441,7 +507,7 @@ pub inline fn insertImageBuffer(
     self: WorkSheet,
     row: u32,
     col: u16,
-    image_buffer: [*c]const u8,
+    image_buffer: ?CString,
     image_size: usize,
 ) XlsxError!void {
     try check(c.worksheet_insert_image_buffer(
@@ -458,7 +524,7 @@ pub inline fn insertImageBufferOpt(
     self: WorkSheet,
     row: u32,
     col: u16,
-    image_buffer: [*c]const u8,
+    image_buffer: ?CString,
     image_size: usize,
     options: ImageOptions,
 ) XlsxError!void {
@@ -468,7 +534,7 @@ pub inline fn insertImageBufferOpt(
         col,
         image_buffer,
         image_size,
-        @ptrCast(@constCast(&options)),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -477,7 +543,7 @@ pub inline fn embedImage(
     self: WorkSheet,
     row: u32,
     col: u16,
-    filename: [*c]const u8,
+    filename: ?CString,
 ) XlsxError!void {
     try check(c.worksheet_embed_image(
         self.worksheet_c,
@@ -492,7 +558,7 @@ pub inline fn embedImageOpt(
     self: WorkSheet,
     row: u32,
     col: u16,
-    filename: [*c]const u8,
+    filename: ?CString,
     options: ImageOptions,
 ) XlsxError!void {
     try check(c.worksheet_embed_image_opt(
@@ -500,7 +566,7 @@ pub inline fn embedImageOpt(
         row,
         col,
         filename,
-        @ptrCast(@constCast(&options)),
+        @constCast(&options.toC()),
     ));
 }
 
@@ -509,7 +575,7 @@ pub inline fn embedImageBuffer(
     self: WorkSheet,
     row: u32,
     col: u16,
-    image_buffer: [*c]const u8,
+    image_buffer: ?CString,
     image_size: usize,
 ) XlsxError!void {
     try check(c.worksheet_embed_image_buffer(
@@ -526,7 +592,7 @@ pub inline fn embedImageBufferOpt(
     self: WorkSheet,
     row: u32,
     col: u16,
-    image_buffer: [*c]const u8,
+    image_buffer: ?CString,
     image_size: usize,
     options: ImageOptions,
 ) XlsxError!void {
@@ -536,11 +602,74 @@ pub inline fn embedImageBufferOpt(
         col,
         image_buffer,
         image_size,
-        @ptrCast(@constCast(&options)),
+        @constCast(&options.toC()),
     ));
 }
 
+// pub extern fn worksheet_set_background(worksheet: [*c]lxw_worksheet, filename: [*c]const u8) lxw_error;
+pub inline fn setBackGround(
+    self: WorkSheet,
+    filename: ?CString,
+) XlsxError!void {
+    try check(c.worksheet_set_background(
+        self.worksheet_c,
+        filename,
+    ));
+}
+
+// pub extern fn worksheet_set_background_buffer(worksheet: [*c]lxw_worksheet, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+pub inline fn setBackGroundBuffer(
+    self: WorkSheet,
+    image_buffer: ?CString,
+    image_size: usize,
+) XlsxError!void {
+    try check(c.worksheet_set_background_buffer(
+        self.worksheet_c,
+        image_buffer,
+        image_size,
+    ));
+}
+
+// pub extern fn worksheet_set_tab_color(worksheet: [*c]lxw_worksheet, color: lxw_color_t) void;
+pub inline fn setTabColor(
+    self: WorkSheet,
+    color: Format.DefinedColors,
+) void {
+    c.worksheet_set_tab_color(self.worksheet_c, @intFromEnum(color));
+}
+
 // chart functions
+
+pub const ObjectPosition = enum(u8) {
+    default = c.LXW_OBJECT_POSITION_DEFAULT,
+    move_and_size = c.LXW_OBJECT_MOVE_AND_SIZE,
+    move_dont_size = c.LXW_OBJECT_MOVE_DONT_SIZE,
+    dont_move_dont_size = c.LXW_OBJECT_DONT_MOVE_DONT_SIZE,
+    move_and_size_after = c.LXW_OBJECT_MOVE_AND_SIZE_AFTER,
+};
+
+pub const ChartOptions = struct {
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+    x_scale: f64 = 0,
+    y_scale: f64 = 0,
+    object_position: ObjectPosition = .default,
+    description: ?CString = null,
+    decorative: bool = false,
+
+    inline fn toC(self: ChartOptions) c.lxw_chart_options {
+        return c.lxw_chart_options{
+            .x_offset = self.x_offset,
+            .y_offset = self.y_offset,
+            .x_scale = self.x_scale,
+            .y_scale = self.y_scale,
+            .object_position = @intFromEnum(self.object_position),
+            .description = self.description,
+            .decorative = @intFromBool(self.decorative),
+        };
+    }
+};
+
 // pub extern fn worksheet_insert_chart(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart) lxw_error;
 pub inline fn insertChart(
     self: WorkSheet,
@@ -557,6 +686,21 @@ pub inline fn insertChart(
 }
 
 // pub extern fn worksheet_insert_chart_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart, user_options: [*c]lxw_chart_options) lxw_error;
+pub inline fn insertChartOpt(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    chart: Chart,
+    user_options: ChartOptions,
+) XlsxError!void {
+    try check(c.worksheet_insert_chart_opt(
+        self.worksheet_c,
+        row,
+        col,
+        chart.chart_c,
+        @constCast(&user_options.toC()),
+    ));
+}
 
 // filter functions
 pub const autoFilter = filter.autoFilter;
@@ -578,7 +722,7 @@ pub inline fn mergeRange(
     first_col: u16,
     last_row: u32,
     last_col: u16,
-    string: [*c]const u8,
+    string: ?CString,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_merge_range(
@@ -635,25 +779,75 @@ pub const ValidationErrorTypes = enum(u8) {
 pub const DataValidation = struct {
     validate: ValidationTypes = .none,
     criteria: ValidationCriteria = .none,
-    ignore_blank: u8 = 0,
-    show_input: u8 = 0,
-    show_error: u8 = 0,
+    ignore_blank: ValidationBoolean = .default,
+    show_input: ValidationBoolean = .default,
+    show_error: ValidationBoolean = .default,
     error_type: ValidationErrorTypes = .stop,
-    dropdown: u8 = 0,
+    dropdown: ValidationBoolean = .default,
     value_number: f64 = 0,
-    value_formula: [*c]const u8 = null,
-    value_list: StringArray = &.{},
+    value_formula: ?CString = null,
+    value_list: CStringArray = &.{},
     value_datetime: c.lxw_datetime = .{},
     minimum_number: f64 = 0,
-    minimum_formula: [*c]const u8 = null,
+    minimum_formula: ?CString = null,
     minimum_datetime: c.lxw_datetime = .{},
     maximum_number: f64 = 0,
-    maximum_formula: [*c]const u8 = null,
+    maximum_formula: ?CString = null,
     maximum_datetime: c.lxw_datetime = .{},
-    input_title: [*c]const u8 = null,
-    input_message: [*c]const u8 = null,
-    error_title: [*c]const u8 = null,
-    error_message: [*c]const u8 = null,
+    input_title: ?CString = null,
+    input_message: ?CString = null,
+    error_title: ?CString = null,
+    error_message: ?CString = null,
+
+    pub const default = DataValidation{
+        .validate = .none,
+        .criteria = .none,
+        .ignore_blank = .default,
+        .show_input = .default,
+        .show_error = .default,
+        .error_type = .stop,
+        .dropdown = .default,
+        .value_number = 0,
+        .value_formula = null,
+        .value_list = &.{},
+        .value_datetime = .{},
+        .minimum_number = 0,
+        .minimum_formula = null,
+        .minimum_datetime = .{},
+        .maximum_number = 0,
+        .maximum_formula = null,
+        .maximum_datetime = .{},
+        .input_title = null,
+        .input_message = null,
+        .error_title = null,
+        .error_message = null,
+    };
+
+    inline fn toC(self: DataValidation) c.lxw_data_validation {
+        return c.lxw_data_validation{
+            .validate = @intFromEnum(self.validate),
+            .criteria = @intFromEnum(self.criteria),
+            .ignore_blank = @intFromEnum(self.ignore_blank),
+            .show_input = @intFromEnum(self.show_input),
+            .show_error = @intFromEnum(self.show_error),
+            .error_type = @intFromEnum(self.error_type),
+            .dropdown = @intFromEnum(self.dropdown),
+            .value_number = self.value_number,
+            .value_formula = self.value_formula,
+            .value_list = @ptrCast(@constCast(self.value_list)),
+            .value_datetime = self.value_datetime,
+            .minimum_number = self.minimum_number,
+            .minimum_formula = self.minimum_formula,
+            .minimum_datetime = self.minimum_datetime,
+            .maximum_number = self.maximum_number,
+            .maximum_formula = self.maximum_formula,
+            .maximum_datetime = self.maximum_datetime,
+            .input_title = self.input_title,
+            .input_message = self.input_message,
+            .error_title = self.error_title,
+            .error_message = self.error_message,
+        };
+    }
 };
 
 // pub extern fn worksheet_data_validation_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
@@ -663,34 +857,11 @@ pub inline fn dataValidationCell(
     col: u16,
     validation: DataValidation,
 ) XlsxError!void {
-    var data_validation: c.lxw_data_validation = .{
-        .validate = @intFromEnum(validation.validate),
-        .criteria = @intFromEnum(validation.criteria),
-        .ignore_blank = validation.ignore_blank,
-        .show_input = validation.show_input,
-        .show_error = validation.show_error,
-        .error_type = @intFromEnum(validation.error_type),
-        .dropdown = validation.dropdown,
-        .value_number = validation.value_number,
-        .value_formula = validation.value_formula,
-        .value_list = @ptrCast(@constCast(validation.value_list)),
-        .value_datetime = validation.value_datetime,
-        .minimum_number = validation.minimum_number,
-        .minimum_formula = validation.minimum_formula,
-        .minimum_datetime = validation.minimum_datetime,
-        .maximum_number = validation.maximum_number,
-        .maximum_formula = validation.maximum_formula,
-        .maximum_datetime = validation.maximum_datetime,
-        .input_title = validation.input_title,
-        .input_message = validation.input_message,
-        .error_title = validation.error_title,
-        .error_message = validation.error_message,
-    };
     try check(c.worksheet_data_validation_cell(
         self.worksheet_c,
         row,
         col,
-        &data_validation,
+        @constCast(&validation.toC()),
     ));
 }
 
@@ -797,80 +968,120 @@ pub const ConditionalIconTypes = enum(u8) {
     icons_5_quarters = c.LXW_CONDITIONAL_ICONS_5_QUARTERS,
 };
 
-pub const ConditionalFormat = extern struct {
+pub const ConditionalFormat = struct {
     type: ConditionalFormatTypes = .none,
     criteria: ConditionalCriteria = .none,
     value: f64 = 0,
-    value_string: [*c]const u8 = null,
-    format_c: ?*c.lxw_format = null,
+    value_string: ?CString = null,
+    format: Format = .none,
     min_value: f64 = 0,
-    min_value_string: [*c]const u8 = null,
+    min_value_string: ?CString = null,
     min_rule_type: ConditionalFormatRuleTypes = .none,
-    min_color: Format.DefinedColors = @enumFromInt(0),
+    min_color: Format.DefinedColors = .default,
     mid_value: f64 = 0,
-    mid_value_string: [*c]const u8 = null,
+    mid_value_string: ?CString = null,
     mid_rule_type: ConditionalFormatRuleTypes = .none,
-    mid_color: Format.DefinedColors = @enumFromInt(0),
+    mid_color: Format.DefinedColors = .default,
     max_value: f64 = 0,
-    max_value_string: [*c]const u8 = null,
+    max_value_string: ?CString = null,
     max_rule_type: ConditionalFormatRuleTypes = .none,
-    max_color: Format.DefinedColors = @enumFromInt(0),
-    bar_color: Format.DefinedColors = @enumFromInt(0),
-    bar_only: u8 = 0,
-    data_bar_2010: u8 = 0,
-    bar_solid: u8 = 0,
-    bar_negative_color: Format.DefinedColors = @enumFromInt(0),
-    bar_border_color: Format.DefinedColors = @enumFromInt(0),
-    bar_negative_border_color: Format.DefinedColors = @enumFromInt(0),
-    bar_negative_color_same: u8 = 0,
-    bar_negative_border_color_same: u8 = 0,
-    bar_no_border: u8 = 0,
+    max_color: Format.DefinedColors = .default,
+    bar_color: Format.DefinedColors = .default,
+    bar_only: bool = false,
+    data_bar_2010: bool = false,
+    bar_solid: bool = false,
+    bar_negative_color: Format.DefinedColors = .default,
+    bar_border_color: Format.DefinedColors = .default,
+    bar_negative_border_color: Format.DefinedColors = .default,
+    bar_negative_color_same: bool = false,
+    bar_negative_border_color_same: bool = false,
+    bar_no_border: bool = false,
     bar_direction: ConditionalFormatBarDirection = .context,
     bar_axis_position: ConditionalBarAxisPosition = .automatic,
-    bar_axis_color: Format.DefinedColors = @enumFromInt(0),
+    bar_axis_color: Format.DefinedColors = .default,
     icon_style: ConditionalIconTypes = .icons_3_arrows_colored,
-    reverse_icons: u8 = 0,
-    icons_only: u8 = 0,
-    multi_range: [*c]const u8 = null,
-    stop_if_true: u8 = 0,
+    reverse_icons: bool = false,
+    icons_only: bool = false,
+    multi_range: ?CString = null,
+    stop_if_true: bool = false,
 
-    pub const empty: ConditionalFormat = .{
+    pub const none: ConditionalFormat = .{
         .type = .none,
         .criteria = .none,
         .value = 0,
         .value_string = null,
-        .format_c = null,
+        .format = .none,
         .min_value = 0,
         .min_value_string = null,
         .min_rule_type = .none,
-        .min_color = @enumFromInt(0),
+        .min_color = .default,
         .mid_value = 0,
         .mid_value_string = null,
         .mid_rule_type = .none,
-        .mid_color = @enumFromInt(0),
+        .mid_color = .default,
         .max_value = 0,
         .max_value_string = null,
         .max_rule_type = .none,
-        .max_color = @enumFromInt(0),
-        .bar_color = @enumFromInt(0),
-        .bar_only = 0,
-        .data_bar_2010 = 0,
-        .bar_solid = 0,
-        .bar_negative_color = @enumFromInt(0),
-        .bar_border_color = @enumFromInt(0),
-        .bar_negative_border_color = @enumFromInt(0),
-        .bar_negative_color_same = 0,
-        .bar_negative_border_color_same = 0,
-        .bar_no_border = 0,
+        .max_color = .default,
+        .bar_color = .default,
+        .bar_only = false,
+        .data_bar_2010 = false,
+        .bar_solid = false,
+        .bar_negative_color = .default,
+        .bar_border_color = .default,
+        .bar_negative_border_color = .default,
+        .bar_negative_color_same = false,
+        .bar_negative_border_color_same = false,
+        .bar_no_border = false,
         .bar_direction = .context,
         .bar_axis_position = .automatic,
-        .bar_axis_color = @enumFromInt(0),
+        .bar_axis_color = .default,
         .icon_style = .icons_3_arrows_colored,
-        .reverse_icons = 0,
-        .icons_only = 0,
+        .reverse_icons = false,
+        .icons_only = false,
         .multi_range = null,
-        .stop_if_true = 0,
+        .stop_if_true = false,
     };
+
+    inline fn toC(self: ConditionalFormat) c.lxw_conditional_format {
+        return c.lxw_conditional_format{
+            .type = @intFromEnum(self.type),
+            .criteria = @intFromEnum(self.criteria),
+            .value = self.value,
+            .value_string = self.value_string,
+            .format = self.format.format_c,
+            .min_value = self.min_value,
+            .min_value_string = self.min_value_string,
+            .min_rule_type = @intFromEnum(self.min_rule_type),
+            .min_color = @intFromEnum(self.min_color),
+            .mid_value = self.mid_value,
+            .mid_value_string = self.mid_value_string,
+            .mid_rule_type = @intFromEnum(self.mid_rule_type),
+            .mid_color = @intFromEnum(self.mid_color),
+            .max_value = self.max_value,
+            .max_value_string = self.max_value_string,
+            .max_rule_type = @intFromEnum(self.max_rule_type),
+            .max_color = @intFromEnum(self.max_color),
+            .bar_color = @intFromEnum(self.bar_color),
+            .bar_only = @intFromBool(self.bar_only),
+            .data_bar_2010 = @intFromBool(self.data_bar_2010),
+            .bar_solid = @intFromBool(self.bar_solid),
+            .bar_negative_color = @intFromEnum(self.bar_negative_color),
+            .bar_border_color = @intFromEnum(self.bar_border_color),
+            .bar_negative_border_color = @intFromEnum(self.bar_negative_border_color),
+            .bar_negative_color_same = @intFromBool(self.bar_negative_color_same),
+            .bar_negative_border_color_same = @intFromBool(self.bar_negative_border_color_same),
+            .bar_no_border = @intFromBool(self.bar_no_border),
+            .bar_direction = @intFromEnum(self.bar_direction),
+            .bar_axis_position = @intFromEnum(self.bar_axis_position),
+            .bar_axis_color = @intFromEnum(self.bar_axis_color),
+            .icon_style = @intFromEnum(self.icon_style),
+            .reverse_icons = @intFromBool(self.reverse_icons),
+            .icons_only = @intFromBool(self.icons_only),
+            .multi_range = self.multi_range,
+            .stop_if_true = @intFromBool(self.stop_if_true),
+        };
+    }
 };
 
 // pub extern fn worksheet_conditional_format_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
@@ -888,7 +1099,7 @@ pub inline fn conditionalFormatRange(
         first_col,
         last_row,
         last_col,
-        @ptrCast(@constCast(&conditional_format)),
+        @constCast(&conditional_format.toC()),
     ));
 }
 
@@ -912,13 +1123,13 @@ pub const TableTotalFunctions = enum(u8) {
     variance = c.LXW_TABLE_FUNCTION_VAR,
 };
 
-pub const TableColumn = extern struct {
-    header: [*c]const u8 = null,
-    formula: [*c]const u8 = null,
-    total_string: [*c]const u8 = null,
+pub const TableColumn = struct {
+    header: ?CString = null,
+    formula: ?CString = null,
+    total_string: ?CString = null,
     total_function: TableTotalFunctions = .none,
-    header_format_c: ?*c.lxw_format = null,
-    format_c: ?*c.lxw_format = null,
+    header_format: Format = .none,
+    format: Format = .none,
     total_value: f64 = 0,
 
     pub const empty: TableColumn = .{
@@ -930,34 +1141,62 @@ pub const TableColumn = extern struct {
         .format_c = null,
         .total_value = 0,
     };
+
+    inline fn toC(self: TableColumn) c.lxw_table_column {
+        return c.lxw_table_column{
+            .header = self.header,
+            .formula = self.formula,
+            .total_string = self.total_string,
+            .total_function = @intFromEnum(self.total_function),
+            .header_format = self.header_format.format_c,
+            .format = self.format.format_c,
+            .total_value = self.total_value,
+        };
+    }
 };
-pub const TableColumnArray = [:null]const ?*TableColumn;
+
 pub const TableOptions = struct {
-    name: [*c]const u8 = null,
-    no_header_row: u8 = 0,
-    no_autofilter: u8 = 0,
-    no_banded_rows: u8 = 0,
-    banded_columns: u8 = 0,
-    first_column: u8 = 0,
-    last_column: u8 = 0,
+    name: ?CString = null,
+    no_header_row: bool = false,
+    no_autofilter: bool = false,
+    no_banded_rows: bool = false,
+    banded_columns: bool = false,
+    first_column: bool = false,
+    last_column: bool = false,
     style_type: TableStyleType = .default,
     style_type_number: u8 = 0,
-    total_row: u8 = 0,
-    columns: TableColumnArray = &.{},
+    total_row: bool = false,
+    columns: []const TableColumn = &.{},
 
     pub const empty: TableOptions = .{
         .name = null,
-        .no_header_row = 0,
-        .no_autofilter = 0,
-        .no_banded_rows = 0,
-        .banded_columns = 0,
-        .first_column = 0,
-        .last_column = 0,
+        .no_header_row = false,
+        .no_autofilter = false,
+        .no_banded_rows = false,
+        .banded_columns = false,
+        .first_column = false,
+        .last_column = false,
         .style_type = .default,
         .style_type_number = 0,
-        .total_row = 0,
+        .total_row = false,
         .columns = &.{},
     };
+
+    inline fn toC(self: TableOptions, columns: [:null]const ?*c.lxw_table_column) c.lxw_table_options {
+        return c.lxw_table_options{
+            .name = self.name,
+            .no_header_row = @intFromBool(self.no_header_row),
+            .no_autofilter = @intFromBool(self.no_autofilter),
+            .no_banded_rows = @intFromBool(self.no_banded_rows),
+            .banded_columns = @intFromBool(self.banded_columns),
+            .first_column = @intFromBool(self.first_column),
+            .last_column = @intFromBool(self.last_column),
+            .style_type = @intFromEnum(self.style_type),
+            .style_type_number = self.style_type_number,
+            .total_row = @intFromBool(self.total_row),
+            .columns = @ptrCast(@constCast(columns)),
+        };
+    }
 };
 
 // pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, options: [*c]lxw_table_options) lxw_error;
@@ -968,46 +1207,44 @@ pub inline fn addTable(
     last_row: u32,
     last_col: u16,
     options: TableOptions,
-) XlsxError!void {
-    var table_options: c.lxw_table_options = .{
-        .name = options.name,
-        .no_header_row = options.no_header_row,
-        .no_autofilter = options.no_autofilter,
-        .no_banded_rows = options.no_banded_rows,
-        .banded_columns = options.banded_columns,
-        .first_column = options.first_column,
-        .last_column = options.last_column,
-        .style_type = @intFromEnum(options.style_type),
-        .style_type_number = options.style_type_number,
-        .total_row = options.total_row,
-        .columns = @ptrCast(@constCast(options.columns)),
-    };
+) !void {
+    // convert table_columns to [*c][*c]lxw_table_column
+    var table_column_array = try self.alloc.alloc(c.lxw_table_column, options.columns.len);
+    defer self.alloc.free(table_column_array);
+    var table_column_c = try self.alloc.allocSentinel(?*c.lxw_table_column, options.columns.len, null);
+    defer self.alloc.free(table_column_c);
+
+    for (options.columns, 0..) |column, i| {
+        table_column_array[i] = column.toC();
+        table_column_c[i] = &table_column_array[i];
+    }
+
     try check(c.worksheet_add_table(
         self.worksheet_c,
         first_row,
         first_col,
         last_row,
         last_col,
-        &table_options,
+        @constCast(&options.toC(table_column_c)),
     ));
 }
 
 pub const HeaderFooterOptions = c.lxw_header_footer_options;
 
 // pub extern fn worksheet_set_header(worksheet: [*c]lxw_worksheet, string: [*c]const u8) lxw_error;
-pub inline fn setHeader(self: WorkSheet, string: [*c]const u8) XlsxError!void {
+pub inline fn setHeader(self: WorkSheet, string: ?CString) XlsxError!void {
     try check(c.worksheet_set_header(self.worksheet_c, string));
 }
 
 // pub extern fn worksheet_set_footer(worksheet: [*c]lxw_worksheet, string: [*c]const u8) lxw_error;
-pub inline fn setFooter(self: WorkSheet, string: [*c]const u8) XlsxError!void {
+pub inline fn setFooter(self: WorkSheet, string: ?CString) XlsxError!void {
     try check(c.worksheet_set_footer(self.worksheet_c, string));
 }
 
 // pub extern fn worksheet_set_header_opt(worksheet: [*c]lxw_worksheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
 pub inline fn setHeaderOpt(
     self: WorkSheet,
-    string: [*c]const u8,
+    string: ?CString,
     options: HeaderFooterOptions,
 ) XlsxError!void {
     try check(c.worksheet_set_header_opt(
@@ -1020,7 +1257,7 @@ pub inline fn setHeaderOpt(
 // pub extern fn worksheet_set_footer_opt(worksheet: [*c]lxw_worksheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
 pub inline fn setFooterOpt(
     self: WorkSheet,
-    string: [*c]const u8,
+    string: ?CString,
     options: HeaderFooterOptions,
 ) XlsxError!void {
     try check(c.worksheet_set_footer_opt(
@@ -1030,11 +1267,90 @@ pub inline fn setFooterOpt(
     ));
 }
 
+// pub extern fn worksheet_hide(worksheet: [*c]lxw_worksheet) void;
+pub inline fn hide(self: WorkSheet) void {
+    c.worksheet_hide(self.worksheet_c);
+}
+
+pub const Protection = extern struct {
+    no_select_locked_cells: bool = false,
+    no_select_unlocked_cells: bool = false,
+    format_cells: bool = false,
+    format_columns: bool = false,
+    format_rows: bool = false,
+    insert_columns: bool = false,
+    insert_rows: bool = false,
+    insert_hyperlinks: bool = false,
+    delete_columns: bool = false,
+    delete_rows: bool = false,
+    sort: bool = false,
+    autofilter: bool = false,
+    pivot_tables: bool = false,
+    scenarios: bool = false,
+    objects: bool = false,
+    no_content: bool = false,
+    no_objects: bool = false,
+
+    pub const default = Protection{
+        .no_select_locked_cells = false,
+        .no_select_unlocked_cells = false,
+        .format_cells = false,
+        .format_columns = false,
+        .format_rows = false,
+        .insert_columns = false,
+        .insert_rows = false,
+        .insert_hyperlinks = false,
+        .delete_columns = false,
+        .delete_rows = false,
+        .sort = false,
+        .autofilter = false,
+        .pivot_tables = false,
+        .scenarios = false,
+        .objects = false,
+        .no_content = false,
+        .no_objects = false,
+    };
+
+    inline fn toC(self: Protection) c.lxw_protection {
+        return c.lxw_protection{
+            .no_select_locked_cells = @intFromBool(self.no_select_locked_cells),
+            .no_select_unlocked_cells = @intFromBool(self.no_select_unlocked_cells),
+            .format_cells = @intFromBool(self.format_cells),
+            .format_columns = @intFromBool(self.format_columns),
+            .format_rows = @intFromBool(self.format_rows),
+            .insert_columns = @intFromBool(self.insert_columns),
+            .insert_rows = @intFromBool(self.insert_rows),
+            .insert_hyperlinks = @intFromBool(self.insert_hyperlinks),
+            .delete_columns = @intFromBool(self.delete_columns),
+            .delete_rows = @intFromBool(self.delete_rows),
+            .sort = @intFromBool(self.sort),
+            .autofilter = @intFromBool(self.autofilter),
+            .pivot_tables = @intFromBool(self.pivot_tables),
+            .scenarios = @intFromBool(self.scenarios),
+            .objects = @intFromBool(self.objects),
+            .no_content = @intFromBool(self.no_content),
+            .no_objects = @intFromBool(self.no_objects),
+        };
+    }
+};
+
+// pub extern fn worksheet_protect(worksheet: [*c]lxw_worksheet, password: [*c]const u8, options: [*c]lxw_protection) void;
+pub inline fn protect(
+    self: WorkSheet,
+    password: ?CString,
+    options: Protection,
+) void {
+    c.worksheet_protect(
+        self.worksheet_c,
+        password,
+        @constCast(&options.toC()),
+    );
+}
+
 // pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_insert_button(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, options: [*c]lxw_button_options) lxw_error;
 // pub extern fn worksheet_activate(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_select(worksheet: [*c]lxw_worksheet) void;
-// pub extern fn worksheet_hide(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_set_first_sheet(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_print_across(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_gridlines(worksheet: [*c]lxw_worksheet, option: u8) void;
@@ -1048,13 +1364,14 @@ pub inline fn setFooterOpt(
 // pub extern fn worksheet_print_black_and_white(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_right_to_left(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_hide_zero(worksheet: [*c]lxw_worksheet) void;
-// pub extern fn worksheet_protect(worksheet: [*c]lxw_worksheet, password: [*c]const u8, options: [*c]lxw_protection) void;
 // pub extern fn worksheet_outline_settings(worksheet: [*c]lxw_worksheet, visible: u8, symbols_below: u8, symbols_right: u8, auto_style: u8) void;
 // pub extern fn worksheet_show_comments(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_ignore_errors(worksheet: [*c]lxw_worksheet, @"type": u8, range: [*c]const u8) lxw_error;
 
-const c = @import("xlsxwriter_c");
-const StringArray = @import("xlsxwriter").StringArray;
+const std = @import("std");
+const c = @import("lxw");
+const CString = @import("xlsxwriter.zig").CString;
+const CStringArray = @import("xlsxwriter.zig").CStringArray;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const Format = @import("Format.zig");

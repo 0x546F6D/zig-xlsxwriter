@@ -14,7 +14,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 const mktmp = @import("mktmp");
 
 // Embed the VBA project binary
@@ -33,28 +33,28 @@ pub fn main() !void {
     try tmp_file.write(vba_data);
 
     // Note the xlsm extension of the filename
-    const workbook = xlsxwriter.workbook_new("zig-macro.xlsm");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-macro.xlsm");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 30, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 0, 30, null);
 
     // Add a macro file extracted from an Excel workbook
     // Convert the path to a null-terminated C string pointer
     const c_path = @as([*c]const u8, @ptrCast(tmp_file.path.ptr));
-    _ = xlsxwriter.workbook_add_vba_project(workbook, c_path);
+    _ = lxw.workbook_add_vba_project(workbook, c_path);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 0, "Press the button to say hello.", null);
+    _ = lxw.worksheet_write_string(worksheet, 2, 0, "Press the button to say hello.", null);
 
-    var options = xlsxwriter.lxw_button_options{
+    var options = lxw.lxw_button_options{
         .caption = "Press Me",
         .macro = "say_hello",
         .width = 80,
         .height = 30,
     };
 
-    _ = xlsxwriter.worksheet_insert_button(worksheet, 2, 1, &options);
+    _ = lxw.worksheet_insert_button(worksheet, 2, 1, &options);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 
     // The temporary file will be automatically cleaned up by the defer statement
 }

@@ -6,11 +6,11 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
     // A datetime to display.
-    var datetime = xlsxwriter.lxw_datetime{
+    var datetime = lxw.lxw_datetime{
         .year = 2013,
         .month = 1,
         .day = 23,
@@ -40,35 +40,35 @@ pub fn main() !void {
         "hh:mm:ss.000",
     };
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times04.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-dates_and_times04.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Add a bold format.
-    const bold = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_bold(bold);
+    const bold = lxw.workbook_add_format(workbook);
+    _ = lxw.format_set_bold(bold);
 
     // Write the column headers.
-    _ = xlsxwriter.worksheet_write_string(worksheet, row, col, "Formatted date", bold);
-    _ = xlsxwriter.worksheet_write_string(worksheet, row, col + 1, "Format", bold);
+    _ = lxw.worksheet_write_string(worksheet, row, col, "Formatted date", bold);
+    _ = lxw.worksheet_write_string(worksheet, row, col + 1, "Format", bold);
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 1, 20, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 1, 20, null);
 
     // Write the same date and time using each of the above formats.
     for (date_formats) |date_format| {
         row += 1;
 
         // Create a format for the date or time.
-        const format = xlsxwriter.workbook_add_format(workbook);
-        _ = xlsxwriter.format_set_num_format(format, date_format.ptr);
-        _ = xlsxwriter.format_set_align(format, xlsxwriter.LXW_ALIGN_LEFT);
+        const format = lxw.workbook_add_format(workbook);
+        _ = lxw.format_set_num_format(format, date_format.ptr);
+        _ = lxw.format_set_align(format, lxw.LXW_ALIGN_LEFT);
 
         // Write the datetime with each format.
-        _ = xlsxwriter.worksheet_write_datetime(worksheet, row, col, &datetime, format);
+        _ = lxw.worksheet_write_datetime(worksheet, row, col, &datetime, format);
 
         // Also write the format string for comparison.
-        _ = xlsxwriter.worksheet_write_string(worksheet, row, col + 1, date_format.ptr, null);
+        _ = lxw.worksheet_write_string(worksheet, row, col + 1, date_format.ptr, null);
     }
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

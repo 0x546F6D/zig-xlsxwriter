@@ -28,7 +28,7 @@ pub fn getAssetPath(alloc: std.mem.Allocator, asset_name: []const u8) ![:0]const
 const std = @import("std");
 
 // common replace:
-// %s/xlsxwriter.workbook_add_format(workbook)/try workbook.addFormat()
+// %s/xlsxwriter.workbook_add_format(\(\n *\)\=workbook\(,\n *\)\=)/try workbook.addFormat()
 // %s/_ = xlsxwriter.worksheet_set_column(\(\n *\)\=worksheet\d*, /try worksheet.setColumn(
 // %s/_ = xlsxwriter.worksheet_set_column_opt(\(\n *\)\=worksheet\d*, /try worksheet.setColumnOpt(
 // %s/_ = xlsxwriter.worksheet_set_row(\(\n *\)\=worksheet\d*, /try worksheet.setRow(
@@ -36,11 +36,3 @@ const std = @import("std");
 // %s/_ = xlsxwriter.worksheet_write_string(\(\n *\)\=worksheet\d*,/try worksheet.writeString(
 // %s/_ = xlsxwriter.worksheet_write_number(\(\n *\)\=worksheet\d*,/try worksheet.writeNumber(
 // %s/_ = xlsxwriter.worksheet_write_formula(\(\n *\)\=worksheet\d*,/try worksheet.writeFormula(
-//
-//
-//
-//
-//
-//
-//
-//

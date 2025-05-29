@@ -1,30 +1,31 @@
-//
-// Example of how to hide a worksheet using libxlsxwriter.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-hide_sheet.xlsx");
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet3 = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet1 = try workbook.addWorkSheet(null);
+    const worksheet2 = try workbook.addWorkSheet(null);
+    const worksheet3 = try workbook.addWorkSheet(null);
 
     // Hide Sheet2. It won't be visible until it is unhidden in Excel.
-    _ = xlsxwriter.worksheet_hide(worksheet2);
+    worksheet2.hide();
 
-    _ = xlsxwriter.worksheet_write_string(worksheet1, 0, 0, "Sheet2 is hidden", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet2, 0, 0, "Now it's my turn to find you!", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet3, 0, 0, "Sheet2 is hidden", null);
+    try worksheet1.writeString(0, 0, "Sheet2 is hidden", .none);
+    try worksheet2.writeString(0, 0, "Now it's my turn to find you!", .none);
+    try worksheet3.writeString(0, 0, "Sheet2 is hidden", .none);
 
     // Make the first column wider to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet1, 0, 0, 30, null);
-    _ = xlsxwriter.worksheet_set_column(worksheet2, 0, 0, 30, null);
-    _ = xlsxwriter.worksheet_set_column(worksheet3, 0, 0, 30, null);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet1.setColumn(0, 0, 30, .none);
+    try worksheet2.setColumn(0, 0, 30, .none);
+    try worksheet3.setColumn(0, 0, 30, .none);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");

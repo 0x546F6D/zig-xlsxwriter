@@ -1,5 +1,5 @@
 // A datetime to display.
-var datetime: xlsxwriter.DateTime = .{
+var datetime: xwz.DateTime = .{
     .year = 2013,
     .month = 1,
     .day = 23,
@@ -10,7 +10,7 @@ var datetime: xlsxwriter.DateTime = .{
 
 // Examples date and time formats. In the output file compare how changing
 // the format strings changes the appearance of the date.
-const date_formats = [_][]const u8{
+const date_formats: []const ?CString = &.{
     "dd/mm/yy",
     "mm/dd/yy",
     "dd m yy",
@@ -34,7 +34,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -54,18 +54,19 @@ pub fn main() !void {
 
         // Create a format for the date or time.
         const format = try workbook.addFormat();
-        format.setNumFormat(date_format.ptr);
+        format.setNumFormat(date_format);
         format.setAlign(.left);
 
         // Write the datetime with each format.
         try worksheet.writeDateTime(@intCast(row), 0, datetime, format);
 
         // Also write the format string for comparison.
-        try worksheet.writeString(@intCast(row), 1, date_format.ptr, .none);
+        try worksheet.writeString(@intCast(row), 1, date_format, .none);
     }
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");
+const CString = xwz.CString;

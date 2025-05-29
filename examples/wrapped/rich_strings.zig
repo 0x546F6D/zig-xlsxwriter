@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -33,82 +33,82 @@ pub fn main() !void {
 
     // Example 1: Bold and italic text
     // Write individual cells with appropriate formatting
-    const fragment11: xlsxwriter.RichStringTuple = .{
+    const fragment11: xwz.RichStringTuple = .{
         .string = "This is ",
     };
-    const fragment12: xlsxwriter.RichStringTuple = .{
-        .format_c = bold.format_c,
+    const fragment12: xwz.RichStringTuple = .{
+        .format = bold,
         .string = "bold",
     };
-    const fragment13: xlsxwriter.RichStringTuple = .{
+    const fragment13: xwz.RichStringTuple = .{
         .string = " and this is ",
     };
-    const fragment14: xlsxwriter.RichStringTuple = .{
-        .format_c = italic.format_c,
+    const fragment14: xwz.RichStringTuple = .{
+        .format = italic,
         .string = "italic",
     };
-    const rich_string1: xlsxwriter.RichStringType = &.{
-        &fragment11,
-        &fragment12,
-        &fragment13,
-        &fragment14,
+    const rich_string1 = &.{
+        fragment11,
+        fragment12,
+        fragment13,
+        fragment14,
     };
     try worksheet.writeRichString(0, 0, rich_string1, .none);
 
     // Example 2: Red and blue text
 
-    const fragment21: xlsxwriter.RichStringTuple = .{
+    const fragment21: xwz.RichStringTuple = .{
         .string = "This is ",
     };
-    const fragment22: xlsxwriter.RichStringTuple = .{
-        .format_c = red.format_c,
+    const fragment22: xwz.RichStringTuple = .{
+        .format = red,
         .string = "red",
     };
-    const fragment23: xlsxwriter.RichStringTuple = .{
+    const fragment23: xwz.RichStringTuple = .{
         .string = " and this is ",
     };
-    const fragment24: xlsxwriter.RichStringTuple = .{
-        .format_c = blue.format_c,
+    const fragment24: xwz.RichStringTuple = .{
+        .format = blue,
         .string = "blue",
     };
-    const rich_string2: xlsxwriter.RichStringType = &.{
-        &fragment21,
-        &fragment22,
-        &fragment23,
-        &fragment24,
+    const rich_string2 = &.{
+        fragment21,
+        fragment22,
+        fragment23,
+        fragment24,
     };
     try worksheet.writeRichString(2, 0, rich_string2, .none);
 
     // Example 3. A rich string plus cell formatting.
-    const fragment31: xlsxwriter.RichStringTuple = .{
+    const fragment31: xwz.RichStringTuple = .{
         .string = "Some ",
     };
-    const fragment32: xlsxwriter.RichStringTuple = .{
-        .format_c = bold.format_c,
+    const fragment32: xwz.RichStringTuple = .{
+        .format = bold,
         .string = "bold text",
     };
-    const fragment33: xlsxwriter.RichStringTuple = .{
+    const fragment33: xwz.RichStringTuple = .{
         .string = " centered",
     };
-    const rich_string3: xlsxwriter.RichStringType = &.{
-        &fragment31,
-        &fragment32,
-        &fragment33,
+    const rich_string3 = &.{
+        fragment31,
+        fragment32,
+        fragment33,
     };
     try worksheet.writeRichString(4, 0, rich_string3, center);
 
     // Example 4: Math example with superscript
-    const fragment41: xlsxwriter.RichStringTuple = .{
-        .format_c = italic.format_c,
+    const fragment41: xwz.RichStringTuple = .{
+        .format = italic,
         .string = "j =k",
     };
-    const fragment42: xlsxwriter.RichStringTuple = .{
-        .format_c = superscript.format_c,
+    const fragment42: xwz.RichStringTuple = .{
+        .format = superscript,
         .string = "(n-1)",
     };
-    const rich_string4: xlsxwriter.RichStringType = &.{
-        &fragment41,
-        &fragment42,
+    const rich_string4 = &.{
+        fragment41,
+        fragment42,
     };
     try worksheet.writeRichString(6, 0, rich_string4, center);
 }
@@ -116,4 +116,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

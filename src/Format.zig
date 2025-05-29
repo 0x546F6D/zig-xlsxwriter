@@ -17,7 +17,7 @@ pub inline fn setItalic(self: Format) void {
 }
 
 // pub extern fn format_set_num_format(format: [*c]lxw_format, num_format: [*c]const u8) void;
-pub inline fn setNumFormat(self: Format, num_format: [*c]const u8) void {
+pub inline fn setNumFormat(self: Format, num_format: ?CString) void {
     c.format_set_num_format(self.format_c, num_format);
 }
 
@@ -60,7 +60,8 @@ pub inline fn setUnderline(self: Format, style: Underlines) void {
     c.format_set_underline(self.format_c, @intFromEnum(style));
 }
 
-pub const DefinedColors = enum(c_int) {
+pub const DefinedColors = enum(u32) {
+    default = 0,
     // Some colors are changed to reflect Excel default RGB code
     black = c.LXW_COLOR_BLACK,
     white = c.LXW_COLOR_WHITE,
@@ -188,7 +189,7 @@ pub inline fn setFgColor(self: Format, color: DefinedColors) void {
     c.format_set_fg_color(self.format_c, @intFromEnum(color));
 }
 
-pub const Scripts = enum(c_int) {
+pub const Scripts = enum(u8) {
     superscript = c.LXW_FONT_SUPERSCRIPT,
     subscript = c.LXW_FONT_SUBSCRIPT,
 };
@@ -198,7 +199,7 @@ pub inline fn setFontScript(self: Format, style: Scripts) void {
     c.format_set_font_script(self.format_c, @intFromEnum(style));
 }
 
-pub const Borders = enum(c_int) {
+pub const Borders = enum(u8) {
     none = c.LXW_BORDER_NONE,
     thin = c.LXW_BORDER_THIN,
     medium = c.LXW_BORDER_MEDIUM,
@@ -235,37 +236,125 @@ pub inline fn setIndent(self: Format, level: u8) void {
     c.format_set_indent(self.format_c, level);
 }
 
+pub const DiagonalTypes = enum(u8) {
+    up = c.LXW_DIAGONAL_BORDER_UP,
+    down = c.LXW_DIAGONAL_BORDER_DOWN,
+    up_down = c.LXW_DIAGONAL_BORDER_UP_DOWN,
+};
+
+// pub extern fn format_set_diag_type(format: [*c]lxw_format, @"type": u8) void;
+pub inline fn setDiagType(self: Format, @"type": DiagonalTypes) void {
+    c.format_set_diag_type(self.format_c, @intFromEnum(@"type"));
+}
+
+// pub extern fn format_set_diag_border(format: [*c]lxw_format, style: u8) void;
+pub inline fn setDiagBorder(self: Format, style: Borders) void {
+    c.format_set_diag_border(self.format_c, @intFromEnum(style));
+}
+
+// pub extern fn format_set_diag_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setDiagColor(self: Format, color: DefinedColors) void {
+    c.format_set_diag_color(self.format_c, @intFromEnum(color));
+}
+
+// pub extern fn format_set_hidden(format: [*c]lxw_format) void;
+pub inline fn setHidden(self: Format) void {
+    c.format_set_hidden(self.format_c);
+}
+
+// pub extern fn format_set_unlocked(format: [*c]lxw_format) void;
+pub inline fn setUnlocked(self: Format) void {
+    c.format_set_unlocked(self.format_c);
+}
+
+// pub extern fn format_set_shrink(format: [*c]lxw_format) void;
+pub inline fn setShrink(self: Format) void {
+    c.format_set_shrink(self.format_c);
+}
+
+// pub extern fn format_set_quote_prefix(format: [*c]lxw_format) void;
+pub inline fn setQuotePrefix(self: Format) void {
+    c.format_set_quote_prefix(self.format_c);
+}
+
+// pub extern fn format_set_font_outline(format: [*c]lxw_format) void;
+pub inline fn setFontOutline(self: Format) void {
+    c.format_set_font_outline(self.format_c);
+}
+
+// pub extern fn format_set_font_shadow(format: [*c]lxw_format) void;
+pub inline fn setFontShadow(self: Format) void {
+    c.format_set_font_shadow(self.format_c);
+}
+
+// pub extern fn format_set_font_condense(format: [*c]lxw_format) void;
+pub inline fn setFontCondense(self: Format) void {
+    c.format_set_font_condense(self.format_c);
+}
+
+// pub extern fn format_set_font_extend(format: [*c]lxw_format) void;
+pub inline fn setFontExtended(self: Format) void {
+    c.format_set_font_extend(self.format_c);
+}
+
+// pub extern fn format_set_hyperlink(format: [*c]lxw_format) void;
+pub inline fn setHyperLink(self: Format) void {
+    c.format_set_hyperlink(self.format_c);
+}
+
+// pub extern fn format_set_font_only(format: [*c]lxw_format) void;
+pub inline fn setFontOnly(self: Format) void {
+    c.format_set_font_only(self.format_c);
+}
+
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
+pub inline fn setFontName(self: Format, font_name: ?CString) void {
+    c.format_set_font_name(self.format_c, font_name);
+}
+
 // pub extern fn format_set_font_size(format: [*c]lxw_format, size: f64) void;
+pub inline fn setFontSize(self: Format, size: f64) void {
+    c.format_set_font_size(self.format_c, size);
+}
+
+// pub extern fn format_set_rotation(format: [*c]lxw_format, angle: i16) void;
+pub inline fn setRotation(self: Format, angle: i16) void {
+    c.format_set_rotation(self.format_c, angle);
+}
+
+// pub extern fn format_set_bottom_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setBottomColor(self: Format, color: DefinedColors) void {
+    c.format_set_bottom_color(self.format_c, @intFromEnum(color));
+}
+
+// pub extern fn format_set_top_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setTopColor(self: Format, color: DefinedColors) void {
+    c.format_set_top_color(self.format_c, @intFromEnum(color));
+}
+
+// pub extern fn format_set_left_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setLeftColor(self: Format, color: DefinedColors) void {
+    c.format_set_left_color(self.format_c, @intFromEnum(color));
+}
+
+// pub extern fn format_set_right_color(format: [*c]lxw_format, color: lxw_color_t) void;
+pub inline fn setRightColor(self: Format, color: DefinedColors) void {
+    c.setRightColor(self.format_c, @intFromEnum(color));
+}
+
 // pub extern fn format_set_font_family(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_font_charset(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_num_format_index(format: [*c]lxw_format, index: u8) void;
-// pub extern fn format_set_unlocked(format: [*c]lxw_format) void;
-// pub extern fn format_set_hidden(format: [*c]lxw_format) void;
-// pub extern fn format_set_rotation(format: [*c]lxw_format, angle: i16) void;
-// pub extern fn format_set_shrink(format: [*c]lxw_format) void;
 // pub extern fn format_set_pattern(format: [*c]lxw_format, index: u8) void;
 // pub extern fn format_set_bottom(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_top(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_left(format: [*c]lxw_format, style: u8) void;
 // pub extern fn format_set_right(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_bottom_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_top_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_left_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_right_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_diag_type(format: [*c]lxw_format, @"type": u8) void;
-// pub extern fn format_set_diag_border(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_diag_color(format: [*c]lxw_format, color: lxw_color_t) void;
-// pub extern fn format_set_quote_prefix(format: [*c]lxw_format) void;
-// pub extern fn format_set_font_outline(format: [*c]lxw_format) void;
-// pub extern fn format_set_font_shadow(format: [*c]lxw_format) void;
 // pub extern fn format_set_font_scheme(format: [*c]lxw_format, font_scheme: [*c]const u8) void;
-// pub extern fn format_set_font_condense(format: [*c]lxw_format) void;
-// pub extern fn format_set_font_extend(format: [*c]lxw_format) void;
 // pub extern fn format_set_reading_order(format: [*c]lxw_format, value: u8) void;
 // pub extern fn format_set_theme(format: [*c]lxw_format, value: u8) void;
-// pub extern fn format_set_hyperlink(format: [*c]lxw_format) void;
 // pub extern fn format_set_color_indexed(format: [*c]lxw_format, value: u8) void;
-// pub extern fn format_set_font_only(format: [*c]lxw_format) void;
 
-const c = @import("xlsxwriter_c");
+const c = @import("lxw");
+const CString = @import("xlsxwriter.zig").CString;
+const CStringArray = @import("xlsxwriter.zig").CStringArray;

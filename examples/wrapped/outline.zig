@@ -5,14 +5,14 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Outlined Rows");
     const worksheet2 = try workbook.addWorkSheet("Collapsed Rows");
     const worksheet3 = try workbook.addWorkSheet("Outline Columns");
     const worksheet4 = try workbook.addWorkSheet("Outline levels");
-    var worksheet: xlsxwriter.WorkSheet = undefined;
+    var worksheet: xwz.WorkSheet = undefined;
 
     const bold = try workbook.addFormat();
     bold.setBold();
@@ -27,8 +27,8 @@ pub fn main() !void {
     worksheet = worksheet1;
 
     // The option structs with the outline level set.
-    const options1 = xlsxwriter.RowColOptions{ .level = 2 };
-    const options2 = xlsxwriter.RowColOptions{ .level = 1 };
+    const options1 = xwz.RowColOptions{ .level = 2 };
+    const options2 = xwz.RowColOptions{ .level = 1 };
 
     // Set the column width for clarity.
     try worksheet.setColumn(0, 0, 20, .none);
@@ -82,9 +82,9 @@ pub fn main() !void {
     worksheet = worksheet2;
 
     // The option structs with the outline level and collapsed property set.
-    const options3 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
-    const options4 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 1 };
-    const options5 = xlsxwriter.RowColOptions{ .collapsed = xw_true };
+    const options3 = xwz.RowColOptions{ .hidden = true, .level = 2 };
+    const options4 = xwz.RowColOptions{ .hidden = true, .level = 1 };
+    const options5 = xwz.RowColOptions{ .collapsed = true };
 
     // Set the column width for clarity.
     try worksheet.setColumn(0, 0, 20, .none);
@@ -135,7 +135,7 @@ pub fn main() !void {
 
     // Example 3: Create a worksheet with outlined columns.
     worksheet = worksheet3;
-    const options6 = xlsxwriter.RowColOptions{ .level = 1 };
+    const options6 = xwz.RowColOptions{ .level = 1 };
 
     // Add data and formulas to the worksheet.
     try worksheet.writeString(0, 0, "Month", .none);
@@ -195,13 +195,13 @@ pub fn main() !void {
 
     // Example 4: Show all possible outline levels.
     worksheet = worksheet4;
-    const level1 = xlsxwriter.RowColOptions{ .level = 1 };
-    const level2 = xlsxwriter.RowColOptions{ .level = 2 };
-    const level3 = xlsxwriter.RowColOptions{ .level = 3 };
-    const level4 = xlsxwriter.RowColOptions{ .level = 4 };
-    const level5 = xlsxwriter.RowColOptions{ .level = 5 };
-    const level6 = xlsxwriter.RowColOptions{ .level = 6 };
-    const level7 = xlsxwriter.RowColOptions{ .level = 7 };
+    const level1 = xwz.RowColOptions{ .level = 1 };
+    const level2 = xwz.RowColOptions{ .level = 2 };
+    const level3 = xwz.RowColOptions{ .level = 3 };
+    const level4 = xwz.RowColOptions{ .level = 4 };
+    const level5 = xwz.RowColOptions{ .level = 5 };
+    const level6 = xwz.RowColOptions{ .level = 6 };
+    const level7 = xwz.RowColOptions{ .level = 7 };
 
     try worksheet.writeString(0, 0, "Level 1", .none);
     try worksheet.writeString(1, 0, "Level 2", .none);
@@ -235,7 +235,5 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const xw_true = xlsxwriter.xw_true;
-const xw_false = xlsxwriter.xw_false;
-const def_row_height = xlsxwriter.def_row_height;
+const xwz = @import("xlsxwriter");
+const def_row_height = xwz.def_row_height;

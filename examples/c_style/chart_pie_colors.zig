@@ -12,56 +12,56 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-chart_pie_colors.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-chart_pie_colors.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Write data for the chart
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Pass", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 0, "Fail", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 0, 1, 90, null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 1, 10, null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 0, "Pass", null);
+    _ = lxw.worksheet_write_string(worksheet, 1, 0, "Fail", null);
+    _ = lxw.worksheet_write_number(worksheet, 0, 1, 90, null);
+    _ = lxw.worksheet_write_number(worksheet, 1, 1, 10, null);
 
     // Create a pie chart
-    const chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_PIE);
+    const chart = lxw.workbook_add_chart(workbook, lxw.LXW_CHART_PIE);
 
     // Add the data series
-    const series = xlsxwriter.chart_add_series(
+    const series = lxw.chart_add_series(
         chart,
         "=Sheet1!$A$1:$A$2",
         "=Sheet1!$B$1:$B$2",
     );
 
     // Create fills for chart segments
-    var red_fill = xlsxwriter.lxw_chart_fill{
-        .color = xlsxwriter.LXW_COLOR_RED,
+    var red_fill = lxw.lxw_chart_fill{
+        .color = lxw.LXW_COLOR_RED,
     };
-    var green_fill = xlsxwriter.lxw_chart_fill{
-        .color = xlsxwriter.LXW_COLOR_GREEN,
+    var green_fill = lxw.lxw_chart_fill{
+        .color = lxw.LXW_COLOR_GREEN,
     };
 
     // Create points with fills
-    var red_point = xlsxwriter.lxw_chart_point{
+    var red_point = lxw.lxw_chart_point{
         .fill = &red_fill,
     };
-    var green_point = xlsxwriter.lxw_chart_point{
+    var green_point = lxw.lxw_chart_point{
         .fill = &green_fill,
     };
 
     // Create array of points (null terminated)
-    var points = [_]?*xlsxwriter.lxw_chart_point{
+    var points = [_]?*lxw.lxw_chart_point{
         &green_point,
         &red_point,
         null,
     };
 
     // Set the points on the series
-    _ = xlsxwriter.chart_series_set_points(series, &points);
+    _ = lxw.chart_series_set_points(series, &points);
 
     // Insert chart into worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 1, 3, chart);
+    _ = lxw.worksheet_insert_chart(worksheet, 1, 3, chart);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

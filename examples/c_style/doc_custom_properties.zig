@@ -7,12 +7,12 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-doc_custom_properties.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
-    var datetime = xlsxwriter.lxw_datetime{
+    const workbook = lxw.workbook_new("zig-doc_custom_properties.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
+    var datetime = lxw.lxw_datetime{
         .year = 2016,
         .month = 12,
         .day = 12,
@@ -22,40 +22,40 @@ pub fn main() !void {
     };
 
     // Set some custom document properties in the workbook.
-    _ = xlsxwriter.workbook_set_custom_property_string(
+    _ = lxw.workbook_set_custom_property_string(
         workbook,
         "Checked by",
         "Eve",
     );
-    _ = xlsxwriter.workbook_set_custom_property_datetime(
+    _ = lxw.workbook_set_custom_property_datetime(
         workbook,
         "Date completed",
         &datetime,
     );
-    _ = xlsxwriter.workbook_set_custom_property_number(
+    _ = lxw.workbook_set_custom_property_number(
         workbook,
         "Document number",
         12345,
     );
-    _ = xlsxwriter.workbook_set_custom_property_number(
+    _ = lxw.workbook_set_custom_property_number(
         workbook,
         "Reference number",
         1.2345,
     );
-    _ = xlsxwriter.workbook_set_custom_property_boolean(
+    _ = lxw.workbook_set_custom_property_boolean(
         workbook,
         "Has Review",
         1,
     );
-    _ = xlsxwriter.workbook_set_custom_property_boolean(
+    _ = lxw.workbook_set_custom_property_boolean(
         workbook,
         "Signed off",
         0,
     );
 
     // Add some text to the file.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(
+    _ = lxw.worksheet_set_column(worksheet, 0, 0, 50, null);
+    _ = lxw.worksheet_write_string(
         worksheet,
         0,
         0,
@@ -63,5 +63,5 @@ pub fn main() !void {
         null,
     );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

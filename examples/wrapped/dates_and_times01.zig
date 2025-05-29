@@ -8,9 +8,9 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch |err| {
-        std.debug.print("{}: {s}\n", .{ err, xlsxwriter.strError(err) });
+        std.debug.print("{}: {s}\n", .{ err, xwz.strError(err) });
     };
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -34,4 +34,4 @@ const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

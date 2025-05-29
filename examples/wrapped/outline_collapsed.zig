@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Outlined Rows");
@@ -14,7 +14,7 @@ pub fn main() !void {
     const worksheet4 = try workbook.addWorkSheet("Collapsed Rows 3");
     const worksheet5 = try workbook.addWorkSheet("Outline Columns");
     const worksheet6 = try workbook.addWorkSheet("Collapsed Columns");
-    var worksheet: xlsxwriter.WorkSheet = undefined;
+    var worksheet: xwz.WorkSheet = undefined;
 
     const bold = try workbook.addFormat();
     bold.setBold();
@@ -29,8 +29,8 @@ pub fn main() !void {
     worksheet = worksheet1;
 
     // The option structs with the outline level set.
-    const options1 = xlsxwriter.RowColOptions{ .level = 2 };
-    const options2 = xlsxwriter.RowColOptions{ .level = 1 };
+    const options1 = xwz.RowColOptions{ .level = 2 };
+    const options2 = xwz.RowColOptions{ .level = 1 };
 
     // Set the row outline properties.
     try worksheet.setRowOpt(1, def_row_height, .none, options1);
@@ -51,9 +51,9 @@ pub fn main() !void {
     // Example 2: Create a worksheet with collapsed outlined rows.
     worksheet = worksheet2;
     // This is the same as the example 1 except that all rows are collapsed.
-    const options3 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
-    const options4 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 1 };
-    const options5 = xlsxwriter.RowColOptions{ .collapsed = xw_true };
+    const options3 = xwz.RowColOptions{ .hidden = true, .level = 2 };
+    const options4 = xwz.RowColOptions{ .hidden = true, .level = 1 };
+    const options5 = xwz.RowColOptions{ .collapsed = true };
 
     // Set the row options with the outline level.
     try worksheet.setRowOpt(1, def_row_height, .none, options3);
@@ -75,8 +75,8 @@ pub fn main() !void {
     // Example 3: Create a worksheet with collapsed outlined rows. Same as the
     // example 1 except that the two sub-totals are collapsed.
     worksheet = worksheet3;
-    const options6 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
-    const options7 = xlsxwriter.RowColOptions{ .level = 1, .collapsed = xw_true };
+    const options6 = xwz.RowColOptions{ .hidden = true, .level = 2 };
+    const options7 = xwz.RowColOptions{ .level = 1, .collapsed = true };
 
     // Set the row options with the outline level.
     try worksheet.setRowOpt(1, def_row_height, .none, options6);
@@ -97,9 +97,9 @@ pub fn main() !void {
     // Example 4: Create a worksheet with outlined rows. Same as the example 1
     // except that the two sub-totals are collapsed.
     worksheet = worksheet4;
-    const options8 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 2 };
-    const options9 = xlsxwriter.RowColOptions{ .hidden = xw_true, .level = 1, .collapsed = xw_true };
-    const options10 = xlsxwriter.RowColOptions{ .collapsed = xw_true };
+    const options8 = xwz.RowColOptions{ .hidden = true, .level = 2 };
+    const options9 = xwz.RowColOptions{ .hidden = true, .level = 1, .collapsed = true };
+    const options10 = xwz.RowColOptions{ .collapsed = true };
 
     // Set the row options with the outline level.
     try worksheet.setRowOpt(1, def_row_height, .none, options8);
@@ -120,7 +120,7 @@ pub fn main() !void {
 
     // Example 5: Create a worksheet with outlined columns.
     worksheet = worksheet5;
-    const options11 = xlsxwriter.RowColOptions{ .level = 1 };
+    const options11 = xwz.RowColOptions{ .level = 1 };
 
     // Write the sub-total data that is common to the column examples.
     try createColExampleData(worksheet5, bold);
@@ -135,15 +135,13 @@ pub fn main() !void {
 
     // Example 6: Create a worksheet with outlined columns.
     worksheet = worksheet6;
-    const options12 = xlsxwriter.RowColOptions{
-        .hidden = 1,
+    const options12 = xwz.RowColOptions{
+        .hidden = true,
         .level = 1,
-        .collapsed = 0,
     };
-    const options13 = xlsxwriter.RowColOptions{
-        .hidden = 0,
+    const options13 = xwz.RowColOptions{
         .level = 0,
-        .collapsed = 1,
+        .collapsed = true,
     };
 
     // Write the sub-total data that is common to the column examples.
@@ -250,9 +248,7 @@ fn createColExampleData(worksheet: WorkSheet, bold: Format) !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = xlsxwriter.WorkSheet;
-const Format = xlsxwriter.Format;
-const xw_true = xlsxwriter.xw_true;
-const xw_false = xlsxwriter.xw_false;
-const def_row_height = xlsxwriter.def_row_height;
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;
+const Format = xwz.Format;
+const def_row_height = xwz.def_row_height;

@@ -11,32 +11,32 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
     // A number to display as a date.
     const number = 41333.5;
 
-    const workbook = xlsxwriter.workbook_new("zig-dates_and_times01.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-dates_and_times01.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Add a format with date formatting.
-    const format = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
+    const format = lxw.workbook_add_format(workbook);
+    _ = lxw.format_set_num_format(format, "mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 20, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 0, 20, null);
 
     // Write the number without formatting.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 0, 0, number, null); // 41333.5
+    _ = lxw.worksheet_write_number(worksheet, 0, 0, number, null); // 41333.5
 
     // Write the number with formatting. Note: the worksheet_write_datetime()
     // or worksheet_write_unixtime() functions are preferable for writing
     // dates and times. This is for demonstration purposes only.
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 0, number, format); // Feb 28 2013 12:00 PM
+    _ = lxw.worksheet_write_number(worksheet, 1, 0, number, format); // Feb 28 2013 12:00 PM
 
-    const result = xlsxwriter.workbook_close(workbook);
-    if (result != xlsxwriter.LXW_NO_ERROR) {
+    const result = lxw.workbook_close(workbook);
+    if (result != lxw.LXW_NO_ERROR) {
         std.debug.print("Error closing workbook: {d}\n", .{result});
         return error.WorkbookCloseFailed;
     }

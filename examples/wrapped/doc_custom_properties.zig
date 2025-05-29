@@ -1,18 +1,19 @@
-//
-// Example of setting custom document properties for an Excel spreadsheet
-// using libxlsxwriter.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-doc_custom_properties.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
-    var datetime = xlsxwriter.lxw_datetime{
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    const asset_path = try h.getAssetPath(alloc, "logo.png");
+    defer alloc.free(asset_path);
+
+    // Create a workbook and add a worksheet.
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet = try workbook.addWorkSheet(null);
+
+    const datetime = xwz.DateTime{
         .year = 2016,
         .month = 12,
         .day = 12,
@@ -22,46 +23,19 @@ pub fn main() !void {
     };
 
     // Set some custom document properties in the workbook.
-    _ = xlsxwriter.workbook_set_custom_property_string(
-        workbook,
-        "Checked by",
-        "Eve",
-    );
-    _ = xlsxwriter.workbook_set_custom_property_datetime(
-        workbook,
-        "Date completed",
-        &datetime,
-    );
-    _ = xlsxwriter.workbook_set_custom_property_number(
-        workbook,
-        "Document number",
-        12345,
-    );
-    _ = xlsxwriter.workbook_set_custom_property_number(
-        workbook,
-        "Reference number",
-        1.2345,
-    );
-    _ = xlsxwriter.workbook_set_custom_property_boolean(
-        workbook,
-        "Has Review",
-        1,
-    );
-    _ = xlsxwriter.workbook_set_custom_property_boolean(
-        workbook,
-        "Signed off",
-        0,
-    );
+    try workbook.setCustomPropertyString("Checked by", "Eve");
+    try workbook.setCustomPropertyDateTime("Date completed", datetime);
+    try workbook.setCustomPropertyNumber("Document number", 12345);
+    try workbook.setCustomPropertyNumber("Reference number", 1.2345);
+    try workbook.setCustomPropertyBoolean("Has Review", true);
+    try workbook.setCustomPropertyBoolean("Signed off", false);
 
     // Add some text to the file.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        0,
-        0,
-        "Select 'Workbook Properties' to see properties.",
-        null,
-    );
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.writeString(0, 0, "Select 'Workbook Properties' to see properties.", .none);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");

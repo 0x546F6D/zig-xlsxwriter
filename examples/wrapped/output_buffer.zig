@@ -1,4 +1,6 @@
-var output_buffer: [*c]const u8 = undefined;
+// var output_buffer: xwz.WorkBookOutputBuffer = undefined;
+var output_buffer: [*:0]const u8 = undefined;
+// var output_buffer: [*c]const u8 = undefined;
 var output_buffer_size: usize = undefined;
 
 pub fn main() !void {
@@ -8,16 +10,16 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Set the worksheet options.
-    const options: xlsxwriter.WorkBookOptions = .{
-        .constant_memory = xlsxwriter.xw_true,
+    const options: xwz.WorkBookOptions = .{
+        .constant_memory = true,
         .tmpdir = null,
-        .use_zip64 = xlsxwriter.xw_false,
+        .use_zip64 = false,
         .output_buffer = &output_buffer,
         .output_buffer_size = &output_buffer_size,
     };
 
     // Create a new workbook with options
-    const workbook = try xlsxwriter.initWorkBookOpt(null, options);
+    var workbook = try xwz.initWorkBookOpt(alloc, null, options);
     const worksheet = try workbook.addWorkSheet(null);
 
     try worksheet.writeString(0, 0, "Hello", .none);
@@ -39,6 +41,4 @@ const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");

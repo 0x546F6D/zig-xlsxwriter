@@ -5,13 +5,13 @@
 // Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
 //
 
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-utf8.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-utf8.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 1, "Это фраза на русском!", null);
+    _ = lxw.worksheet_write_string(worksheet, 2, 1, "Это фраза на русском!", null);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

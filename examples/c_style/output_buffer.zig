@@ -42,31 +42,31 @@
 // }
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
     var output_buffer: [*c]const u8 = undefined;
     var output_buffer_size: usize = undefined;
 
     // Set the worksheet options.
-    var options = xlsxwriter.lxw_workbook_options{
+    var options = lxw.lxw_workbook_options{
         .output_buffer = &output_buffer,
         .output_buffer_size = &output_buffer_size,
-        .constant_memory = xlsxwriter.LXW_FALSE,
+        .constant_memory = lxw.LXW_FALSE,
         .tmpdir = null,
-        .use_zip64 = xlsxwriter.LXW_FALSE,
+        .use_zip64 = lxw.LXW_FALSE,
     };
 
     // Create a new workbook with options.
-    const workbook = xlsxwriter.workbook_new_opt(null, &options);
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new_opt(null, &options);
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Hello", null);
-    _ = xlsxwriter.worksheet_write_number(worksheet, 1, 0, 123, null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 0, "Hello", null);
+    _ = lxw.worksheet_write_number(worksheet, 1, 0, 123, null);
 
-    const error_code = xlsxwriter.workbook_close(workbook);
+    const error_code = lxw.workbook_close(workbook);
 
-    if (error_code != xlsxwriter.LXW_NO_ERROR) {
+    if (error_code != lxw.LXW_NO_ERROR) {
         return error.WorkbookCloseFailed;
     }
 

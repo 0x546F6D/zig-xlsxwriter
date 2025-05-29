@@ -1,97 +1,38 @@
-//
-// Example of cell locking and formula hiding in an Excel
-// worksheet using libxlsxwriter.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook =
-        xlsxwriter.workbook_new(
-            "zig-worksheet_protection.xlsx",
-        );
-    const worksheet =
-        xlsxwriter.workbook_add_worksheet(
-            workbook,
-            null,
-        );
+    defer _ = dbga.deinit();
 
-    const unlocked =
-        xlsxwriter.workbook_add_format(
-            workbook,
-        );
-    _ = xlsxwriter.format_set_unlocked(unlocked);
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
 
-    const hidden =
-        xlsxwriter.workbook_add_format(
-            workbook,
-        );
-    _ = xlsxwriter.format_set_hidden(hidden);
+    // Create a workbook and add a worksheet.
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    defer workbook.deinit() catch {};
 
-    // Widen the first column to make the text clearer
-    _ = xlsxwriter.worksheet_set_column(
-        worksheet,
-        0,
-        0,
-        40,
-        null,
-    );
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Turn worksheet protection on without a password
-    _ = xlsxwriter.worksheet_protect(
-        worksheet,
-        null,
-        null,
-    );
+    worksheet.protect(null, .default);
+
+    const unlocked = try workbook.addFormat();
+    unlocked.setUnlocked();
+
+    const hidden = try workbook.addFormat();
+    hidden.setHidden();
+
+    // Widen the first column to make the text clearer
+    try worksheet.setColumn(0, 0, 40, .none);
 
     // Write a locked, unlocked and hidden cell
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        0,
-        0,
-        "B1 is locked. It cannot be edited.",
-        null,
-    );
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        1,
-        0,
-        "B2 is unlocked. It can be edited.",
-        null,
-    );
-    _ = xlsxwriter.worksheet_write_string(
-        worksheet,
-        2,
-        0,
-        "B3 is hidden. The formula isn't visible.",
-        null,
-    );
+    try worksheet.writeString(0, 0, "B1 is locked. It cannot be edited.", .none);
+    try worksheet.writeString(1, 0, "B2 is unlocked. It can be edited.", .none);
+    try worksheet.writeString(2, 0, "B3 is hidden. The formula isn't visible.", .none);
 
-    _ = xlsxwriter.worksheet_write_formula(
-        worksheet,
-        0,
-        1,
-        "=1+2",
-        null,
-    ); // Locked by default
-    _ = xlsxwriter.worksheet_write_formula(
-        worksheet,
-        1,
-        1,
-        "=1+2",
-        unlocked,
-    );
-    _ = xlsxwriter.worksheet_write_formula(
-        worksheet,
-        2,
-        1,
-        "=1+2",
-        hidden,
-    );
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.writeFormula(0, 1, "=1+2", .none); // Locked by default
+    try worksheet.writeFormula(1, 1, "=1+2", unlocked);
+    try worksheet.writeFormula(2, 1, "=1+2", hidden);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");

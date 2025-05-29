@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -14,51 +14,51 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Change some of the column widths for clarity.
-    const cols = xlsxwriter.cols("A:A");
+    const cols = xwz.cols("A:A");
     try worksheet.setColumn(cols.first_col, cols.last_col, 30, .none);
 
     // Insert an image.
-    var cell = xlsxwriter.cell("A2");
+    var cell = xwz.cell("A2");
     try worksheet.writeString(cell.row, cell.col, "Insert an image in a cell:", .none);
 
-    cell = xlsxwriter.cell("B2");
+    cell = xwz.cell("B2");
     try worksheet.insertImage(cell.row, cell.col, asset_path);
 
     // Insert an image offset in the cell.
-    cell = xlsxwriter.cell("A12");
+    cell = xwz.cell("A12");
     try worksheet.writeString(cell.row, cell.col, "Insert an offset image:", .none);
 
-    const options1 = xlsxwriter.ImageOptions{
+    const options1 = xwz.ImageOptions{
         .x_offset = 15,
         .y_offset = 10,
     };
 
-    cell = xlsxwriter.cell("B12");
+    cell = xwz.cell("B12");
     try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options1);
 
     // Insert an image with scaling.
-    cell = xlsxwriter.cell("A22");
+    cell = xwz.cell("A22");
     try worksheet.writeString(cell.row, cell.col, "Insert a scaled image:", .none);
 
-    const options2 = xlsxwriter.ImageOptions{
+    const options2 = xwz.ImageOptions{
         .x_scale = 0.5,
         .y_scale = 0.5,
     };
 
-    cell = xlsxwriter.cell("B22");
+    cell = xwz.cell("B22");
     try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options2);
 
     // Insert an image with a hyperlink.
-    cell = xlsxwriter.cell("A32");
+    cell = xwz.cell("A32");
     try worksheet.writeString(cell.row, cell.col, "Insert an image with a hyperlink:", .none);
 
-    const options3 = xlsxwriter.ImageOptions{ .url = "https://github.com/jmcnamara" };
+    const options3 = xwz.ImageOptions{ .url = "https://github.com/jmcnamara" };
 
-    cell = xlsxwriter.cell("B32");
+    cell = xwz.cell("B32");
     try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options3);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

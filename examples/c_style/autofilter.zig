@@ -10,29 +10,29 @@ const std = @import("std");
 const c = @cImport({
     @cInclude("string.h");
 });
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
-fn writeWorksheetHeader(worksheet: ?*xlsxwriter.lxw_worksheet, header: ?*xlsxwriter.lxw_format) void {
+fn writeWorksheetHeader(worksheet: ?*lxw.lxw_worksheet, header: ?*lxw.lxw_format) void {
     // Make the columns wider for clarity
-    _ = xlsxwriter.worksheet_set_column(worksheet, 0, 3, 12, null);
+    _ = lxw.worksheet_set_column(worksheet, 0, 3, 12, null);
 
     // Write the column headers
-    _ = xlsxwriter.worksheet_set_row(worksheet, 0, 20, header);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Region", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 1, "Item", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 2, "Volume", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 3, "Month", null);
+    _ = lxw.worksheet_set_row(worksheet, 0, 20, header);
+    _ = lxw.worksheet_write_string(worksheet, 0, 0, "Region", null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 1, "Item", null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 2, "Volume", null);
+    _ = lxw.worksheet_write_string(worksheet, 0, 3, "Month", null);
 }
 
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-autofilter.xlsx");
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet3 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet4 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet5 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet6 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet7 = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-autofilter.xlsx");
+    const worksheet1 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet2 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet3 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet4 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet5 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet6 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet7 = lxw.workbook_add_worksheet(workbook, null);
 
     const Row = struct {
         region: [*:0]const u8,
@@ -94,10 +94,10 @@ pub fn main() !void {
         .{ .region = "East", .item = "Grape", .volume = 6000, .month = "February" },
     };
 
-    var hidden = xlsxwriter.lxw_row_col_options{ .hidden = xlsxwriter.LXW_TRUE };
+    var hidden = lxw.lxw_row_col_options{ .hidden = lxw.LXW_TRUE };
 
-    const header = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_bold(header);
+    const header = lxw.workbook_add_format(workbook);
+    _ = lxw.format_set_bold(header);
 
     //
     // Example 1. Autofilter without conditions.
@@ -108,14 +108,14 @@ pub fn main() !void {
 
     // Write the row data
     for (data, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet1, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet1, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet1, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet1, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet1, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet1, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet1, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet1, @intCast(i + 1), 3, row.month, null);
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet1, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet1, 0, 0, 50, 3);
 
     //
     // Example 2. Autofilter with a filter condition in the first column.
@@ -126,28 +126,28 @@ pub fn main() !void {
 
     // Write the row data
     for (data, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet2, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet2, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet2, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet2, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet2, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet2, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet2, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet2, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (c.strcmp(row.region, "East") != 0) {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet2, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet2, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet2, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet2, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule2 = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_EQUAL_TO,
+    var filter_rule2 = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_EQUAL_TO,
         .value_string = "East",
         .value = 0,
     };
 
-    _ = xlsxwriter.worksheet_filter_column(worksheet2, 0, &filter_rule2);
+    _ = lxw.worksheet_filter_column(worksheet2, 0, &filter_rule2);
 
     //
     // Example 3. Autofilter with a dual filter condition in one of the columns.
@@ -158,34 +158,34 @@ pub fn main() !void {
 
     // Write the row data
     for (data, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet3, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet3, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet3, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet3, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet3, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet3, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet3, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet3, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (c.strcmp(row.region, "East") != 0 and c.strcmp(row.region, "South") != 0) {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet3, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet3, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet3, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet3, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule3a = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_EQUAL_TO,
+    var filter_rule3a = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_EQUAL_TO,
         .value_string = "East",
         .value = 0,
     };
 
-    var filter_rule3b = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_EQUAL_TO,
+    var filter_rule3b = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_EQUAL_TO,
         .value_string = "South",
         .value = 0,
     };
 
-    _ = xlsxwriter.worksheet_filter_column2(worksheet3, 0, &filter_rule3a, &filter_rule3b, xlsxwriter.LXW_FILTER_OR);
+    _ = lxw.worksheet_filter_column2(worksheet3, 0, &filter_rule3a, &filter_rule3b, lxw.LXW_FILTER_OR);
 
     //
     // Example 4. Autofilter with filter conditions in two columns.
@@ -196,43 +196,43 @@ pub fn main() !void {
 
     // Write the row data
     for (data, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet4, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet4, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet4, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet4, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet4, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet4, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet4, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet4, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (!(c.strcmp(row.region, "East") == 0 and
             row.volume > 3000 and row.volume < 8000))
         {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet4, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet4, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet4, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet4, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule4a = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_EQUAL_TO,
+    var filter_rule4a = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_EQUAL_TO,
         .value_string = "East",
         .value = 0,
     };
 
-    var filter_rule4b = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_GREATER_THAN,
+    var filter_rule4b = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_GREATER_THAN,
         .value_string = "",
         .value = 3000,
     };
 
-    var filter_rule4c = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_LESS_THAN,
+    var filter_rule4c = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_LESS_THAN,
         .value_string = "",
         .value = 8000,
     };
 
-    _ = xlsxwriter.worksheet_filter_column(worksheet4, 0, &filter_rule4a);
-    _ = xlsxwriter.worksheet_filter_column2(worksheet4, 2, &filter_rule4b, &filter_rule4c, xlsxwriter.LXW_FILTER_AND);
+    _ = lxw.worksheet_filter_column(worksheet4, 0, &filter_rule4a);
+    _ = lxw.worksheet_filter_column2(worksheet4, 2, &filter_rule4b, &filter_rule4c, lxw.LXW_FILTER_AND);
 
     //
     // Example 5. Autofilter with a list filter condition.
@@ -243,31 +243,31 @@ pub fn main() !void {
 
     // Write the row data
     for (data, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet5, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet5, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet5, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet5, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet5, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet5, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet5, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet5, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (c.strcmp(row.region, "East") != 0 and
             c.strcmp(row.region, "North") != 0 and
             c.strcmp(row.region, "South") != 0)
         {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet5, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet5, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet5, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet5, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule5 = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_EQUAL_TO,
+    var filter_rule5 = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_EQUAL_TO,
         .value_string = "East",
         .value = 0,
     };
 
-    _ = xlsxwriter.worksheet_filter_column(worksheet5, 0, &filter_rule5);
+    _ = lxw.worksheet_filter_column(worksheet5, 0, &filter_rule5);
 
     //
     // Example 6. Autofilter with filter for blanks.
@@ -284,28 +284,28 @@ pub fn main() !void {
 
     // Write the row data
     for (data_with_blank, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet6, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet6, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet6, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet6, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet6, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet6, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet6, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet6, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (c.strcmp(row.region, "") != 0) {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet6, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet6, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet6, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet6, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule6 = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_BLANKS,
+    var filter_rule6 = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_BLANKS,
         .value_string = "",
         .value = 0,
     };
 
-    _ = xlsxwriter.worksheet_filter_column(worksheet6, 0, &filter_rule6);
+    _ = lxw.worksheet_filter_column(worksheet6, 0, &filter_rule6);
 
     //
     // Example 7. Autofilter with filter for non-blanks.
@@ -316,28 +316,28 @@ pub fn main() !void {
 
     // Write the row data
     for (data_with_blank, 0..) |row, i| {
-        _ = xlsxwriter.worksheet_write_string(worksheet7, @intCast(i + 1), 0, row.region, null);
-        _ = xlsxwriter.worksheet_write_string(worksheet7, @intCast(i + 1), 1, row.item, null);
-        _ = xlsxwriter.worksheet_write_number(worksheet7, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
-        _ = xlsxwriter.worksheet_write_string(worksheet7, @intCast(i + 1), 3, row.month, null);
+        _ = lxw.worksheet_write_string(worksheet7, @intCast(i + 1), 0, row.region, null);
+        _ = lxw.worksheet_write_string(worksheet7, @intCast(i + 1), 1, row.item, null);
+        _ = lxw.worksheet_write_number(worksheet7, @intCast(i + 1), 2, @floatFromInt(row.volume), null);
+        _ = lxw.worksheet_write_string(worksheet7, @intCast(i + 1), 3, row.month, null);
 
         // Hide rows that don't match the filter
         if (c.strcmp(row.region, "") == 0) {
-            _ = xlsxwriter.worksheet_set_row_opt(worksheet7, @intCast(i + 1), xlsxwriter.LXW_DEF_ROW_HEIGHT, null, &hidden);
+            _ = lxw.worksheet_set_row_opt(worksheet7, @intCast(i + 1), lxw.LXW_DEF_ROW_HEIGHT, null, &hidden);
         }
     }
 
     // Add the autofilter
-    _ = xlsxwriter.worksheet_autofilter(worksheet7, 0, 0, 50, 3);
+    _ = lxw.worksheet_autofilter(worksheet7, 0, 0, 50, 3);
 
     // Add the filter criteria
-    var filter_rule7 = xlsxwriter.lxw_filter_rule{
-        .criteria = xlsxwriter.LXW_FILTER_CRITERIA_NON_BLANKS,
+    var filter_rule7 = lxw.lxw_filter_rule{
+        .criteria = lxw.LXW_FILTER_CRITERIA_NON_BLANKS,
         .value_string = "",
         .value = 0,
     };
 
-    _ = xlsxwriter.worksheet_filter_column(worksheet7, 0, &filter_rule7);
+    _ = lxw.worksheet_filter_column(worksheet7, 0, &filter_rule7);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

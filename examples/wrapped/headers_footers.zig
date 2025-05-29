@@ -32,7 +32,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     // get image path
@@ -41,7 +41,7 @@ pub fn main() !void {
 
     const preview = "Select Print Preview to see the header and footer";
 
-    var worksheet: xlsxwriter.WorkSheet = undefined;
+    var worksheet: xwz.WorkSheet = undefined;
     var header: [*:0]const u8 = undefined;
     var footer: [*:0]const u8 = undefined;
 
@@ -60,13 +60,13 @@ pub fn main() !void {
     // An example with an image
     const worksheet2 = try workbook.addWorkSheet("Image");
     worksheet = worksheet2;
-    const header_options = xlsxwriter.HeaderFooterOptions{
+    const header_options = xwz.HeaderFooterOptions{
         .image_left = asset_path,
     };
 
     try worksheet.setHeaderOpt("&L&[Picture]", header_options);
 
-    const margins: xlsxwriter.Margins = .{
+    const margins: xwz.Margins = .{
         .left = -1,
         .right = -1,
         .top = 1.3,
@@ -88,7 +88,7 @@ pub fn main() !void {
     try worksheet.setHeader(header);
     try worksheet.setFooter(footer);
 
-    const breaks: xlsxwriter.RowBreaks = &.{20};
+    const breaks: xwz.RowBreaks = &.{20};
     try worksheet.setHPageBreaks(breaks);
 
     // This example shows how to use more than one font
@@ -124,4 +124,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

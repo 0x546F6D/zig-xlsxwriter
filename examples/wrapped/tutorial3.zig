@@ -1,31 +1,26 @@
 const Expense = struct {
     item: [*:0]const u8,
     cost: f64,
-    datetime: xlsxwriter.DateTime,
+    datetime: xwz.DateTime,
 };
 
-var expenses = [_]Expense{
-    .{
-        .item = "Rent",
-        .cost = 1000.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 13 },
-    },
-    .{
-        .item = "Gas",
-        .cost = 100.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 14 },
-    },
-    .{
-        .item = "Food",
-        .cost = 300.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 16 },
-    },
-    .{
-        .item = "Gym",
-        .cost = 50.0,
-        .datetime = .{ .year = 2013, .month = 1, .day = 20 },
-    },
-};
+var expenses = [_]Expense{ .{
+    .item = "Rent",
+    .cost = 1000.0,
+    .datetime = .{ .year = 2013, .month = 1, .day = 13 },
+}, .{
+    .item = "Gas",
+    .cost = 100.0,
+    .datetime = .{ .year = 2013, .month = 1, .day = 14 },
+}, .{
+    .item = "Food",
+    .cost = 300.0,
+    .datetime = .{ .year = 2013, .month = 1, .day = 16 },
+}, .{
+    .item = "Gym",
+    .cost = 50.0,
+    .datetime = .{ .year = 2013, .month = 1, .day = 20 },
+} };
 
 pub fn main() !void {
     defer _ = dbga.deinit();
@@ -34,7 +29,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -72,4 +67,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

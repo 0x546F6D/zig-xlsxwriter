@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -26,7 +26,15 @@ pub fn main() !void {
     try worksheet.writeArrayFormula(0, 0, 0, 0, "{=SUM(B1:C1*B2:C2)}", .none);
 
     // Similar to above but using the RANGE macro.
-    try worksheet.writeArrayFormula(1, xlsxwriter.range("A2:A2"), 0, 0, "{=SUM(B1:C1*B2:C2)}", .none);
+    const range = xwz.range("A2:A2");
+    try worksheet.writeArrayFormula(
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
+        "{=SUM(B1:C1*B2:C2)}",
+        .none,
+    );
 
     // Write an array formula that returns a range of values.
     try worksheet.writeArrayFormula(4, 0, 6, 0, "{=TREND(C5:C7,B5:B7)}", .none);
@@ -35,4 +43,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

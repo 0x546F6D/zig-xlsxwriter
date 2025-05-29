@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
     // We don't use the returned worksheets in this example and use a generic
     // loop below instead.
@@ -21,9 +21,8 @@ pub fn main() !void {
     try workbook.defineName("Sheet2!Sales", "=Sheet2!$G$1:$G$10");
 
     // Write some text to the worksheets and one of the defined names in a formula
-    const worksheets_o = try workbook.getWorkSheets(alloc);
+    const worksheets_o = try workbook.getWorkSheets();
     const worksheets = if (worksheets_o) |worksheets| worksheets else return;
-    defer alloc.free(worksheets);
 
     for (worksheets) |worksheet| {
         try worksheet.setColumn(0, 0, 45, .none);
@@ -37,4 +36,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
+const xwz = @import("xlsxwriter");

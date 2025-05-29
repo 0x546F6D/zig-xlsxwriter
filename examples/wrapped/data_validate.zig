@@ -1,6 +1,6 @@
 // Write some data to the worksheet.
 fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {
-    try worksheet.writeString(0, 0, "Some examples of data validation in libxlsxwriter", format);
+    try worksheet.writeString(0, 0, "Some examples of data validation in libxwz", format);
     try worksheet.writeString(0, 1, "Enter values in this column", format);
     try worksheet.writeString(0, 3, "Sample Data", format);
 
@@ -26,13 +26,13 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
 
     // Allocate memory for the data validation structure
-    var data_validation: xlsxwriter.DataValidation = .{};
+    var data_validation: xwz.DataValidation = .{};
 
     // Add a format to use to highlight the header cells.
     const format = try workbook.addFormat();
@@ -103,7 +103,7 @@ pub fn main() !void {
     // Example 6. Limiting input to a value in a dropdown list.
     try worksheet.writeString(12, 0, "Select a value from a dropdown list", .none);
 
-    const list: xlsxwriter.StringArray = &.{ "open", "high", "close" };
+    const list: xwz.CStringArray = &.{ "open", "high", "close" };
     data_validation.validate = .list;
     data_validation.value_list = list;
 
@@ -120,8 +120,8 @@ pub fn main() !void {
     // Example 8. Limiting input to a date in a fixed range.
     try worksheet.writeString(16, 0, "Enter a date between 1/1/2024 and 12/12/2024", .none);
 
-    const datetime1: xlsxwriter.DateTime = .{ .year = 2024, .month = 1, .day = 1, .hour = 0, .min = 0, .sec = 0 };
-    const datetime2: xlsxwriter.DateTime = .{ .year = 2024, .month = 12, .day = 12, .hour = 0, .min = 0, .sec = 0 };
+    const datetime1: xwz.DateTime = .{ .year = 2024, .month = 1, .day = 1, .hour = 0, .min = 0, .sec = 0 };
+    const datetime2: xwz.DateTime = .{ .year = 2024, .month = 12, .day = 12, .hour = 0, .min = 0, .sec = 0 };
 
     data_validation.validate = .date;
     data_validation.criteria = .between;
@@ -133,8 +133,8 @@ pub fn main() !void {
     // Example 9. Limiting input to a time in a fixed range.
     try worksheet.writeString(18, 0, "Enter a time between 6:00 and 12:00", .none);
 
-    const datetime3: xlsxwriter.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 6, .min = 0, .sec = 0 };
-    const datetime4: xlsxwriter.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 12, .min = 0, .sec = 0 };
+    const datetime3: xwz.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 6, .min = 0, .sec = 0 };
+    const datetime4: xwz.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 12, .min = 0, .sec = 0 };
 
     data_validation.validate = .time;
     data_validation.criteria = .between;
@@ -208,6 +208,6 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;
+const Format = xwz.Format;

@@ -7,7 +7,7 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 // Simple array with some PNG data
 const image_buffer = [_]u8{
@@ -34,18 +34,18 @@ const image_size = 200;
 
 pub fn main() !void {
     // Create a new workbook and add a worksheet
-    const workbook = xlsxwriter.workbook_new("zig-embed_image_buffer.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const workbook = lxw.workbook_new("zig-embed_image_buffer.xlsx");
+    const worksheet = lxw.workbook_add_worksheet(workbook, null);
 
     // Embed the image from the buffer
     // In Zig, we need to convert the cell reference "B3" to row and column
-    const row_b3 = xlsxwriter.lxw_name_to_row("B3");
-    const col_b3 = xlsxwriter.lxw_name_to_col("B3");
+    const row_b3 = lxw.lxw_name_to_row("B3");
+    const col_b3 = lxw.lxw_name_to_col("B3");
 
     // Get a pointer to the image buffer
     const image_ptr = @as([*c]const u8, &image_buffer);
 
-    _ = xlsxwriter.worksheet_embed_image_buffer(
+    _ = lxw.worksheet_embed_image_buffer(
         worksheet,
         row_b3,
         col_b3,
@@ -53,5 +53,5 @@ pub fn main() !void {
         image_size,
     );
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }

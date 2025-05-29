@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xlsxwriter.initWorkBook(xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -26,27 +26,26 @@ pub fn main() !void {
     blue.setFontColor(@enumFromInt(0x0000FF));
 
     // Create the fragments for the rich string.
-    const fragment1: xlsxwriter.RichStringTuple = .{
+    const fragment1: xwz.RichStringTuple = .{
         .string = "This is ",
     };
-    const fragment2: xlsxwriter.RichStringTuple = .{
-        .format_c = red.format_c,
+    const fragment2: xwz.RichStringTuple = .{
+        .format = red,
         .string = "red",
     };
-    const fragment3: xlsxwriter.RichStringTuple = .{
+    const fragment3: xwz.RichStringTuple = .{
         .string = " and this is ",
     };
-    const fragment4: xlsxwriter.RichStringTuple = .{
-        .format_c = blue.format_c,
+    const fragment4: xwz.RichStringTuple = .{
+        .format = blue,
         .string = "blue",
     };
 
-    const rich_string: xlsxwriter.RichStringType = &.{
-        &fragment1,
-        &fragment2,
-        &fragment3,
-        &fragment4,
-        null,
+    const rich_string = &.{
+        fragment1,
+        fragment2,
+        fragment3,
+        fragment4,
     };
 
     // Write an empty string to the merged range.
@@ -61,6 +60,4 @@ pub fn main() !void {
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
-const xlsxwriter = @import("xlsxwriter");
-const WorkSheet = @import("xlsxwriter").WorkSheet;
-const Format = @import("xlsxwriter").Format;
+const xwz = @import("xlsxwriter");

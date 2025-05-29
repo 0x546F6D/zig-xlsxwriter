@@ -6,24 +6,24 @@
 //
 
 const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+const lxw = @import("lxw");
 
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-tab_colors.xlsx");
+    const workbook = lxw.workbook_new("zig-tab_colors.xlsx");
 
     // Set up some worksheets.
-    const worksheet1 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet2 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet3 = xlsxwriter.workbook_add_worksheet(workbook, null);
-    const worksheet4 = xlsxwriter.workbook_add_worksheet(workbook, null);
+    const worksheet1 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet2 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet3 = lxw.workbook_add_worksheet(workbook, null);
+    const worksheet4 = lxw.workbook_add_worksheet(workbook, null);
 
     // Set the tab colors.
-    _ = xlsxwriter.worksheet_set_tab_color(worksheet1, xlsxwriter.LXW_COLOR_RED);
-    _ = xlsxwriter.worksheet_set_tab_color(worksheet2, xlsxwriter.LXW_COLOR_GREEN);
-    _ = xlsxwriter.worksheet_set_tab_color(worksheet3, 0xFF9900); // Orange.
+    _ = lxw.worksheet_set_tab_color(worksheet1, lxw.LXW_COLOR_RED);
+    _ = lxw.worksheet_set_tab_color(worksheet2, lxw.LXW_COLOR_GREEN);
+    _ = lxw.worksheet_set_tab_color(worksheet3, 0xFF9900); // Orange.
 
     // worksheet4 will have the default color.
-    _ = xlsxwriter.worksheet_write_string(worksheet4, 0, 0, "Hello", null);
+    _ = lxw.worksheet_write_string(worksheet4, 0, 0, "Hello", null);
 
-    _ = xlsxwriter.workbook_close(workbook);
+    _ = lxw.workbook_close(workbook);
 }
