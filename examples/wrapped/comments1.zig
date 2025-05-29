@@ -5,12 +5,12 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
 
-    try worksheet.writeString(0, 0, "Hello", null);
+    try worksheet.writeString(0, 0, "Hello", .none);
 
     try worksheet.writeComment(0, 0, "This is a comment");
 }

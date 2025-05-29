@@ -469,23 +469,64 @@ pub inline fn writeComment(
     ));
 }
 
-// pub const struct_lxw_comment_options = extern struct {
-//     visible: u8 = @import("std").mem.zeroes(u8),
-//     author: [*c]const u8 = @import("std").mem.zeroes([*c]const u8),
-//     width: u16 = @import("std").mem.zeroes(u16),
-//     height: u16 = @import("std").mem.zeroes(u16),
-//     x_scale: f64 = @import("std").mem.zeroes(f64),
-//     y_scale: f64 = @import("std").mem.zeroes(f64),
-//     color: lxw_color_t = @import("std").mem.zeroes(lxw_color_t),
-//     font_name: [*c]const u8 = @import("std").mem.zeroes([*c]const u8),
-//     font_size: f64 = @import("std").mem.zeroes(f64),
-//     font_family: u8 = @import("std").mem.zeroes(u8),
-//     start_row: lxw_row_t = @import("std").mem.zeroes(lxw_row_t),
-//     start_col: lxw_col_t = @import("std").mem.zeroes(lxw_col_t),
-//     x_offset: i32 = @import("std").mem.zeroes(i32),
-//     y_offset: i32 = @import("std").mem.zeroes(i32),
-// };
-// pub const lxw_comment_options = struct_lxw_comment_options;
+pub const CommentDisplayTypes = enum(u8) {
+    default = c.LXW_COMMENT_DISPLAY_DEFAULT,
+    hidden = c.LXW_COMMENT_DISPLAY_HIDDEN,
+    visible = c.LXW_COMMENT_DISPLAY_VISIBLE,
+};
+
+pub const CommentOptions = extern struct {
+    visible: CommentDisplayTypes = .default,
+    author: ?CString = null,
+    width: u16 = 0,
+    height: u16 = 0,
+    x_scale: f64 = 1,
+    y_scale: f64 = 1,
+    color: Format.DefinedColors = .default,
+    font_name: ?CString = null,
+    font_size: f64 = 8,
+    font_family: u8 = 0,
+    start_row: u32 = 0,
+    start_col: u16 = 0,
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+
+    pub const default = CommentOptions{
+        .visible = .default,
+        .author = null,
+        .width = 0,
+        .height = 0,
+        .x_scale = 1,
+        .y_scale = 1,
+        .color = .default,
+        .font_name = null,
+        .font_size = 8,
+        .font_family = 0,
+        .start_row = 0,
+        .start_col = 0,
+        .x_offset = 0,
+        .y_offset = 0,
+    };
+
+    inline fn toC(self: CommentOptions) c.lxw_comment_options {
+        return c.lxw_comment_options{
+            .visible = @intFromEnum(self.visible),
+            .author = self.author,
+            .width = self.width,
+            .height = self.height,
+            .x_scale = self.x_scale,
+            .y_scale = self.y_scale,
+            .color = @intFromEnum(self.color),
+            .font_name = self.font_name,
+            .font_size = self.font_size,
+            .font_family = self.font_family,
+            .start_row = self.start_row,
+            .start_col = self.start_col,
+            .x_offset = self.x_offset,
+            .y_offset = self.y_offset,
+        };
+    }
+};
 
 // pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
 pub inline fn writeCommentOpt(
@@ -493,15 +534,20 @@ pub inline fn writeCommentOpt(
     row: u32,
     col: u16,
     string: ?CString,
-    options: ?CString,
+    options: CommentOptions,
 ) XlsxError!void {
     try check(c.worksheet_write_comment_opt(
         self.worksheet_c,
         row,
         col,
         string,
-        options,
+        @constCast(&options.toC()),
     ));
+}
+
+// pub extern fn worksheet_show_comments(worksheet: [*c]lxw_worksheet) void;
+pub inline fn showComments(self: WorkSheet) void {
+    c.worksheet_show_comments(self.worksheet_c);
 }
 
 // pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
@@ -1535,7 +1581,6 @@ pub inline fn protect(
 // pub extern fn worksheet_right_to_left(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_hide_zero(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_outline_settings(worksheet: [*c]lxw_worksheet, visible: u8, symbols_below: u8, symbols_right: u8, auto_style: u8) void;
-// pub extern fn worksheet_show_comments(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_ignore_errors(worksheet: [*c]lxw_worksheet, @"type": u8, range: [*c]const u8) lxw_error;
 
 const std = @import("std");

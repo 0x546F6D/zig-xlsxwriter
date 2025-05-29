@@ -46,6 +46,7 @@ pub const HeaderFooterOptions = WorkSheet.HeaderFooterOptions;
 pub const RowBreaks = WorkSheet.RowBreaks;
 pub const ColBreaks = WorkSheet.ColBreaks;
 pub const Margins = WorkSheet.Margins;
+pub const CommentOptions = WorkSheet.CommentOptions;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;
