@@ -48,65 +48,6 @@ pub const Pattern = struct {
     }
 };
 
-// lxw_chart_marker
-pub const Marker = struct {
-    type: MarkerType = .automatic,
-    size: u8 = 0,
-    line: ?*Line = null,
-    fill: ?*Fill = null,
-    pattern: ?*Pattern = null,
-
-    pub const default = Marker{
-        .type = .automatic,
-        .size = 0,
-        .line = null,
-        .fill = null,
-        .pattern = null,
-    };
-
-    inline fn toC(
-        self: Marker,
-        line: ?*c.lxw_chart_line,
-        fill: ?*c.lxw_chart_fill,
-        pattern: ?*c.lxw_chart_pattern,
-    ) c.lxw_chart_marker {
-        return c.lxw_chart_marker{
-            .type = @intFromEnum(self.type),
-            .size = self.size,
-            .line = @ptrCast(line),
-            .fill = @ptrCast(fill),
-            .pattern = @ptrCast(pattern),
-        };
-    }
-};
-
-// lxw_chart_point
-pub const Point = extern struct {
-    line: ?*Line = null,
-    fill: ?*Fill = null,
-    pattern: ?*Pattern = null,
-
-    pub const default = Marker{
-        .line = null,
-        .fill = null,
-        .pattern = null,
-    };
-
-    inline fn toC(
-        self: Point,
-        line: ?*c.lxw_chart_line,
-        fill: ?*c.lxw_chart_fill,
-        pattern: ?*c.lxw_chart_pattern,
-    ) c.lxw_chart_point {
-        _ = self;
-        return c.lxw_chart_point{
-            .line = @ptrCast(line),
-            .fill = @ptrCast(fill),
-            .pattern = @ptrCast(pattern),
-        };
-    }
-};
-
 pub const Type = enum(u8) {
     area = c.LXW_CHART_AREA,
     area_stacked = c.LXW_CHART_AREA_STACKED,
@@ -144,20 +85,6 @@ pub const LineDashType = enum(u8) {
     dot = c.LXW_CHART_LINE_DASH_DOT,
     system_dash_dot = c.LXW_CHART_LINE_DASH_SYSTEM_DASH_DOT,
     system_dash_dot_dot = c.LXW_CHART_LINE_DASH_SYSTEM_DASH_DOT_DOT,
-};
-
-pub const MarkerType = enum(u8) {
-    automatic = c.LXW_CHART_MARKER_AUTOMATIC,
-    none = c.LXW_CHART_MARKER_NONE,
-    square = c.LXW_CHART_MARKER_SQUARE,
-    diamond = c.LXW_CHART_MARKER_DIAMOND,
-    triangle = c.LXW_CHART_MARKER_TRIANGLE,
-    x = c.LXW_CHART_MARKER_X,
-    star = c.LXW_CHART_MARKER_STAR,
-    short_dash = c.LXW_CHART_MARKER_SHORT_DASH,
-    long_dash = c.LXW_CHART_MARKER_LONG_DASH,
-    circle = c.LXW_CHART_MARKER_CIRCLE,
-    plus = c.LXW_CHART_MARKER_PLUS,
 };
 
 pub const PatternType = enum(u8) {
@@ -210,27 +137,6 @@ pub const PatternType = enum(u8) {
     large_check = c.LXW_CHART_PATTERN_LARGE_CHECK,
     outlined_diamond = c.LXW_CHART_PATTERN_OUTLINED_DIAMOND,
     solid_diamond = c.LXW_CHART_PATTERN_SOLID_DIAMOND,
-};
-
-pub const LabelPosition = enum(u8) {
-    default = c.LXW_CHART_LABEL_POSITION_DEFAULT,
-    center = c.LXW_CHART_LABEL_POSITION_CENTER,
-    right = c.LXW_CHART_LABEL_POSITION_RIGHT,
-    left = c.LXW_CHART_LABEL_POSITION_LEFT,
-    above = c.LXW_CHART_LABEL_POSITION_ABOVE,
-    below = c.LXW_CHART_LABEL_POSITION_BELOW,
-    inside_base = c.LXW_CHART_LABEL_POSITION_INSIDE_BASE,
-    inside_end = c.LXW_CHART_LABEL_POSITION_INSIDE_END,
-    outside_end = c.LXW_CHART_LABEL_POSITION_OUTSIDE_END,
-    best_fit = c.LXW_CHART_LABEL_POSITION_BEST_FIT,
-};
-
-pub const LabelSeparator = enum(u8) {
-    comma = c.LXW_CHART_LABEL_SEPARATOR_COMMA,
-    semicolon = c.LXW_CHART_LABEL_SEPARATOR_SEMICOLON,
-    period = c.LXW_CHART_LABEL_SEPARATOR_PERIOD,
-    newline = c.LXW_CHART_LABEL_SEPARATOR_NEWLINE,
-    space = c.LXW_CHART_LABEL_SEPARATOR_SPACE,
 };
 
 pub const AxisType = enum(u8) {

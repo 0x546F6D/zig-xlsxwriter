@@ -69,6 +69,7 @@ pub const XlsxError = error{
     AddFormat,
     AddChart,
     ChartAddSeries,
+    GetErrorBars,
     WriteRichString,
     AddTable,
 };
@@ -152,6 +153,7 @@ pub inline fn strError(err: anyerror) []const u8 {
         error.AddFormat => "add_format() returned a null pointer.",
         error.AddChart => "add_chart() returned a null pointer.",
         error.ChartAddSeries => "chart_add_series() returned a null pointer.",
+        error.GetErrorBars => "chart_series_get_error_bars() returned a null pointer.",
         error.WriteRichString =>
         \\No Allocator provided to initWorkBook(), writeRichString() cannot be called,
         \\ > Provide Allocator or use writeRichStringNoAlloc() instead.

@@ -83,7 +83,7 @@ pub inline fn setLandscape(self: ChartSheet) void {
 
 // pub extern fn chartsheet_set_portrait(chartsheet: [*c]lxw_chartsheet) void;
 pub inline fn setPortrait(self: ChartSheet) void {
-    c.chartsheet_set_landscape(self.chartsheet_c);
+    c.chartsheet_set_portrait(self.chartsheet_c);
 }
 
 // pub extern fn chartsheet_set_paper(chartsheet: [*c]lxw_chartsheet, paper_type: u8) void;
