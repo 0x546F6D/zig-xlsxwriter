@@ -1,6 +1,8 @@
 const Chart = @This();
 
 chart_c: ?*c.lxw_chart,
+x_axis: ChartAxis,
+y_axis: ChartAxis,
 
 pub const Font = struct {
     name: ?CString = null,
@@ -198,8 +200,6 @@ pub const Point = extern struct {
         };
     }
 };
-
-pub const Series = c.lxw_chart_series;
 
 // pub const struct_lxw_chart_title = extern struct {
 //     name: [*c]u8 = @import("std").mem.zeroes([*c]u8),
@@ -479,14 +479,12 @@ pub const TickMark = enum(u8) {
     crossing = c.LXW_CHART_AXIS_TICK_MARK_CROSSING,
 };
 
-pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) XlsxError!*Series {
-    return c.chart_add_series(self.chart_c, categories, values) orelse XlsxError.ChartAddSeries;
-}
-
+// pub extern fn chart_title_set_name(chart: [*c]lxw_chart, name: [*c]const u8) void;
 pub inline fn titleSetName(self: Chart, name: ?CString) void {
     c.chart_title_set_name(self.chart_c, name);
 }
 
+// pub extern fn chart_title_set_name_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
 pub inline fn titleSetNameFont(self: Chart, font: Font) void {
     c.chart_title_set_name_font(
         self.chart_c,
@@ -494,10 +492,60 @@ pub inline fn titleSetNameFont(self: Chart, font: Font) void {
     );
 }
 
+// pub extern fn chart_set_style(chart: [*c]lxw_chart, style_id: u8) void;
+pub inline fn setStyle(self: Chart, style_id: u8) void {
+    c.chart_set_style(
+        self.chart_c,
+        style_id,
+    );
+}
+
+// pub extern fn chart_title_set_name_range(chart: [*c]lxw_chart, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
+// pub extern fn chart_title_off(chart: [*c]lxw_chart) void;
+// pub extern fn chart_title_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+// pub extern fn chart_title_set_overlay(chart: [*c]lxw_chart, overlay: u8) void;
+
+// pub extern fn chart_add_series(chart: [*c]lxw_chart, categories: [*c]const u8, values: [*c]const u8) [*c]lxw_chart_series;
+pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) XlsxError!ChartSeries {
+    return ChartSeries{
+        .chartseries_c = c.chart_add_series(self.chart_c, categories, values) orelse return XlsxError.ChartAddSeries,
+    };
+}
+
+// pub extern fn chart_legend_set_position(chart: [*c]lxw_chart, position: u8) void;
+// pub extern fn chart_legend_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+// pub extern fn chart_legend_set_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
+// pub extern fn chart_legend_delete_series(chart: [*c]lxw_chart, delete_series: [*c]i16) lxw_error;
+
+// pub extern fn chart_chartarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+// pub extern fn chart_chartarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
+// pub extern fn chart_chartarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
+
+// pub extern fn chart_plotarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+// pub extern fn chart_plotarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
+// pub extern fn chart_plotarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
+// pub extern fn chart_plotarea_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+
+// pub extern fn chart_set_table(chart: [*c]lxw_chart) void;
+// pub extern fn chart_set_table_grid(chart: [*c]lxw_chart, horizontal: u8, vertical: u8, outline: u8, legend_keys: u8) void;
+// pub extern fn chart_set_table_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
+// pub extern fn chart_set_up_down_bars(chart: [*c]lxw_chart) void;
+// pub extern fn chart_set_up_down_bars_format(chart: [*c]lxw_chart, up_bar_line: [*c]lxw_chart_line, up_bar_fill: [*c]lxw_chart_fill, down_bar_line: [*c]lxw_chart_line, down_bar_fill: [*c]lxw_chart_fill) void;
+// pub extern fn chart_set_drop_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+// pub extern fn chart_set_high_low_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+// pub extern fn chart_set_series_overlap(chart: [*c]lxw_chart, overlap: i8) void;
+// pub extern fn chart_set_series_gap(chart: [*c]lxw_chart, gap: u16) void;
+// pub extern fn chart_show_blanks_as(chart: [*c]lxw_chart, option: u8) void;
+// pub extern fn chart_show_hidden_data(chart: [*c]lxw_chart) void;
+// pub extern fn chart_set_rotation(chart: [*c]lxw_chart, rotation: u16) void;
+// pub extern fn chart_set_hole_size(chart: [*c]lxw_chart, size: u8) void;
+
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
 const CString = xlsxwriter.CString;
 const CStringArray = xlsxwriter.CStringArray;
 const Bool = xlsxwriter.Boolean;
-const DefinedColors = @import("format.zig").DefinedColors;
 const XlsxError = @import("errors.zig").XlsxError;
+const DefinedColors = @import("format.zig").DefinedColors;
+const ChartSeries = @import("ChartSeries.zig");
+const ChartAxis = @import("ChartAxis.zig");

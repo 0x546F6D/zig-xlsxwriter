@@ -80,8 +80,12 @@ pub inline fn addFormat(self: WorkBook) XlsxError!Format {
 
 // pub extern fn workbook_add_chart(workbook: [*c]lxw_workbook, chart_type: u8) [*c]lxw_chart;
 pub inline fn addChart(self: WorkBook, chart_type: Chart.Type) XlsxError!Chart {
+    const chart = c.workbook_add_chart(self.workbook_c, @intFromEnum(chart_type)) orelse
+        return XlsxError.AddChart;
     return Chart{
-        .chart_c = c.workbook_add_chart(self.workbook_c, @intFromEnum(chart_type)) orelse return XlsxError.AddChart,
+        .chart_c = chart,
+        .x_axis = ChartAxis{ .axis_c = chart.*.x_axis },
+        .y_axis = ChartAxis{ .axis_c = chart.*.y_axis },
     };
 }
 
@@ -255,13 +259,13 @@ pub inline fn setVbaName(
 }
 
 // pub extern fn workbook_add_chartsheet(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) [*c]lxw_chartsheet;
-pub inline fn addCharSheet(
+pub inline fn addChartSheet(
     self: WorkBook,
     sheetname: ?CString,
 ) XlsxError!ChartSheet {
     return ChartSheet{
         // .alloc = self.alloc,
-        .worksheet_c = c.workbook_add_chartsheet(self.workbook_c, sheetname) orelse return XlsxError.AddChartSheet,
+        .chartsheet_c = c.workbook_add_chartsheet(self.workbook_c, sheetname) orelse return XlsxError.AddChartSheet,
     };
 }
 
@@ -351,3 +355,4 @@ const WorkSheet = @import("WorkSheet.zig");
 const ChartSheet = @import("ChartSheet.zig");
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
+const ChartAxis = @import("ChartAxis.zig");

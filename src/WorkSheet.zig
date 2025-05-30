@@ -1730,6 +1730,32 @@ pub inline fn insertButton(
     ));
 }
 
+pub const IgnoreErrors = enum(u8) {
+    number_stored_as_text = c.LXW_IGNORE_NUMBER_STORED_AS_TEXT,
+    eval_error = c.LXW_IGNORE_EVAL_ERROR,
+    formula_differs = c.LXW_IGNORE_FORMULA_DIFFERS,
+    formula_range = c.LXW_IGNORE_FORMULA_RANGE,
+    formula_unlocked = c.LXW_IGNORE_FORMULA_UNLOCKED,
+    empty_cell_reference = c.LXW_IGNORE_EMPTY_CELL_REFERENCE,
+    list_data_validation = c.LXW_IGNORE_LIST_DATA_VALIDATION,
+    calculated_column = c.LXW_IGNORE_CALCULATED_COLUMN,
+    two_digit_text_year = c.LXW_IGNORE_TWO_DIGIT_TEXT_YEAR,
+    last_option = c.LXW_IGNORE_LAST_OPTION,
+};
+
+// pub extern fn worksheet_ignore_errors(worksheet: [*c]lxw_worksheet, @"type": u8, range: [*c]const u8) lxw_error;
+pub inline fn ignoreErrors(
+    self: WorkSheet,
+    @"type": IgnoreErrors,
+    range: ?CString,
+) XlsxError!void {
+    try check(c.worksheet_ignore_errors(
+        self.worksheet_c,
+        @intFromEnum(@"type"),
+        range,
+    ));
+}
+
 // pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_activate(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_select(worksheet: [*c]lxw_worksheet) void;
@@ -1747,7 +1773,6 @@ pub inline fn insertButton(
 // pub extern fn worksheet_right_to_left(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_hide_zero(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_outline_settings(worksheet: [*c]lxw_worksheet, visible: u8, symbols_below: u8, symbols_right: u8, auto_style: u8) void;
-// pub extern fn worksheet_ignore_errors(worksheet: [*c]lxw_worksheet, @"type": u8, range: [*c]const u8) lxw_error;
 
 const std = @import("std");
 const c = @import("lxw");

@@ -1,36 +1,36 @@
-//
-// An example of turning off worksheet cells errors/warnings using
-// libxlsxwriter.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-ignore_errors.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add worksheets.
+    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    defer workbook.deinit() catch {};
+
+    const worksheet = try workbook.addWorkSheet(null);
 
     // Write strings that looks like numbers. This will cause an Excel warning.
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 2, "123", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 2, "123", null);
+    try worksheet.writeString(1, 2, "123", .default);
+    try worksheet.writeString(2, 2, "123", .default);
 
     // Write a divide by zero formula. This will also cause an Excel warning.
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 4, 2, "=1/0", null);
-    _ = xlsxwriter.worksheet_write_formula(worksheet, 5, 2, "=1/0", null);
+    try worksheet.writeFormula(4, 2, "=1/0", .default);
+    try worksheet.writeFormula(5, 2, "=1/0", .default);
 
     // Turn off some of the warnings:
-    _ = xlsxwriter.worksheet_ignore_errors(worksheet, xlsxwriter.LXW_IGNORE_NUMBER_STORED_AS_TEXT, "C3");
-    _ = xlsxwriter.worksheet_ignore_errors(worksheet, xlsxwriter.LXW_IGNORE_EVAL_ERROR, "C6");
+    try worksheet.ignoreErrors(.number_stored_as_text, "C3");
+    try worksheet.ignoreErrors(.eval_error, "C6");
 
     // Write some descriptions for the cells and make the column wider for clarity.
-    _ = xlsxwriter.worksheet_set_column(worksheet, 1, 1, 16, null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 1, 1, "Warning:", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 2, 1, "Warning turned off:", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 4, 1, "Warning:", null);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 5, 1, "Warning turned off:", null);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    try worksheet.setColumn(1, 1, 16, .default);
+    try worksheet.writeString(1, 1, "Warning:", .default);
+    try worksheet.writeString(2, 1, "Warning turned off:", .default);
+    try worksheet.writeString(4, 1, "Warning:", .default);
+    try worksheet.writeString(5, 1, "Warning turned off:", .default);
 }
+
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");
