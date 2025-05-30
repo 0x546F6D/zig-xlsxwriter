@@ -61,10 +61,14 @@ pub const XlsxError = error{
     UnknownError,
     NewWorkBook,
     AddWorkSheet,
+    GetWorkSheetName,
+    GetWorkSheets,
+    AddChartSheet,
+    GetChartSheetName,
+    GetChartSheets,
     AddFormat,
     AddChart,
     ChartAddSeries,
-    GetWorkSheets,
     WriteRichString,
     AddTable,
 };
@@ -140,10 +144,14 @@ pub inline fn strError(err: anyerror) []const u8 {
     } else return switch (err) {
         error.NewWorkBook => "new_workbook() returned a null pointer.",
         error.AddWorkSheet => "add_worksheet() returned a null pointer.",
+        error.GetWorkSheetName => "Could Not get WorkSheet with provided name.",
+        error.GetWorkSheets => "No Allocator provided to initWorkBook(), getWorkSheets() cannot be called.",
+        error.AddChartSheet => "add_chartsheet() returned a null pointer.",
+        error.GetChartSheetName => "Could Not get ChartSheet with provided name.",
+        error.GetChartSheets => "No Allocator provided to initWorkBook(), getChartSheets() cannot be called.",
         error.AddFormat => "add_format() returned a null pointer.",
         error.AddChart => "add_chart() returned a null pointer.",
         error.ChartAddSeries => "chart_add_series() returned a null pointer.",
-        error.GetWorkSheets => "No Allocator provided to initWorkBook(), getWorkSheets() cannot be called.",
         error.WriteRichString =>
         \\No Allocator provided to initWorkBook(), writeRichString() cannot be called,
         \\ > Provide Allocator or use writeRichStringNoAlloc() instead.

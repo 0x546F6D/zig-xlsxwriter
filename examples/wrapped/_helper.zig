@@ -1,18 +1,26 @@
-pub fn getXlsxPath(alloc: std.mem.Allocator, example_name: []const u8) ![:0]const u8 {
+pub fn getOutputPath(alloc: std.mem.Allocator, example_name: []const u8, macro: bool) ![:0]const u8 {
     const exe_dir = try std.fs.selfExeDirPathAlloc(alloc);
     defer alloc.free(exe_dir);
 
-    const xlsx_name = try std.fmt.allocPrint(
+    const xls_name = try std.fmt.allocPrint(
         alloc,
-        "{s}.xlsx",
-        .{example_name[0 .. example_name.len - 4]},
+        "{s}.{s}",
+        .{ example_name[0 .. example_name.len - 4], if (macro) "xlsm" else "xlsx" },
     );
-    defer alloc.free(xlsx_name);
+    defer alloc.free(xls_name);
 
     return try std.fs.path.joinZ(
         alloc,
-        &[_][]const u8{ exe_dir, "..", "..", "examples", "wrapped", "out", xlsx_name },
+        &[_][]const u8{ exe_dir, "..", "..", "examples", "wrapped", "out", xls_name },
     );
+}
+
+pub fn getXlsxPath(alloc: std.mem.Allocator, example_name: []const u8) ![:0]const u8 {
+    return getOutputPath(alloc, example_name, false);
+}
+
+pub fn getXlsmPath(alloc: std.mem.Allocator, example_name: []const u8) ![:0]const u8 {
+    return getOutputPath(alloc, example_name, true);
 }
 
 pub fn getAssetPath(alloc: std.mem.Allocator, asset_name: []const u8) ![:0]const u8 {

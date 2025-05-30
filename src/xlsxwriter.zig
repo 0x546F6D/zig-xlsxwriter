@@ -2,7 +2,7 @@ pub const CString = [*:0]const u8;
 pub const CStringArray: type = [:null]const ?CString;
 
 pub const c = @import("lxw");
-pub const Boolean = enum(u8){
+pub const Boolean = enum(u8) {
     true = c.LXW_TRUE,
     false = c.LXW_FALSE,
     explicit_false = c.LXW_EXPLICIT_FALSE,
@@ -47,6 +47,7 @@ pub const RowBreaks = WorkSheet.RowBreaks;
 pub const ColBreaks = WorkSheet.ColBreaks;
 pub const Margins = WorkSheet.Margins;
 pub const CommentOptions = WorkSheet.CommentOptions;
+pub const ButtonOptions = WorkSheet.ButtonOptions;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;

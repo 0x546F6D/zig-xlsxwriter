@@ -1563,8 +1563,46 @@ pub inline fn protect(
     );
 }
 
-// pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
+pub const ButtonOptions = extern struct {
+    caption: ?CString = null,
+    macro: ?CString = null,
+    description: ?CString = null,
+    width: u16 = 0,
+    height: u16 = 0,
+    x_scale: f64 = 0,
+    y_scale: f64 = 0,
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+
+    pub const default = ButtonOptions{
+        .caption = null,
+        .macro = null,
+        .description = null,
+        .width = 0,
+        .height = 0,
+        .x_scale = 0,
+        .y_scale = 0,
+        .x_offset = 0,
+        .y_offset = 0,
+    };
+};
+
 // pub extern fn worksheet_insert_button(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, options: [*c]lxw_button_options) lxw_error;
+pub inline fn insertButton(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+    options: ButtonOptions,
+) XlsxError!void {
+    try check(c.worksheet_insert_button(
+        self.worksheet_c,
+        row,
+        col,
+        @ptrCast(@constCast(&options)),
+    ));
+}
+
+// pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_activate(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_select(worksheet: [*c]lxw_worksheet) void;
 // pub extern fn worksheet_set_first_sheet(worksheet: [*c]lxw_worksheet) void;

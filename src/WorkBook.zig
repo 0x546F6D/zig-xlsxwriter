@@ -3,6 +3,7 @@ const WorkBook = @This();
 alloc: ?std.mem.Allocator = null,
 workbook_c: ?*c.lxw_workbook,
 worksheets: ?[]WorkSheet = null,
+chartsheets: ?[]ChartSheet = null,
 
 // pub extern fn workbook_new(filename: [*c]const u8) [*c]lxw_workbook;
 pub inline fn new(alloc: ?std.mem.Allocator, filename: ?CString) XlsxError!WorkBook {
@@ -58,6 +59,7 @@ pub inline fn newOpt(
 // pub extern fn workbook_close(workbook: [*c]lxw_workbook) lxw_error;
 pub inline fn deinit(self: WorkBook) XlsxError!void {
     if (self.worksheets) |worksheets| self.alloc.?.free(worksheets);
+    if (self.chartsheets) |chartsheets| self.alloc.?.free(chartsheets);
     try check(c.workbook_close(self.workbook_c));
 }
 
@@ -94,7 +96,7 @@ pub inline fn getDefaultUrlFormat(self: WorkBook) XlsxError!Format {
 pub inline fn getWorkSheetByName(self: WorkBook, name: ?CString) WorkSheet {
     return WorkSheet{
         .alloc = self.alloc,
-        .worksheet_c = c.workbook_get_worksheet_by_name(self.workbook_c, name),
+        .worksheet_c = c.workbook_get_worksheet_by_name(self.workbook_c, name) orelse return XlsxError.GetWorkSheetName,
     };
 }
 
@@ -113,7 +115,6 @@ pub inline fn getWorkSheets(self: *WorkBook) !?[]WorkSheet {
     if (nb_worksheet == 0) return null;
 
     var worksheet_array = try allocator.alloc(WorkSheet, nb_worksheet);
-    // var worksheet_array = try self.alloc.alloc(WorkSheet, nb_worksheet);
 
     var worksheet_c: ?*c.lxw_worksheet = self.workbook_c.?.worksheets.*.stqh_first;
     for (0..nb_worksheet) |i| {
@@ -218,17 +219,118 @@ pub inline fn setCustomPropertyDateTime(
     ));
 }
 
-// pub extern fn workbook_add_chartsheet(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) [*c]lxw_chartsheet;
-
-// pub extern fn workbook_get_worksheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_worksheet;
-// pub extern fn workbook_get_chartsheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_chartsheet;
-// pub extern fn workbook_validate_sheet_name(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) lxw_error;
 // pub extern fn workbook_add_vba_project(workbook: [*c]lxw_workbook, filename: [*c]const u8) lxw_error;
+pub inline fn addVbaProject(
+    self: WorkBook,
+    filename: ?CString,
+) XlsxError!void {
+    try check(c.workbook_add_vba_project(
+        self.workbook_c,
+        filename,
+    ));
+}
+
 // pub extern fn workbook_add_signed_vba_project(workbook: [*c]lxw_workbook, vba_project: [*c]const u8, signature: [*c]const u8) lxw_error;
+pub inline fn addSignedVbaProject(
+    self: WorkBook,
+    vba_project: ?CString,
+    signature: ?CString,
+) XlsxError!void {
+    try check(c.workbook_add_signed_vba_project(
+        self.workbook_c,
+        vba_project,
+        signature,
+    ));
+}
+
 // pub extern fn workbook_set_vba_name(workbook: [*c]lxw_workbook, name: [*c]const u8) lxw_error;
+pub inline fn setVbaName(
+    self: WorkBook,
+    name: ?CString,
+) XlsxError!void {
+    try check(c.workbook_set_vba_name(
+        self.workbook_c,
+        name,
+    ));
+}
+
+// pub extern fn workbook_add_chartsheet(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) [*c]lxw_chartsheet;
+pub inline fn addCharSheet(
+    self: WorkBook,
+    sheetname: ?CString,
+) XlsxError!ChartSheet {
+    return ChartSheet{
+        // .alloc = self.alloc,
+        .worksheet_c = c.workbook_add_chartsheet(self.workbook_c, sheetname) orelse return XlsxError.AddChartSheet,
+    };
+}
+
+// pub extern fn workbook_get_chartsheet_by_name(workbook: [*c]lxw_workbook, name: [*c]const u8) [*c]lxw_chartsheet;
+pub inline fn getChartSheetByName(self: WorkBook, name: ?CString) ChartSheet {
+    return ChartSheet{
+        // .alloc = self.alloc,
+        .worksheet_c = c.workbook_get_chartsheet_by_name(self.workbook_c, name) orelse return XlsxError.GetChartSheetName,
+    };
+}
+
+// Get the list of chartsheets
+pub inline fn getChartSheets(self: *WorkBook) !?[]ChartSheet {
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.GetChartSheets;
+    // clean-up previous list of chartsheets
+    if (self.chartsheets) |chartsheets| {
+        allocator.free(chartsheets);
+        self.chartsheets = null;
+    }
+    const nb_chartsheet = self.workbook_c.?.num_chartsheets;
+    if (nb_chartsheet == 0) return null;
+
+    var chartsheet_array = try allocator.alloc(ChartSheet, nb_chartsheet);
+
+    var chartsheet_c: ?*c.lxw_chartsheet = self.workbook_c.?.chartsheets.*.stqh_first;
+    for (0..nb_chartsheet) |i| {
+        chartsheet_array[i] = ChartSheet{
+            // .alloc = self.alloc,
+            .chartsheet_c = chartsheet_c,
+        };
+        chartsheet_c = chartsheet_c.?.list_pointers.stqe_next;
+    }
+
+    self.chartsheets = chartsheet_array;
+    return self.chartsheets;
+}
+
+// pub extern fn workbook_validate_sheet_name(workbook: [*c]lxw_workbook, sheetname: [*c]const u8) lxw_error;
+pub inline fn validateSheetName(
+    self: WorkBook,
+    sheetname: ?CString,
+) XlsxError!void {
+    try check(c.workbook_validate_sheet_name(
+        self.workbook_c,
+        sheetname,
+    ));
+}
+
 // pub extern fn workbook_read_only_recommended(workbook: [*c]lxw_workbook) void;
+pub inline fn readOnlyRecommended(self: WorkBook) void {
+    c.workbook_read_only_recommended(self.workbook_c);
+}
+
 // pub extern fn workbook_set_size(workbook: [*c]lxw_workbook, width: u16, height: u16) void;
+pub inline fn setSize(
+    self: WorkBook,
+    width: u16,
+    height: u16,
+) void {
+    c.workbook_set_size(self.workbook_c, width, height);
+}
+
 // pub extern fn workbook_unset_default_url_format(workbook: [*c]lxw_workbook) void;
+pub inline fn unsetDefaultUrlFormat(self: WorkBook) void {
+    c.workbook_unset_default_url_format(self.workbook_c);
+}
 
 test "assembling a complete Workbook file." {
 
@@ -246,5 +348,6 @@ const CStringArray = @import("xlsxwriter.zig").CStringArray;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const WorkSheet = @import("WorkSheet.zig");
+const ChartSheet = @import("ChartSheet.zig");
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
