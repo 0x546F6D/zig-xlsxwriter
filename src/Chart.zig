@@ -4,123 +4,6 @@ chart_c: ?*c.lxw_chart,
 x_axis: ChartAxis,
 y_axis: ChartAxis,
 
-pub const Font = struct {
-    name: ?CString = null,
-    size: f64 = 0,
-    bold: bool = true,
-    italic: bool = false,
-    underline: bool = false,
-    rotation: i32 = 0,
-    color: DefinedColors = .default,
-    pitch_family: u8 = 0,
-    charset: u8 = 0,
-    baseline: i8 = 0,
-
-    pub const default = Font{
-        .name = null,
-        .size = 0,
-        .bold = false,
-        .italic = false,
-        .underline = false,
-        .rotation = 0,
-        .color = .default,
-        .pitch_family = 0,
-        .charset = 0,
-        .baseline = 0,
-    };
-
-    inline fn toC(self: Font) c.lxw_chart_font {
-        return c.struct_lxw_chart_font{
-            .name = self.name,
-            .size = self.size,
-            // bold by default, need to explicitely disable it
-            .bold = if (self.bold) @intFromBool(self.bold) else @intFromEnum(Bool.explicit_false),
-            .italic = @intFromBool(self.italic),
-            .underline = @intFromBool(self.underline),
-            .rotation = self.rotation,
-            .color = @intFromEnum(self.color),
-            .pitch_family = self.pitch_family,
-            .charset = self.charset,
-            .baseline = self.baseline,
-        };
-    }
-};
-
-// lxw_chart_layout
-pub const Layout = struct {
-    x: f64 = 0,
-    y: f64 = 0,
-    width: f64 = 0,
-    height: f64 = 0,
-    has_inner: bool = false,
-
-    pub const default = Layout{
-        .x = 0,
-        .y = 0,
-        .width = 0,
-        .height = 0,
-        .has_inner = false,
-    };
-
-    inline fn toC(self: Layout) c.lxw_chart_layout {
-        return c.lxw_chart_layout{
-            .x = self.x,
-            .y = self.y,
-            .width = self.width,
-            .height = self.height,
-            .has_inner = @intFromBool(self.has_inner),
-        };
-    }
-};
-
-// lxw_chart_line
-pub const Line = struct {
-    color: DefinedColors = .default,
-    none: bool = false,
-    width: f32 = 2.25,
-    dash_type: LineDashType = .solid,
-    transparency: u8 = 0,
-
-    pub const default = Line{
-        .color = .default,
-        .none = false,
-        .width = 2.25,
-        .dash_type = .solid,
-        .transparency = 0,
-    };
-
-    inline fn toC(self: Line) c.lxw_chart_line {
-        return c.lxw_chart_line{
-            .color = @intFromEnum(self.color),
-            .none = @intFromBool(self.none),
-            .width = self.width,
-            .dash_type = @intFromEnum(self.dash_type),
-            .transparency = self.transparency,
-        };
-    }
-};
-
-// lxw_chart_fill
-pub const Fill = struct {
-    color: DefinedColors = .default,
-    none: bool = false,
-    transparency: u8 = 100,
-
-    pub const default = Fill{
-        .color = .default,
-        .none = false,
-        .transparency = 0,
-    };
-
-    inline fn toC(self: Fill) c.lxw_chart_fill {
-        return c.lxw_chart_fill{
-            .color = @intFromEnum(self.color),
-            .none = @intFromBool(self.none),
-            .transparency = self.transparency,
-        };
-    }
-};
-
 // lxw_chart_pattern
 pub const Pattern = struct {
     fg_color: DefinedColors = .default,
@@ -201,88 +84,6 @@ pub const Point = extern struct {
     }
 };
 
-// pub const struct_lxw_chart_title = extern struct {
-//     name: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     row: lxw_row_t = @import("std").mem.zeroes(lxw_row_t),
-//     col: lxw_col_t = @import("std").mem.zeroes(lxw_col_t),
-//     font: [*c]lxw_chart_font = @import("std").mem.zeroes([*c]lxw_chart_font),
-//     off: u8 = @import("std").mem.zeroes(u8),
-//     is_horizontal: u8 = @import("std").mem.zeroes(u8),
-//     ignore_cache: u8 = @import("std").mem.zeroes(u8),
-//     has_overlay: u8 = @import("std").mem.zeroes(u8),
-//     range: [*c]lxw_series_range = @import("std").mem.zeroes([*c]lxw_series_range),
-//     data_point: struct_lxw_series_data_point = @import("std").mem.zeroes(struct_lxw_series_data_point),
-//     layout: [*c]lxw_chart_layout = @import("std").mem.zeroes([*c]lxw_chart_layout),
-// };
-
-// pub const struct_lxw_series_data_point = extern struct {
-//     is_string: u8 = @import("std").mem.zeroes(u8),
-//     number: f64 = @import("std").mem.zeroes(f64),
-//     string: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     no_data: u8 = @import("std").mem.zeroes(u8),
-//     list_pointers: struct_unnamed_9 = @import("std").mem.zeroes(struct_unnamed_9),
-// };
-
-// pub const struct_lxw_series_range = extern struct {
-//     formula: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     sheetname: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     first_row: lxw_row_t = @import("std").mem.zeroes(lxw_row_t),
-//     last_row: lxw_row_t = @import("std").mem.zeroes(lxw_row_t),
-//     first_col: lxw_col_t = @import("std").mem.zeroes(lxw_col_t),
-//     last_col: lxw_col_t = @import("std").mem.zeroes(lxw_col_t),
-//     ignore_cache: u8 = @import("std").mem.zeroes(u8),
-//     has_string_cache: u8 = @import("std").mem.zeroes(u8),
-//     num_data_points: u16 = @import("std").mem.zeroes(u16),
-//     data_cache: [*c]struct_lxw_series_data_points = @import("std").mem.zeroes([*c]struct_lxw_series_data_points),
-// };
-
-// pub const struct_lxw_chart_series = extern struct {
-//     categories: [*c]lxw_series_range = @import("std").mem.zeroes([*c]lxw_series_range),
-//     values: [*c]lxw_series_range = @import("std").mem.zeroes([*c]lxw_series_range),
-//     title: lxw_chart_title = @import("std").mem.zeroes(lxw_chart_title),
-//     line: [*c]lxw_chart_line = @import("std").mem.zeroes([*c]lxw_chart_line),
-//     fill: [*c]lxw_chart_fill = @import("std").mem.zeroes([*c]lxw_chart_fill),
-//     pattern: [*c]lxw_chart_pattern = @import("std").mem.zeroes([*c]lxw_chart_pattern),
-//     marker: [*c]lxw_chart_marker = @import("std").mem.zeroes([*c]lxw_chart_marker),
-//     points: [*c]lxw_chart_point = @import("std").mem.zeroes([*c]lxw_chart_point),
-//     data_labels: [*c]lxw_chart_custom_label = @import("std").mem.zeroes([*c]lxw_chart_custom_label),
-//     point_count: u16 = @import("std").mem.zeroes(u16),
-//     data_label_count: u16 = @import("std").mem.zeroes(u16),
-//     smooth: u8 = @import("std").mem.zeroes(u8),
-//     invert_if_negative: u8 = @import("std").mem.zeroes(u8),
-//     has_labels: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_value: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_category: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_name: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_leader: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_legend: u8 = @import("std").mem.zeroes(u8),
-//     show_labels_percent: u8 = @import("std").mem.zeroes(u8),
-//     label_position: u8 = @import("std").mem.zeroes(u8),
-//     label_separator: u8 = @import("std").mem.zeroes(u8),
-//     default_label_position: u8 = @import("std").mem.zeroes(u8),
-//     label_num_format: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     label_font: [*c]lxw_chart_font = @import("std").mem.zeroes([*c]lxw_chart_font),
-//     label_line: [*c]lxw_chart_line = @import("std").mem.zeroes([*c]lxw_chart_line),
-//     label_fill: [*c]lxw_chart_fill = @import("std").mem.zeroes([*c]lxw_chart_fill),
-//     label_pattern: [*c]lxw_chart_pattern = @import("std").mem.zeroes([*c]lxw_chart_pattern),
-//     x_error_bars: [*c]lxw_series_error_bars = @import("std").mem.zeroes([*c]lxw_series_error_bars),
-//     y_error_bars: [*c]lxw_series_error_bars = @import("std").mem.zeroes([*c]lxw_series_error_bars),
-//     has_trendline: u8 = @import("std").mem.zeroes(u8),
-//     has_trendline_forecast: u8 = @import("std").mem.zeroes(u8),
-//     has_trendline_equation: u8 = @import("std").mem.zeroes(u8),
-//     has_trendline_r_squared: u8 = @import("std").mem.zeroes(u8),
-//     has_trendline_intercept: u8 = @import("std").mem.zeroes(u8),
-//     trendline_type: u8 = @import("std").mem.zeroes(u8),
-//     trendline_value: u8 = @import("std").mem.zeroes(u8),
-//     trendline_forward: f64 = @import("std").mem.zeroes(f64),
-//     trendline_backward: f64 = @import("std").mem.zeroes(f64),
-//     trendline_value_type: u8 = @import("std").mem.zeroes(u8),
-//     trendline_name: [*c]u8 = @import("std").mem.zeroes([*c]u8),
-//     trendline_line: [*c]lxw_chart_line = @import("std").mem.zeroes([*c]lxw_chart_line),
-//     trendline_intercept: f64 = @import("std").mem.zeroes(f64),
-//     list_pointers: struct_unnamed_10 = @import("std").mem.zeroes(struct_unnamed_10),
-// };
-
 pub const Type = enum(u8) {
     area = c.LXW_CHART_AREA,
     area_stacked = c.LXW_CHART_AREA_STACKED,
@@ -306,18 +107,6 @@ pub const Type = enum(u8) {
     radar = c.LXW_CHART_RADAR,
     radar_with_markers = c.LXW_CHART_RADAR_WITH_MARKERS,
     radar_filled = c.LXW_CHART_RADAR_FILLED,
-};
-
-pub const LegendPosition = enum(u8) {
-    none = c.LXW_CHART_LEGEND_NONE,
-    right = c.LXW_CHART_LEGEND_RIGHT,
-    left = c.LXW_CHART_LEGEND_LEFT,
-    top = c.LXW_CHART_LEGEND_TOP,
-    bottom = c.LXW_CHART_LEGEND_BOTTOM,
-    top_right = c.LXW_CHART_LEGEND_TOP_RIGHT,
-    overlay_right = c.LXW_CHART_LEGEND_OVERLAY_RIGHT,
-    overlay_left = c.LXW_CHART_LEGEND_OVERLAY_LEFT,
-    overlay_top_right = c.LXW_CHART_LEGEND_OVERLAY_TOP_RIGHT,
 };
 
 pub const LineDashType = enum(u8) {
@@ -484,11 +273,111 @@ pub inline fn titleSetName(self: Chart, name: ?CString) void {
     c.chart_title_set_name(self.chart_c, name);
 }
 
+// pub extern fn chart_title_set_name_range(chart: [*c]lxw_chart, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
+pub inline fn titleSetNameRange(
+    self: Chart,
+    name: ?CString,
+    row: u32,
+    col: u16,
+) void {
+    c.chart_title_set_name_range(self.chart_c, name, row, col);
+}
+
+pub const Font = struct {
+    name: ?CString = null,
+    size: f64 = 0,
+    bold: bool = true,
+    italic: bool = false,
+    underline: bool = false,
+    rotation: i32 = 0,
+    color: DefinedColors = .default,
+    pitch_family: u8 = 0,
+    charset: u8 = 0,
+    baseline: i8 = 0,
+
+    pub const default = Font{
+        .name = null,
+        .size = 0,
+        .bold = false,
+        .italic = false,
+        .underline = false,
+        .rotation = 0,
+        .color = .default,
+        .pitch_family = 0,
+        .charset = 0,
+        .baseline = 0,
+    };
+
+    inline fn toC(self: Font) c.lxw_chart_font {
+        return c.struct_lxw_chart_font{
+            .name = self.name,
+            .size = self.size,
+            // bold by default, need to explicitely disable it
+            .bold = if (self.bold) @intFromBool(self.bold) else @intFromEnum(Bool.explicit_false),
+            .italic = @intFromBool(self.italic),
+            .underline = @intFromBool(self.underline),
+            .rotation = self.rotation,
+            .color = @intFromEnum(self.color),
+            .pitch_family = self.pitch_family,
+            .charset = self.charset,
+            .baseline = self.baseline,
+        };
+    }
+};
+
 // pub extern fn chart_title_set_name_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
 pub inline fn titleSetNameFont(self: Chart, font: Font) void {
     c.chart_title_set_name_font(
         self.chart_c,
         @constCast(&font.toC()),
+    );
+}
+
+// pub extern fn chart_title_off(chart: [*c]lxw_chart) void;
+pub inline fn titleOff(self: Chart) void {
+    c.chart_title_off(self.chart_c);
+}
+
+// lxw_chart_layout
+pub const Layout = struct {
+    x: f64 = 0,
+    y: f64 = 0,
+    width: f64 = 0,
+    height: f64 = 0,
+    has_inner: bool = false,
+
+    pub const default = Layout{
+        .x = 0,
+        .y = 0,
+        .width = 0,
+        .height = 0,
+        .has_inner = false,
+    };
+
+    inline fn toC(self: Layout) c.lxw_chart_layout {
+        return c.lxw_chart_layout{
+            .x = self.x,
+            .y = self.y,
+            .width = self.width,
+            .height = self.height,
+            .has_inner = @intFromBool(self.has_inner),
+        };
+    }
+};
+
+// pub extern fn chart_title_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+pub inline fn titleSetLayout(self: Chart, layout: Layout) void {
+    c.chart_title_set_name_font(
+        self.chart_c,
+        @constCast(&layout.toC()),
+    );
+}
+
+// pub extern fn chart_title_set_overlay(chart: [*c]lxw_chart, overlay: u8) void;
+pub inline fn titleSetOverlay(self: Chart, overlay: bool) void {
+    c.chart_title_set_overlay(
+        self.chart_c,
+        @intFromBool(overlay),
     );
 }
 
@@ -500,10 +389,296 @@ pub inline fn setStyle(self: Chart, style_id: u8) void {
     );
 }
 
-// pub extern fn chart_title_set_name_range(chart: [*c]lxw_chart, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
-// pub extern fn chart_title_off(chart: [*c]lxw_chart) void;
-// pub extern fn chart_title_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
-// pub extern fn chart_title_set_overlay(chart: [*c]lxw_chart, overlay: u8) void;
+// pub extern fn chart_set_table(chart: [*c]lxw_chart) void;
+pub inline fn setTable(self: Chart) void {
+    c.chart_set_table(self.chart_c);
+}
+
+// pub extern fn chart_set_table_grid(chart: [*c]lxw_chart, horizontal: u8, vertical: u8, outline: u8, legend_keys: u8) void;
+pub inline fn setTableGrid(
+    self: Chart,
+    horizontal: bool,
+    vertical: bool,
+    outline: bool,
+    legend_keys: bool,
+) void {
+    c.chart_set_table_grid(
+        self.chart_c,
+        @intFromBool(horizontal),
+        @intFromBool(vertical),
+        @intFromBool(outline),
+        @intFromBool(legend_keys),
+    );
+}
+
+// pub extern fn chart_set_table_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
+pub inline fn setTableFont(self: Chart, font: Font) void {
+    c.chart_set_table_font(
+        self.chart_c,
+        @constCast(&font.toC()),
+    );
+}
+
+// pub extern fn chart_set_up_down_bars(chart: [*c]lxw_chart) void;
+pub inline fn setUpDownBars(self: Chart) void {
+    c.chart_set_up_down_bars(self.chart_c);
+}
+
+// lxw_chart_line
+pub const Line = struct {
+    color: DefinedColors = .default,
+    none: bool = false,
+    width: f32 = 2.25,
+    dash_type: LineDashType = .solid,
+    transparency: u8 = 0,
+
+    pub const default = Line{
+        .color = .default,
+        .none = false,
+        .width = 2.25,
+        .dash_type = .solid,
+        .transparency = 0,
+    };
+
+    inline fn toC(self: Line) c.lxw_chart_line {
+        return c.lxw_chart_line{
+            .color = @intFromEnum(self.color),
+            .none = @intFromBool(self.none),
+            .width = self.width,
+            .dash_type = @intFromEnum(self.dash_type),
+            .transparency = self.transparency,
+        };
+    }
+};
+
+// lxw_chart_fill
+pub const Fill = struct {
+    color: DefinedColors = .default,
+    none: bool = false,
+    transparency: u8 = 100,
+
+    pub const default = Fill{
+        .color = .default,
+        .none = false,
+        .transparency = 0,
+    };
+
+    inline fn toC(self: Fill) c.lxw_chart_fill {
+        return c.lxw_chart_fill{
+            .color = @intFromEnum(self.color),
+            .none = @intFromBool(self.none),
+            .transparency = self.transparency,
+        };
+    }
+};
+
+// pub extern fn chart_set_up_down_bars_format(chart: [*c]lxw_chart, up_bar_line: [*c]lxw_chart_line, up_bar_fill: [*c]lxw_chart_fill, down_bar_line: [*c]lxw_chart_line, down_bar_fill: [*c]lxw_chart_fill) void;
+pub inline fn setUpDownBarsFormat(
+    self: Chart,
+    up_bar_line: Line,
+    up_bar_fill: Fill,
+    down_bar_line: Line,
+    down_bar_fill: Fill,
+) void {
+    c.chart_set_up_down_bars_format(
+        self.chart_c,
+        @constCast(&up_bar_line.toC()),
+        @constCast(&up_bar_fill.toC()),
+        @constCast(&down_bar_line.toC()),
+        @constCast(&down_bar_fill.toC()),
+    );
+}
+
+// pub extern fn chart_set_drop_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+pub inline fn setDropLines(
+    self: Chart,
+    line: Line,
+) void {
+    c.chart_set_drop_lines(
+        self.chart_c,
+        @constCast(&line.toC()),
+    );
+}
+
+// pub extern fn chart_set_high_low_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+pub inline fn setHighLowLines(
+    self: Chart,
+    line: Line,
+) void {
+    c.chart_set_high_low_lines(
+        self.chart_c,
+        @constCast(&line.toC()),
+    );
+}
+
+// pub extern fn chart_set_series_overlap(chart: [*c]lxw_chart, overlap: i8) void;
+pub inline fn setSeriesOverlap(self: Chart, overlap: i8) void {
+    c.chart_set_series_overlap(self.chart_c, overlap);
+}
+
+// pub extern fn chart_set_series_gap(chart: [*c]lxw_chart, gap: u16) void;
+pub inline fn setSeriesGap(self: Chart, gap: u16) void {
+    c.chart_set_series_gap(self.chart_c, gap);
+}
+
+pub const ChartBlank = enum(u8) {
+    gap = c.LXW_CHART_BLANKS_AS_GAP,
+    zero = c.LXW_CHART_BLANKS_AS_ZERO,
+    connected = c.LXW_CHART_BLANKS_AS_CONNECTED,
+};
+// pub extern fn chart_show_blanks_as(chart: [*c]lxw_chart, option: u8) void;
+pub inline fn showBlanksAs(
+    self: Chart,
+    option: ChartBlank,
+) void {
+    c.chart_show_blanks_as(
+        self.chart_c,
+        @intFromEnum(option),
+    );
+}
+
+// pub extern fn chart_show_hidden_data(chart: [*c]lxw_chart) void;
+pub inline fn showHiddenData(self: Chart) void {
+    c.chart_show_hidden_data(self.chart_c);
+}
+
+// pub extern fn chart_set_rotation(chart: [*c]lxw_chart, rotation: u16) void;
+pub inline fn setRotation(self: Chart, rotation: u16) void {
+    c.chart_set_rotation(self.chart_c, rotation);
+}
+
+// pub extern fn chart_set_hole_size(chart: [*c]lxw_chart, size: u8) void;
+pub inline fn setHoleSize(self: Chart, size: u16) void {
+    c.chart_set_hole_size(self.chart_c, size);
+}
+
+pub const LegendPosition = enum(u8) {
+    none = c.LXW_CHART_LEGEND_NONE,
+    right = c.LXW_CHART_LEGEND_RIGHT,
+    left = c.LXW_CHART_LEGEND_LEFT,
+    top = c.LXW_CHART_LEGEND_TOP,
+    bottom = c.LXW_CHART_LEGEND_BOTTOM,
+    top_right = c.LXW_CHART_LEGEND_TOP_RIGHT,
+    overlay_right = c.LXW_CHART_LEGEND_OVERLAY_RIGHT,
+    overlay_left = c.LXW_CHART_LEGEND_OVERLAY_LEFT,
+    overlay_top_right = c.LXW_CHART_LEGEND_OVERLAY_TOP_RIGHT,
+};
+
+// pub extern fn chart_legend_set_position(chart: [*c]lxw_chart, position: u8) void;
+pub inline fn legendSetPosition(
+    self: Chart,
+    position: LegendPosition,
+) void {
+    c.chart_legend_set_position(
+        self.chart_c,
+        @intFromEnum(position),
+    );
+}
+
+// pub extern fn chart_legend_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+pub inline fn legendSetLayout(self: Chart, layout: Layout) void {
+    c.chart_legend_set_layout(
+        self.chart_c,
+        @constCast(&layout.toC()),
+    );
+}
+
+// pub extern fn chart_legend_set_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
+pub inline fn legendsetFont(self: Chart, font: Font) void {
+    c.chart_legend_set_font(
+        self.chart_c,
+        @constCast(&font.toC()),
+    );
+}
+
+pub const DeleteSeries = [:-1]i16;
+// pub extern fn chart_legend_delete_series(chart: [*c]lxw_chart, delete_series: [*c]i16) lxw_error;
+pub inline fn legendDeleteSeries(
+    self: Chart,
+    delete_series: DeleteSeries,
+) void {
+    c.chart_legend_delete_series(
+        self.chart_c,
+        @ptrCast(@constCast(&delete_series)),
+    );
+}
+
+// pub extern fn chart_chartarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+pub inline fn chartAreaSetLine(
+    self: Chart,
+    line: Line,
+) void {
+    c.chart_chartarea_set_line(
+        self.chart_c,
+        @constCast(&line.toC()),
+    );
+}
+
+// pub extern fn chart_chartarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
+pub inline fn chartAreaSetFill(
+    self: Chart,
+    fill: Fill,
+) void {
+    c.chart_chartarea_set_fill(
+        self.chart_c,
+        @constCast(&fill.toC()),
+    );
+}
+
+// pub extern fn chart_chartarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
+pub inline fn chartAreaSetPattern(
+    self: Chart,
+    pattern: PatternType,
+) void {
+    c.chart_chartarea_set_pattern(
+        self.chart_c,
+        @intFromEnum(pattern),
+    );
+}
+
+// pub extern fn chart_plotarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
+pub inline fn plotAreaSetLine(
+    self: Chart,
+    line: Line,
+) void {
+    c.chart_plotarea_set_line(
+        self.chart_c,
+        @constCast(&line.toC()),
+    );
+}
+
+// pub extern fn chart_plotarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
+pub inline fn plotAreaSetFill(
+    self: Chart,
+    fill: Fill,
+) void {
+    c.chart_plotarea_set_fill(
+        self.chart_c,
+        @constCast(&fill.toC()),
+    );
+}
+
+// pub extern fn chart_plotarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
+pub inline fn plotAreaSetPattern(
+    self: Chart,
+    pattern: PatternType,
+) void {
+    c.chart_plotarea_set_pattern(
+        self.chart_c,
+        @intFromEnum(pattern),
+    );
+}
+
+// pub extern fn chart_plotarea_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
+pub inline fn plotAreaSetLayout(
+    self: Chart,
+    layout: Layout,
+) void {
+    c.chart_plotarea_set_layout(
+        self.chart_c,
+        @constCast(&layout.toC()),
+    );
+}
 
 // pub extern fn chart_add_series(chart: [*c]lxw_chart, categories: [*c]const u8, values: [*c]const u8) [*c]lxw_chart_series;
 pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) XlsxError!ChartSeries {
@@ -511,34 +686,6 @@ pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) Xls
         .chartseries_c = c.chart_add_series(self.chart_c, categories, values) orelse return XlsxError.ChartAddSeries,
     };
 }
-
-// pub extern fn chart_legend_set_position(chart: [*c]lxw_chart, position: u8) void;
-// pub extern fn chart_legend_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
-// pub extern fn chart_legend_set_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
-// pub extern fn chart_legend_delete_series(chart: [*c]lxw_chart, delete_series: [*c]i16) lxw_error;
-
-// pub extern fn chart_chartarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
-// pub extern fn chart_chartarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
-// pub extern fn chart_chartarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
-
-// pub extern fn chart_plotarea_set_line(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
-// pub extern fn chart_plotarea_set_fill(chart: [*c]lxw_chart, fill: [*c]lxw_chart_fill) void;
-// pub extern fn chart_plotarea_set_pattern(chart: [*c]lxw_chart, pattern: [*c]lxw_chart_pattern) void;
-// pub extern fn chart_plotarea_set_layout(chart: [*c]lxw_chart, layout: [*c]lxw_chart_layout) void;
-
-// pub extern fn chart_set_table(chart: [*c]lxw_chart) void;
-// pub extern fn chart_set_table_grid(chart: [*c]lxw_chart, horizontal: u8, vertical: u8, outline: u8, legend_keys: u8) void;
-// pub extern fn chart_set_table_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
-// pub extern fn chart_set_up_down_bars(chart: [*c]lxw_chart) void;
-// pub extern fn chart_set_up_down_bars_format(chart: [*c]lxw_chart, up_bar_line: [*c]lxw_chart_line, up_bar_fill: [*c]lxw_chart_fill, down_bar_line: [*c]lxw_chart_line, down_bar_fill: [*c]lxw_chart_fill) void;
-// pub extern fn chart_set_drop_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
-// pub extern fn chart_set_high_low_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
-// pub extern fn chart_set_series_overlap(chart: [*c]lxw_chart, overlap: i8) void;
-// pub extern fn chart_set_series_gap(chart: [*c]lxw_chart, gap: u16) void;
-// pub extern fn chart_show_blanks_as(chart: [*c]lxw_chart, option: u8) void;
-// pub extern fn chart_show_hidden_data(chart: [*c]lxw_chart) void;
-// pub extern fn chart_set_rotation(chart: [*c]lxw_chart, rotation: u16) void;
-// pub extern fn chart_set_hole_size(chart: [*c]lxw_chart, size: u8) void;
 
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");

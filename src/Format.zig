@@ -221,6 +221,26 @@ pub inline fn setBorder(self: Format, style: Borders) void {
     c.format_set_border(self.format_c, @intFromEnum(style));
 }
 
+// pub extern fn format_set_bottom(format: [*c]lxw_format, style: u8) void;
+pub inline fn setBottom(self: Format, style: Borders) void {
+    c.format_set_bottom(self.format_c, @intFromEnum(style));
+}
+
+// pub extern fn format_set_top(format: [*c]lxw_format, style: u8) void;
+pub inline fn setTop(self: Format, style: Borders) void {
+    c.format_set_top(self.format_c, @intFromEnum(style));
+}
+
+// pub extern fn format_set_left(format: [*c]lxw_format, style: u8) void;
+pub inline fn setLeft(self: Format, style: Borders) void {
+    c.format_set_left(self.format_c, @intFromEnum(style));
+}
+
+// pub extern fn format_set_right(format: [*c]lxw_format, style: u8) void;
+pub inline fn setRight(self: Format, style: Borders) void {
+    c.format_set_right(self.format_c, @intFromEnum(style));
+}
+
 // pub extern fn format_set_border_color(format: [*c]lxw_format, color: lxw_color_t) void;
 pub inline fn setBorderColor(self: Format, color: DefinedColors) void {
     c.format_set_border_color(self.format_c, @intFromEnum(color));
@@ -339,21 +359,71 @@ pub inline fn setLeftColor(self: Format, color: DefinedColors) void {
 
 // pub extern fn format_set_right_color(format: [*c]lxw_format, color: lxw_color_t) void;
 pub inline fn setRightColor(self: Format, color: DefinedColors) void {
-    c.setRightColor(self.format_c, @intFromEnum(color));
+    c.format_set_right_color(self.format_c, @intFromEnum(color));
 }
 
 // pub extern fn format_set_font_family(format: [*c]lxw_format, value: u8) void;
+pub inline fn setFontFamily(self: Format, value: u8) void {
+    c.format_set_font_family(self.format_c, value);
+}
+
 // pub extern fn format_set_font_charset(format: [*c]lxw_format, value: u8) void;
+pub inline fn setFontCharset(self: Format, value: u8) void {
+    c.format_set_font_charset(self.format_c, value);
+}
+
 // pub extern fn format_set_num_format_index(format: [*c]lxw_format, index: u8) void;
+// check: https://github.com/jmcnamara/libxlsxwriter/blob/21c11a2052162b24c121b766e4373b081ea07ff6/include/xlsxwriter/format.h#L809
+pub inline fn setNumFormatIndex(self: Format, index: u8) void {
+    c.format_set_num_format_index(self.format_c, index);
+}
+
+pub const FormatPattern = enum(u8) {
+    none = c.LXW_PATTERN_NONE,
+    solid = c.LXW_PATTERN_SOLID,
+    medium_gray = c.LXW_PATTERN_MEDIUM_GRAY,
+    dark_gray = c.LXW_PATTERN_DARK_GRAY,
+    light_gray = c.LXW_PATTERN_LIGHT_GRAY,
+    dark_horizontal = c.LXW_PATTERN_DARK_HORIZONTAL,
+    dark_vertical = c.LXW_PATTERN_DARK_VERTICAL,
+    dark_down = c.LXW_PATTERN_DARK_DOWN,
+    dark_up = c.LXW_PATTERN_DARK_UP,
+    dark_grid = c.LXW_PATTERN_DARK_GRID,
+    dark_trellis = c.LXW_PATTERN_DARK_TRELLIS,
+    light_horizontal = c.LXW_PATTERN_LIGHT_HORIZONTAL,
+    light_vertical = c.LXW_PATTERN_LIGHT_VERTICAL,
+    light_down = c.LXW_PATTERN_LIGHT_DOWN,
+    light_up = c.LXW_PATTERN_LIGHT_UP,
+    light_grid = c.LXW_PATTERN_LIGHT_GRID,
+    light_trellis = c.LXW_PATTERN_LIGHT_TRELLIS,
+    gray_125 = c.LXW_PATTERN_GRAY_125,
+    gray_0625 = c.LXW_PATTERN_GRAY_0625,
+};
+
 // pub extern fn format_set_pattern(format: [*c]lxw_format, index: u8) void;
-// pub extern fn format_set_bottom(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_top(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_left(format: [*c]lxw_format, style: u8) void;
-// pub extern fn format_set_right(format: [*c]lxw_format, style: u8) void;
+pub inline fn setPattern(self: Format, index: FormatPattern) void {
+    c.format_set_pattern(self.format_c, @intFromEnum(index));
+}
+
 // pub extern fn format_set_font_scheme(format: [*c]lxw_format, font_scheme: [*c]const u8) void;
+pub inline fn setFontScheme(self: Format, font_scheme: ?CString) void {
+    c.format_set_font_scheme(self.format_c, font_scheme);
+}
+
 // pub extern fn format_set_reading_order(format: [*c]lxw_format, value: u8) void;
+pub inline fn setReadingOrder(self: Format, value: u8) void {
+    c.format_set_reading_order(self.format_c, value);
+}
+
 // pub extern fn format_set_theme(format: [*c]lxw_format, value: u8) void;
+pub inline fn setTheme(self: Format, value: u8) void {
+    c.format_set_theme(self.format_c, value);
+}
+
 // pub extern fn format_set_color_indexed(format: [*c]lxw_format, value: u8) void;
+pub inline fn setColorIndexed(self: Format, value: u8) void {
+    c.format_set_color_indexed(self.format_c, value);
+}
 
 const c = @import("lxw");
 const CString = @import("xlsxwriter.zig").CString;
