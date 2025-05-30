@@ -32,7 +32,6 @@ pub fn main() !void {
     // Insert the chart into the worksheet.
     const cell = xwz.cell("B7");
     try worksheet.insertChart(cell.row, cell.col, chart);
-    // try worksheet.insertChart(xwz.nameToRow("B7"), xlsxwriter.nameToCol("B7"), chart);
 }
 
 fn write_worksheet_data(worksheet: xwz.WorkSheet) !void {
@@ -46,7 +45,7 @@ fn write_worksheet_data(worksheet: xwz.WorkSheet) !void {
 
     for (data, 0..) |set, row| {
         for (set, 0..) |cell, col| {
-            try worksheet.writeNumber(@intCast(row), @intCast(col), cell, .none);
+            try worksheet.writeNumber(@intCast(row), @intCast(col), cell, .default);
         }
     }
 }

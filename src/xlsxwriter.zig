@@ -48,6 +48,7 @@ pub const ColBreaks = WorkSheet.ColBreaks;
 pub const Margins = WorkSheet.Margins;
 pub const CommentOptions = WorkSheet.CommentOptions;
 pub const ButtonOptions = WorkSheet.ButtonOptions;
+pub const ObjectProperties = WorkSheet.ObjectProperties;
 
 pub const filter = @import("filter.zig");
 pub const FilterRule = filter.FilterRule;

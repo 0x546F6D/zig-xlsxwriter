@@ -4,19 +4,19 @@ fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {
     try worksheet.writeString(0, 1, "Enter values in this column", format);
     try worksheet.writeString(0, 3, "Sample Data", format);
 
-    try worksheet.writeString(2, 3, "Integers", .none);
-    try worksheet.writeNumber(2, 4, 1, .none);
-    try worksheet.writeNumber(2, 5, 10, .none);
+    try worksheet.writeString(2, 3, "Integers", .default);
+    try worksheet.writeNumber(2, 4, 1, .default);
+    try worksheet.writeNumber(2, 5, 10, .default);
 
-    try worksheet.writeString(3, 3, "List data", .none);
-    try worksheet.writeString(3, 4, "open", .none);
-    try worksheet.writeString(3, 5, "high", .none);
-    try worksheet.writeString(3, 6, "close", .none);
+    try worksheet.writeString(3, 3, "List data", .default);
+    try worksheet.writeString(3, 4, "open", .default);
+    try worksheet.writeString(3, 5, "high", .default);
+    try worksheet.writeString(3, 6, "close", .default);
 
-    try worksheet.writeString(4, 3, "Formula", .none);
-    try worksheet.writeFormula(4, 4, "=AND(F5=50,G5=60)", .none);
-    try worksheet.writeNumber(4, 5, 50, .none);
-    try worksheet.writeNumber(4, 6, 60, .none);
+    try worksheet.writeString(4, 3, "Formula", .default);
+    try worksheet.writeFormula(4, 4, "=AND(F5=50,G5=60)", .default);
+    try worksheet.writeNumber(4, 5, 50, .default);
+    try worksheet.writeNumber(4, 6, 60, .default);
 }
 
 pub fn main() !void {
@@ -47,13 +47,13 @@ pub fn main() !void {
     try write_worksheet_data(worksheet, format);
 
     // Set up layout of the worksheet.
-    try worksheet.setColumn(0, 0, 55, .none);
-    try worksheet.setColumn(1, 1, 15, .none);
-    try worksheet.setColumn(3, 3, 15, .none);
-    try worksheet.setRow(0, 36, .none);
+    try worksheet.setColumn(0, 0, 55, .default);
+    try worksheet.setColumn(1, 1, 15, .default);
+    try worksheet.setColumn(3, 3, 15, .default);
+    try worksheet.setRow(0, 36, .default);
 
     // Example 1. Limiting input to an integer in a fixed range.
-    try worksheet.writeString(2, 0, "Enter an integer between 1 and 10", .none);
+    try worksheet.writeString(2, 0, "Enter an integer between 1 and 10", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .between;
@@ -63,7 +63,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(2, 1, data_validation);
 
     // Example 2. Limiting input to an integer outside a fixed range.
-    try worksheet.writeString(4, 0, "Enter an integer that is not between 1 and 10 (using cell references)", .none);
+    try worksheet.writeString(4, 0, "Enter an integer that is not between 1 and 10 (using cell references)", .default);
 
     data_validation.validate = .integer_formula;
     data_validation.criteria = .not_between;
@@ -73,7 +73,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(4, 1, data_validation);
 
     // Example 3. Limiting input to an integer greater than a fixed value.
-    try worksheet.writeString(6, 0, "Enter an integer greater than 0", .none);
+    try worksheet.writeString(6, 0, "Enter an integer greater than 0", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .greater_than;
@@ -82,7 +82,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(6, 1, data_validation);
 
     // Example 4. Limiting input to an integer less than a fixed value.
-    try worksheet.writeString(8, 0, "Enter an integer less than 10", .none);
+    try worksheet.writeString(8, 0, "Enter an integer less than 10", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .less_than;
@@ -91,7 +91,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(8, 1, data_validation);
 
     // Example 5. Limiting input to a decimal in a fixed range.
-    try worksheet.writeString(10, 0, "Enter a decimal between 0.1 and 0.5", .none);
+    try worksheet.writeString(10, 0, "Enter a decimal between 0.1 and 0.5", .default);
 
     data_validation.validate = .decimal;
     data_validation.criteria = .between;
@@ -101,7 +101,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(10, 1, data_validation);
 
     // Example 6. Limiting input to a value in a dropdown list.
-    try worksheet.writeString(12, 0, "Select a value from a dropdown list", .none);
+    try worksheet.writeString(12, 0, "Select a value from a dropdown list", .default);
 
     const list: xwz.CStringArray = &.{ "open", "high", "close" };
     data_validation.validate = .list;
@@ -110,7 +110,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(12, 1, data_validation);
 
     // Example 7. Limiting input to a value in a dropdown list.
-    try worksheet.writeString(14, 0, "Select a value from a dropdown list (using a cell range)", .none);
+    try worksheet.writeString(14, 0, "Select a value from a dropdown list (using a cell range)", .default);
 
     data_validation.validate = .list_formula;
     data_validation.value_formula = "=$E$4:$G$4";
@@ -118,7 +118,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(14, 1, data_validation);
 
     // Example 8. Limiting input to a date in a fixed range.
-    try worksheet.writeString(16, 0, "Enter a date between 1/1/2024 and 12/12/2024", .none);
+    try worksheet.writeString(16, 0, "Enter a date between 1/1/2024 and 12/12/2024", .default);
 
     const datetime1: xwz.DateTime = .{ .year = 2024, .month = 1, .day = 1, .hour = 0, .min = 0, .sec = 0 };
     const datetime2: xwz.DateTime = .{ .year = 2024, .month = 12, .day = 12, .hour = 0, .min = 0, .sec = 0 };
@@ -131,7 +131,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(16, 1, data_validation);
 
     // Example 9. Limiting input to a time in a fixed range.
-    try worksheet.writeString(18, 0, "Enter a time between 6:00 and 12:00", .none);
+    try worksheet.writeString(18, 0, "Enter a time between 6:00 and 12:00", .default);
 
     const datetime3: xwz.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 6, .min = 0, .sec = 0 };
     const datetime4: xwz.DateTime = .{ .year = 0, .month = 0, .day = 0, .hour = 12, .min = 0, .sec = 0 };
@@ -144,7 +144,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(18, 1, data_validation);
 
     // Example 10. Limiting input to a string greater than a fixed length.
-    try worksheet.writeString(20, 0, "Enter a string longer than 3 characters", .none);
+    try worksheet.writeString(20, 0, "Enter a string longer than 3 characters", .default);
 
     data_validation.validate = .length;
     data_validation.criteria = .greater_than;
@@ -153,7 +153,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(20, 1, data_validation);
 
     // Example 11. Limiting input based on a formula.
-    try worksheet.writeString(22, 0, "Enter a value if the following is true \"=AND(F5=50,G5=60)\"", .none);
+    try worksheet.writeString(22, 0, "Enter a value if the following is true \"=AND(F5=50,G5=60)\"", .default);
 
     data_validation.validate = .custom_formula;
     data_validation.value_formula = "=AND(F5=50,G5=60)";
@@ -161,7 +161,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(22, 1, data_validation);
 
     // Example 12. Displaying and modifying data validation messages.
-    try worksheet.writeString(24, 0, "Displays a message when you select the cell", .none);
+    try worksheet.writeString(24, 0, "Displays a message when you select the cell", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .between;
@@ -173,7 +173,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(24, 1, data_validation);
 
     // Example 13. Displaying and modifying data validation messages.
-    try worksheet.writeString(26, 0, "Display a custom error message when integer isn't between 1 and 100", .none);
+    try worksheet.writeString(26, 0, "Display a custom error message when integer isn't between 1 and 100", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .between;
@@ -187,7 +187,7 @@ pub fn main() !void {
     try worksheet.dataValidationCell(26, 1, data_validation);
 
     // Example 14. Displaying and modifying data validation messages.
-    try worksheet.writeString(28, 0, "Display a custom info message when integer isn't between 1 and 100", .none);
+    try worksheet.writeString(28, 0, "Display a custom info message when integer isn't between 1 and 100", .default);
 
     data_validation.validate = .integer;
     data_validation.criteria = .between;

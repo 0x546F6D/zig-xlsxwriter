@@ -13,39 +13,39 @@ pub fn main() !void {
     // Write some sample data.
     const row_b1 = xwz.nameToRow("B1");
     const col_b1 = xwz.nameToCol("B1");
-    try worksheet.writeNumber(row_b1, col_b1, 34, .none);
+    try worksheet.writeNumber(row_b1, col_b1, 34, .default);
 
     const row_b2 = xwz.nameToRow("B2");
     const col_b2 = xwz.nameToCol("B2");
-    try worksheet.writeNumber(row_b2, col_b2, 32, .none);
+    try worksheet.writeNumber(row_b2, col_b2, 32, .default);
 
     const row_b3 = xwz.nameToRow("B3");
     const col_b3 = xwz.nameToCol("B3");
-    try worksheet.writeNumber(row_b3, col_b3, 31, .none);
+    try worksheet.writeNumber(row_b3, col_b3, 31, .default);
 
     const row_b4 = xwz.nameToRow("B4");
     const col_b4 = xwz.nameToCol("B4");
-    try worksheet.writeNumber(row_b4, col_b4, 35, .none);
+    try worksheet.writeNumber(row_b4, col_b4, 35, .default);
 
     const row_b5 = xwz.nameToRow("B5");
     const col_b5 = xwz.nameToCol("B5");
-    try worksheet.writeNumber(row_b5, col_b5, 36, .none);
+    try worksheet.writeNumber(row_b5, col_b5, 36, .default);
 
     const row_b6 = xwz.nameToRow("B6");
     const col_b6 = xwz.nameToCol("B6");
-    try worksheet.writeNumber(row_b6, col_b6, 30, .none);
+    try worksheet.writeNumber(row_b6, col_b6, 30, .default);
 
     const row_b7 = xwz.nameToRow("B7");
     const col_b7 = xwz.nameToCol("B7");
-    try worksheet.writeNumber(row_b7, col_b7, 38, .none);
+    try worksheet.writeNumber(row_b7, col_b7, 38, .default);
 
     const row_b8 = xwz.nameToRow("B8");
     const col_b8 = xwz.nameToCol("B8");
-    try worksheet.writeNumber(row_b8, col_b8, 38, .none);
+    try worksheet.writeNumber(row_b8, col_b8, 38, .default);
 
     const row_b9 = xwz.nameToRow("B9");
     const col_b9 = xwz.nameToCol("B9");
-    try worksheet.writeNumber(row_b9, col_b9, 32, .none);
+    try worksheet.writeNumber(row_b9, col_b9, 32, .default);
 
     // Add a format with red text.
     const custom_format = try workbook.addFormat();

@@ -47,7 +47,7 @@ pub fn main() !void {
     try worksheet.writeString(0, 1, "Format", bold);
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Write the same date and time using each of the above formats.
     for (date_formats, 1..) |date_format, row| {
@@ -61,7 +61,7 @@ pub fn main() !void {
         try worksheet.writeDateTime(@intCast(row), 0, datetime, format);
 
         // Also write the format string for comparison.
-        try worksheet.writeString(@intCast(row), 1, date_format, .none);
+        try worksheet.writeString(@intCast(row), 1, date_format, .default);
     }
 }
 

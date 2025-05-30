@@ -27,13 +27,13 @@ pub fn main() !void {
 
     // Iterate over the data and write it out element by element.
     for (expenses) |expense| {
-        try worksheet.writeString(row, col, expense.item, .none);
-        try worksheet.writeNumber(row, col + 1, expense.cost, .none);
+        try worksheet.writeString(row, col, expense.item, .default);
+        try worksheet.writeNumber(row, col + 1, expense.cost, .default);
         row += 1;
     }
 
-    try worksheet.writeString(row, col, "Total", .none);
-    try worksheet.writeFormula(row, col + 1, "=SUM(B1:B4)", .none);
+    try worksheet.writeString(row, col, "Total", .default);
+    try worksheet.writeFormula(row, col + 1, "=SUM(B1:B4)", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

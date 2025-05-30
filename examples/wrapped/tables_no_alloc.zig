@@ -43,7 +43,7 @@ pub fn main() !void {
         worksheet2,
         "Default table with data.",
     );
-    try write_worksheet_data(worksheet2, .none);
+    try write_worksheet_data(worksheet2, .default);
     try worksheet2.addTableNoAlloc(2, 1, 6, 5, .default);
 
     // Example 3: Table without autofilter
@@ -51,7 +51,7 @@ pub fn main() !void {
         worksheet3,
         "Table without autofilter.",
     );
-    try write_worksheet_data(worksheet3, .none);
+    try write_worksheet_data(worksheet3, .default);
     const options3 = xwz.TableOptionsNoAlloc{
         .no_autofilter = Bool.true,
     };
@@ -62,7 +62,7 @@ pub fn main() !void {
         worksheet4,
         "Table without default header row.",
     );
-    try write_worksheet_data(worksheet4, .none);
+    try write_worksheet_data(worksheet4, .default);
     const options4 = xwz.TableOptionsNoAlloc{
         .no_header_row = Bool.true,
     };
@@ -77,7 +77,7 @@ pub fn main() !void {
         .first_column = Bool.true,
         .last_column = Bool.true,
     };
-    try write_worksheet_data(worksheet5, .none);
+    try write_worksheet_data(worksheet5, .default);
     try worksheet5.addTableNoAlloc(2, 1, 6, 5, options5);
 
     // Example 6: Table with banded columns but without default banded rows
@@ -85,7 +85,7 @@ pub fn main() !void {
         worksheet6,
         "Table with banded columns but without default banded rows.",
     );
-    try write_worksheet_data(worksheet6, .none);
+    try write_worksheet_data(worksheet6, .default);
     const options6 = xwz.TableOptionsNoAlloc{
         .no_banded_rows = Bool.true,
         .banded_columns = Bool.true,
@@ -97,7 +97,7 @@ pub fn main() !void {
         worksheet7,
         "Table with user defined column headers.",
     );
-    try write_worksheet_data(worksheet7, .none);
+    try write_worksheet_data(worksheet7, .default);
     const col7_1 = xwz.TableColumnNoAlloc{ .header = "Product" };
     const col7_2 = xwz.TableColumnNoAlloc{ .header = "Quarter 1" };
     const col7_3 = xwz.TableColumnNoAlloc{ .header = "Quarter 2" };
@@ -120,7 +120,7 @@ pub fn main() !void {
         worksheet8,
         "Table with user defined column headers.",
     );
-    try write_worksheet_data(worksheet8, .none);
+    try write_worksheet_data(worksheet8, .default);
     const col8_1 = xwz.TableColumnNoAlloc{ .header = "Product" };
     const col8_2 = xwz.TableColumnNoAlloc{ .header = "Quarter 1" };
     const col8_3 = xwz.TableColumnNoAlloc{ .header = "Quarter 2" };
@@ -148,7 +148,7 @@ pub fn main() !void {
         worksheet9,
         "Table with totals row (but no caption or totals).",
     );
-    try write_worksheet_data(worksheet9, .none);
+    try write_worksheet_data(worksheet9, .default);
     const col9_1 = xwz.TableColumnNoAlloc{ .header = "Product" };
     const col9_2 = xwz.TableColumnNoAlloc{ .header = "Quarter 1" };
     const col9_3 = xwz.TableColumnNoAlloc{ .header = "Quarter 2" };
@@ -177,7 +177,7 @@ pub fn main() !void {
         worksheet10,
         "Table with totals row with user captions and functions.",
     );
-    try write_worksheet_data(worksheet10, .none);
+    try write_worksheet_data(worksheet10, .default);
     const col10_1 = xwz.TableColumnNoAlloc{
         .header = "Product",
         .total_string = "Totals",
@@ -222,7 +222,7 @@ pub fn main() !void {
         worksheet11,
         "Table with alternative Excel style.",
     );
-    try write_worksheet_data(worksheet11, .none);
+    try write_worksheet_data(worksheet11, .default);
     const col11_1 = xwz.TableColumnNoAlloc{
         .header = "Product",
         .total_string = "Totals",
@@ -269,7 +269,7 @@ pub fn main() !void {
         worksheet12,
         "Table with Excel style removed.",
     );
-    try write_worksheet_data(worksheet12, .none);
+    try write_worksheet_data(worksheet12, .default);
     const col12_1 = xwz.TableColumnNoAlloc{
         .header = "Product",
         .total_string = "Totals",
@@ -366,8 +366,8 @@ fn write_worksheet(
     title: [*c]const u8,
 ) !void {
     // Example 1: Default table with no data
-    try worksheet.setColumn(1, 6, 12, .none);
-    try worksheet.writeString(0, 1, title, .none);
+    try worksheet.setColumn(1, 6, 12, .default);
+    try worksheet.writeString(0, 1, title, .default);
 }
 
 fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {

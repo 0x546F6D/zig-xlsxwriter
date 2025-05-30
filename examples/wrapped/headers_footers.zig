@@ -54,8 +54,8 @@ pub fn main() !void {
     try worksheet.setHeader(header);
     try worksheet.setFooter(footer);
 
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
 
     // An example with an image
     const worksheet2 = try workbook.addWorkSheet("Image");
@@ -73,15 +73,15 @@ pub fn main() !void {
         .bottom = -1,
     };
     worksheet.setMargins(margins);
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
 
     // This is an example of some of the header/footer variables
     const worksheet3 = try workbook.addWorkSheet("Variables");
     worksheet = worksheet3;
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
-    try worksheet.writeString(20, 0, "Next page", .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
+    try worksheet.writeString(20, 0, "Next page", .default);
 
     header = "&LPage &P of &N" ++ "&CFilename: &F" ++ "&RSheetname: &A";
     footer = "&LCurrent date: &D" ++ "&RCurrent time: &T";
@@ -94,8 +94,8 @@ pub fn main() !void {
     // This example shows how to use more than one font
     const worksheet4 = try workbook.addWorkSheet("Mixed fonts");
     worksheet = worksheet4;
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
 
     header = "&C&\"Courier New,Bold\"Hello &\"Arial,Italic\"World";
     footer = "&C&\"Symbol\"e&\"Arial\" = mc&X2";
@@ -105,8 +105,8 @@ pub fn main() !void {
     // Example of line wrapping
     const worksheet5 = try workbook.addWorkSheet("Word wrap");
     worksheet = worksheet5;
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
 
     header = "&CHeading 1\nHeading 2";
     try worksheet.setHeader(header);
@@ -114,8 +114,8 @@ pub fn main() !void {
     // Example of inserting a literal ampersand &
     const worksheet6 = try workbook.addWorkSheet("Ampersand");
     worksheet = worksheet6;
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, preview, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, preview, .default);
 
     header = "&CCuriouser && Curiouser - Attorneys at Law";
     try worksheet.setHeader(header);

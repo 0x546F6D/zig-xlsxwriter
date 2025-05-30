@@ -24,10 +24,10 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Write the datetime without formatting.
-    try worksheet.writeDateTime(0, 0, datetime, .none);
+    try worksheet.writeDateTime(0, 0, datetime, .default);
 
     // Write the datetime with formatting.
     try worksheet.writeDateTime(1, 0, datetime, format);

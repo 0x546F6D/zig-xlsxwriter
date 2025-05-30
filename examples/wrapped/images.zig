@@ -15,18 +15,18 @@ pub fn main() !void {
 
     // Change some of the column widths for clarity.
     const cols = xwz.cols("A:A");
-    try worksheet.setColumn(cols.first_col, cols.last_col, 30, .none);
+    try worksheet.setColumn(cols.first_col, cols.last_col, 30, .default);
 
     // Insert an image.
     var cell = xwz.cell("A2");
-    try worksheet.writeString(cell.row, cell.col, "Insert an image in a cell:", .none);
+    try worksheet.writeString(cell.row, cell.col, "Insert an image in a cell:", .default);
 
     cell = xwz.cell("B2");
     try worksheet.insertImage(cell.row, cell.col, asset_path);
 
     // Insert an image offset in the cell.
     cell = xwz.cell("A12");
-    try worksheet.writeString(cell.row, cell.col, "Insert an offset image:", .none);
+    try worksheet.writeString(cell.row, cell.col, "Insert an offset image:", .default);
 
     const options1 = xwz.ImageOptions{
         .x_offset = 15,
@@ -38,7 +38,7 @@ pub fn main() !void {
 
     // Insert an image with scaling.
     cell = xwz.cell("A22");
-    try worksheet.writeString(cell.row, cell.col, "Insert a scaled image:", .none);
+    try worksheet.writeString(cell.row, cell.col, "Insert a scaled image:", .default);
 
     const options2 = xwz.ImageOptions{
         .x_scale = 0.5,
@@ -50,7 +50,7 @@ pub fn main() !void {
 
     // Insert an image with a hyperlink.
     cell = xwz.cell("A32");
-    try worksheet.writeString(cell.row, cell.col, "Insert an image with a hyperlink:", .none);
+    try worksheet.writeString(cell.row, cell.col, "Insert an image with a hyperlink:", .default);
 
     const options3 = xwz.ImageOptions{ .url = "https://github.com/jmcnamara" };
 

@@ -32,7 +32,7 @@ pub const Font = struct {
             .name = self.name,
             .size = self.size,
             // bold by default, need to explicitely disable it
-            .bold = if (self.bold) @intFromBool(self.bold) else xlsxwriter.explicit_false,
+            .bold = if (self.bold) @intFromBool(self.bold) else @intFromEnum(Bool.explicit_false),
             .italic = @intFromBool(self.italic),
             .underline = @intFromBool(self.underline),
             .rotation = self.rotation,
@@ -498,5 +498,6 @@ const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
 const CString = xlsxwriter.CString;
 const CStringArray = xlsxwriter.CStringArray;
+const Bool = xlsxwriter.Boolean;
 const DefinedColors = @import("format.zig").DefinedColors;
 const XlsxError = @import("errors.zig").XlsxError;

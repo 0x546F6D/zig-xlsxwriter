@@ -10,7 +10,7 @@ pub fn main() !void {
 
     const worksheet = try workbook.addWorkSheet(null);
 
-    try worksheet.writeString(0, 0, "Hello", .none);
+    try worksheet.writeString(0, 0, "Hello", .default);
 
     try worksheet.writeComment(0, 0, "This is a comment");
 }

@@ -27,12 +27,12 @@ pub fn main() !void {
     try workbook.setProperties(properties);
 
     // Add some text to the file.
-    try worksheet.setColumn(0, 0, 50, .none);
+    try worksheet.setColumn(0, 0, 50, .default);
     try worksheet.writeString(
         0,
         0,
         "Select 'Workbook Properties' to see properties.",
-        .none,
+        .default,
     );
 }
 

@@ -46,7 +46,7 @@ pub fn main() !void {
     date_format.setNumFormat("mmmm d yyyy");
 
     // Adjust the column width.
-    try worksheet.setColumn(0, 0, 15, .none);
+    try worksheet.setColumn(0, 0, 15, .default);
 
     // Write some data header.
     try worksheet.writeString(0, 0, "Item", bold);
@@ -54,7 +54,7 @@ pub fn main() !void {
 
     // Iterate over the data and write it out element by element.
     for (expenses, 1..) |expense, row| {
-        try worksheet.writeString(@intCast(row), 0, expense.item, .none);
+        try worksheet.writeString(@intCast(row), 0, expense.item, .default);
         try worksheet.writeDateTime(@intCast(row), 1, expense.datetime, date_format);
         try worksheet.writeNumber(@intCast(row), 2, expense.cost, money);
     }

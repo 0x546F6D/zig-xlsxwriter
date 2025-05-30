@@ -16,17 +16,17 @@ pub fn main() !void {
     format.setBold();
 
     // Change the column width for clarity.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Write some simple text.
-    try worksheet.writeString(0, 0, "Hello", .none);
+    try worksheet.writeString(0, 0, "Hello", .default);
 
     // Text with formatting.
     try worksheet.writeString(1, 0, "World", format);
 
     // Write some numbers.
-    try worksheet.writeNumber(2, 0, 123, .none);
-    try worksheet.writeNumber(3, 0, 123.456, .none);
+    try worksheet.writeNumber(2, 0, 123, .default);
+    try worksheet.writeNumber(3, 0, 123.456, .default);
 
     // Insert an image.
     const use_buffer = true;

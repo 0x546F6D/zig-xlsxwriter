@@ -9,7 +9,7 @@ pub fn main() !void {
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
-    try worksheet.writeString(2, 1, "Это фраза на русском!", .none);
+    try worksheet.writeString(2, 1, "Это фраза на русском!", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

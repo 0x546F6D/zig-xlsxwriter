@@ -14,8 +14,8 @@ pub fn main() !void {
     const worksheet = try workbook.addWorkSheet(null);
 
     // Write some data
-    try worksheet.writeString(0, 3, "Some hidden columns.", .none);
-    try worksheet.writeString(7, 0, "Some hidden rows.", .none);
+    try worksheet.writeString(0, 3, "Some hidden columns.", .default);
+    try worksheet.writeString(7, 0, "Some hidden rows.", .default);
 
     // Hide all rows without data
     worksheet.setDefaultRow(15, true);
@@ -23,14 +23,14 @@ pub fn main() !void {
     // Set the height of empty rows that we want to display even if it is
     // the default height
     var row: u32 = 1;
-    while (row <= 6) : (row += 1) try worksheet.setRow(row, xwz.def_row_height, .none);
+    while (row <= 6) : (row += 1) try worksheet.setRow(row, xwz.def_row_height, .default);
 
     // Columns can be hidden explicitly. This doesn't increase the file size
     const options = xwz.RowColOptions{ .hidden = true };
 
     // Use COLS macro equivalent for "G:XFD" range
     const cols = xwz.cols("G:XFD");
-    try worksheet.setColumnOpt(cols.first_col, cols.last_col, 8.43, .none, options);
+    try worksheet.setColumnOpt(cols.first_col, cols.last_col, 8.43, .default, options);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

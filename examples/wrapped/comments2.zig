@@ -24,8 +24,8 @@ pub fn main() !void {
 
     // Example 1: Simple cell comment without formatting
     worksheet = worksheet1;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
 
     try worksheet.writeString(
         2,
@@ -37,8 +37,8 @@ pub fn main() !void {
 
     // Example 2: Visible and hidden comments
     worksheet = worksheet2;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
 
     try worksheet.writeString(
         2,
@@ -62,10 +62,10 @@ pub fn main() !void {
 
     // Example 3: Worksheet level comment visibility
     worksheet = worksheet3;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
-    try worksheet.setRow(5, 50, .none);
-    try worksheet.setRow(8, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
+    try worksheet.setRow(5, 50, .default);
+    try worksheet.setRow(8, 50, .default);
 
     worksheet.showComments();
 
@@ -103,12 +103,12 @@ pub fn main() !void {
 
     // Example 4: Comment box dimensions
     worksheet = worksheet4;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
-    try worksheet.setRow(5, 50, .none);
-    try worksheet.setRow(8, 50, .none);
-    try worksheet.setRow(15, 50, .none);
-    try worksheet.setRow(18, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
+    try worksheet.setRow(5, 50, .default);
+    try worksheet.setRow(8, 50, .default);
+    try worksheet.setRow(15, 50, .default);
+    try worksheet.setRow(18, 50, .default);
 
     worksheet.showComments();
 
@@ -172,10 +172,10 @@ pub fn main() !void {
 
     // Example 5: Comment positioning
     worksheet = worksheet5;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
-    try worksheet.setRow(5, 50, .none);
-    try worksheet.setRow(8, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
+    try worksheet.setRow(5, 50, .default);
+    try worksheet.setRow(8, 50, .default);
 
     worksheet.showComments();
 
@@ -215,10 +215,10 @@ pub fn main() !void {
 
     // Example 6: Comment colors
     worksheet = worksheet6;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 50, .none);
-    try worksheet.setRow(5, 50, .none);
-    try worksheet.setRow(8, 50, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 50, .default);
+    try worksheet.setRow(5, 50, .default);
+    try worksheet.setRow(8, 50, .default);
 
     worksheet.showComments();
 
@@ -256,9 +256,9 @@ pub fn main() !void {
 
     // Example 7: Comment author
     worksheet = worksheet7;
-    try worksheet.setColumn(2, 2, 30, .none);
-    try worksheet.setRow(2, 50, .none);
-    try worksheet.setRow(5, 60, .none);
+    try worksheet.setColumn(2, 2, 30, .default);
+    try worksheet.setRow(2, 50, .default);
+    try worksheet.setRow(5, 60, .default);
 
     try worksheet.writeString(
         2,
@@ -284,8 +284,8 @@ pub fn main() !void {
 
     // Example 8. Demonstrates the need to explicitly set the row height.
     worksheet = worksheet8;
-    try worksheet.setColumn(2, 2, 25, .none);
-    try worksheet.setRow(2, 80, .none);
+    try worksheet.setColumn(2, 2, 25, .default);
+    try worksheet.setRow(2, 80, .default);
 
     worksheet.showComments();
 

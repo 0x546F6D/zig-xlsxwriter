@@ -102,7 +102,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "East")) {
-            try worksheet2.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet2.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -125,7 +125,7 @@ pub fn main() !void {
         if (!std.mem.eql(u8, row.region, "East") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet3.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet3.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -153,7 +153,7 @@ pub fn main() !void {
         if (!std.mem.eql(u8, row.region, "East") or
             row.volume < 3000 or row.volume > 8000)
         {
-            try worksheet4.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet4.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -170,7 +170,7 @@ pub fn main() !void {
             !std.mem.eql(u8, row.region, "North") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet5.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet5.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -187,7 +187,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "")) {
-            try worksheet6.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet6.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -201,7 +201,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (std.mem.eql(u8, row.region, "")) {
-            try worksheet7.setRowOpt(@intCast(i), xwz.def_row_height, .none, hidden);
+            try worksheet7.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 }
@@ -217,22 +217,22 @@ fn prepWorkSheet(worksheet: WorkSheet, header: Format) !void {
 
 fn writeWorksheetHeader(worksheet: WorkSheet, header: Format) !void {
     // Make the columns wider for clarity
-    try worksheet.setColumn(0, 3, 12, .none);
+    try worksheet.setColumn(0, 3, 12, .default);
 
     // Write the column headers
     try worksheet.setRow(0, 20, header);
-    try worksheet.writeString(0, 0, "Region", .none);
-    try worksheet.writeString(0, 1, "Item", .none);
-    try worksheet.writeString(0, 2, "Volume", .none);
-    try worksheet.writeString(0, 3, "Month", .none);
+    try worksheet.writeString(0, 0, "Region", .default);
+    try worksheet.writeString(0, 1, "Item", .default);
+    try worksheet.writeString(0, 2, "Volume", .default);
+    try worksheet.writeString(0, 3, "Month", .default);
 }
 
 fn writeData(worksheet: WorkSheet) !void {
     for (data, 1..) |row, i| {
-        try worksheet.writeString(@intCast(i), 0, row.region, .none);
-        try worksheet.writeString(@intCast(i), 1, row.item, .none);
-        try worksheet.writeNumber(@intCast(i), 2, @floatFromInt(row.volume), .none);
-        try worksheet.writeString(@intCast(i), 3, row.month, .none);
+        try worksheet.writeString(@intCast(i), 0, row.region, .default);
+        try worksheet.writeString(@intCast(i), 1, row.item, .default);
+        try worksheet.writeNumber(@intCast(i), 2, @floatFromInt(row.volume), .default);
+        try worksheet.writeString(@intCast(i), 3, row.month, .default);
     }
 }
 

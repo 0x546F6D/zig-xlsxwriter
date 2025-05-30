@@ -20,10 +20,10 @@ pub fn main() !void {
     merge_format.setBorder(.thin);
 
     // Increase the cell size of the merged cells to highlight the formatting.
-    try worksheet.setColumn(1, 3, 12, .none);
-    try worksheet.setRow(3, 30, .none);
-    try worksheet.setRow(6, 30, .none);
-    try worksheet.setRow(7, 30, .none);
+    try worksheet.setColumn(1, 3, 12, .default);
+    try worksheet.setRow(3, 30, .default);
+    try worksheet.setRow(6, 30, .default);
+    try worksheet.setRow(7, 30, .default);
 
     // Merge 3 cells.
     try worksheet.mergeRange(3, 1, 3, 3, "Merged Range", merge_format);

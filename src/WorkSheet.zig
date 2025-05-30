@@ -183,17 +183,88 @@ pub inline fn setDefaultRow(
 }
 
 // pub extern fn worksheet_set_selection(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) lxw_error;
+pub inline fn setSelection(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    last_row: u32,
+    last_col: u16,
+) XlsxError!void {
+    try check(c.worksheet_set_selection(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        last_row,
+        last_col,
+    ));
+}
+
 // pub extern fn worksheet_set_top_left_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t) void;
+pub inline fn setTopLeftCell(
+    self: WorkSheet,
+    row: u32,
+    col: u16,
+) void {
+    c.worksheet_set_top_left_cell(self.worksheet_c, row, col);
+}
+
 // pub extern fn worksheet_set_landscape(worksheet: [*c]lxw_worksheet) void;
+pub inline fn setLandscape(self: WorkSheet) void {
+    c.worksheet_set_landscape(self.worksheet_c);
+}
+
 // pub extern fn worksheet_set_portrait(worksheet: [*c]lxw_worksheet) void;
+pub inline fn setPortrait(self: WorkSheet) void {
+    c.worksheet_set_portrait(self.worksheet_c);
+}
+
 // pub extern fn worksheet_set_page_view(worksheet: [*c]lxw_worksheet) void;
+pub inline fn setPageView(self: WorkSheet) void {
+    c.worksheet_set_page_view(self.worksheet_c);
+}
+
 // pub extern fn worksheet_set_paper(worksheet: [*c]lxw_worksheet, paper_type: u8) void;
+// paper_type in worksheet.h is actually paper_size in worksheet.c
+pub inline fn setPaper(self: WorkSheet, paper_size: u8) void {
+    c.worksheet_set_paper(self.worksheet_c, paper_size);
+}
+
 // pub extern fn worksheet_set_zoom(worksheet: [*c]lxw_worksheet, scale: u16) void;
+pub inline fn setZoom(self: WorkSheet, scale: u16) void {
+    c.worksheet_set_zoom(self.worksheet_c, scale);
+}
+
 // pub extern fn worksheet_set_start_page(worksheet: [*c]lxw_worksheet, start_page: u16) void;
+pub inline fn setStartPage(self: WorkSheet, start_page: u16) void {
+    c.worksheet_set_start_page(self.worksheet_c, start_page);
+}
+
 // pub extern fn worksheet_set_print_scale(worksheet: [*c]lxw_worksheet, scale: u16) void;
+pub inline fn setPrintScale(self: WorkSheet, scale: u16) void {
+    c.worksheet_set_print_scale(self.worksheet_c, scale);
+}
+
 // pub extern fn worksheet_set_vba_name(worksheet: [*c]lxw_worksheet, name: [*c]const u8) lxw_error;
+pub inline fn setVbaName(
+    self: WorkSheet,
+    name: ?CString,
+) XlsxError!void {
+    try check(c.worksheet_set_vba_name(self.worksheet_c, name));
+}
+
 // pub extern fn worksheet_set_comments_author(worksheet: [*c]lxw_worksheet, author: [*c]const u8) void;
+pub inline fn setCommentsAuthor(self: WorkSheet, author: ?CString) void {
+    c.worksheet_set_comments_author(self.worksheet_c, author);
+}
+
+pub const ObjectProperties = c.lxw_object_properties;
 // pub extern fn worksheet_set_error_cell(worksheet: [*c]lxw_worksheet, object_props: [*c]lxw_object_properties, ref_id: u32) void;
+pub inline fn setErrorCell(self: WorkSheet, object_props: ObjectProperties) void {
+    c.worksheet_set_comments_author(
+        self.worksheet_c,
+        @constCast(&object_props),
+    );
+}
 
 // write functions
 // pub extern fn worksheet_write_number(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, number: f64, format: [*c]lxw_format) lxw_error;
@@ -383,11 +454,11 @@ pub inline fn writeUrlOpt(
 }
 
 pub const RichStringTuple = struct {
-    format: Format = .none,
+    format: Format = .default,
     string: ?CString,
 
     pub const default = RichStringTuple{
-        .format = .none,
+        .format = .default,
         .string = null,
     };
 
@@ -566,7 +637,7 @@ pub const ImageOptions = struct {
     decorative: bool = false,
     url: ?CString = null,
     tip: ?CString = null,
-    cell_format: Format = .none,
+    cell_format: Format = .default,
 
     pub const default = ImageOptions{
         .x_offset = 0,
@@ -578,7 +649,7 @@ pub const ImageOptions = struct {
         .decorative = false,
         .url = null,
         .tip = null,
-        .cell_format = .none,
+        .cell_format = .default,
     };
 
     inline fn toC(self: ImageOptions) c.lxw_image_options {
@@ -837,9 +908,66 @@ pub const filterList = filter.filterList;
 
 // panes functions
 // pub extern fn worksheet_freeze_panes(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t) void;
-// pub extern fn worksheet_split_panes(worksheet: [*c]lxw_worksheet, vertical: f64, horizontal: f64) void;
+pub inline fn freezePanes(
+    self: WorkSheet,
+    top_row: u32,
+    left_col: u16,
+) void {
+    c.worksheet_freeze_panes(
+        self.worksheet_c,
+        top_row,
+        left_col,
+    );
+}
+
 // pub extern fn worksheet_freeze_panes_opt(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, top_row: lxw_row_t, left_col: lxw_col_t, @"type": u8) void;
+pub inline fn freezePanesOpt(
+    self: WorkSheet,
+    first_row: u32,
+    first_col: u16,
+    top_row: u32,
+    left_col: u16,
+    @"type": bool,
+) void {
+    c.worksheet_freeze_panes_opt(
+        self.worksheet_c,
+        first_row,
+        first_col,
+        top_row,
+        left_col,
+        @intFromBool(@"type"),
+    );
+}
+
+// pub extern fn worksheet_split_panes(worksheet: [*c]lxw_worksheet, vertical: f64, horizontal: f64) void;
+pub inline fn splitPanes(
+    self: WorkSheet,
+    vertical: f64,
+    horizontal: f64,
+) void {
+    c.worksheet_split_panes(
+        self.worksheet_c,
+        vertical,
+        horizontal,
+    );
+}
+
 // pub extern fn worksheet_split_panes_opt(worksheet: [*c]lxw_worksheet, vertical: f64, horizontal: f64, top_row: lxw_row_t, left_col: lxw_col_t) void;
+pub inline fn splitPanesOpt(
+    self: WorkSheet,
+    vertical: f64,
+    horizontal: f64,
+    top_row: u32,
+    left_col: u16,
+) void {
+    c.worksheet_split_panes_opt(
+        self.worksheet_c,
+        vertical,
+        horizontal,
+        top_row,
+        left_col,
+    );
+}
 
 // other functions
 // pub extern fn worksheet_merge_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, string: [*c]const u8, format: [*c]lxw_format) lxw_error;
@@ -1100,7 +1228,7 @@ pub const ConditionalFormat = struct {
     criteria: ConditionalCriteria = .none,
     value: f64 = 0,
     value_string: ?CString = null,
-    format: Format = .none,
+    format: Format = .default,
     min_value: f64 = 0,
     min_value_string: ?CString = null,
     min_rule_type: ConditionalFormatRuleTypes = .none,
@@ -1132,12 +1260,12 @@ pub const ConditionalFormat = struct {
     multi_range: ?CString = null,
     stop_if_true: bool = false,
 
-    pub const none: ConditionalFormat = .{
+    pub const default: ConditionalFormat = .{
         .type = .none,
         .criteria = .none,
         .value = 0,
         .value_string = null,
-        .format = .none,
+        .format = .default,
         .min_value = 0,
         .min_value_string = null,
         .min_rule_type = .none,
@@ -1255,8 +1383,8 @@ pub const TableColumn = struct {
     formula: ?CString = null,
     total_string: ?CString = null,
     total_function: TableTotalFunctions = .none,
-    header_format: Format = .none,
-    format: Format = .none,
+    header_format: Format = .default,
+    format: Format = .default,
     total_value: f64 = 0,
 
     pub const empty: TableColumn = .{
@@ -1264,8 +1392,8 @@ pub const TableColumn = struct {
         .formula = null,
         .total_string = null,
         .total_function = .none,
-        .header_format_c = null,
-        .format_c = null,
+        .header_format = .default,
+        .format = .default,
         .total_value = 0,
     };
 

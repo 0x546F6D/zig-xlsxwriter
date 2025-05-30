@@ -19,7 +19,7 @@ pub fn main() !void {
     worksheet3.setTabColor(@enumFromInt(0xFF9900)); // Orange.
 
     // worksheet4 will have the default color.
-    try worksheet4.writeString(0, 0, "Hello", .none);
+    try worksheet4.writeString(0, 0, "Hello", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

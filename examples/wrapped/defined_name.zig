@@ -30,11 +30,11 @@ pub fn main() !void {
     const worksheets = if (worksheets_o) |worksheets| worksheets else return;
 
     for (worksheets) |worksheet| {
-        try worksheet.setColumn(0, 0, 45, .none);
-        try worksheet.writeString(0, 0, "This worksheet contains some defined names.", .none);
-        try worksheet.writeString(1, 0, "See Formulas -> Name Manager above.", .none);
-        try worksheet.writeString(2, 0, "Example formula in cell B3 ->", .none);
-        try worksheet.writeFormula(2, 1, "=Exchange_rate", .none);
+        try worksheet.setColumn(0, 0, 45, .default);
+        try worksheet.writeString(0, 0, "This worksheet contains some defined names.", .default);
+        try worksheet.writeString(1, 0, "See Formulas -> Name Manager above.", .default);
+        try worksheet.writeString(2, 0, "Example formula in cell B3 ->", .default);
+        try worksheet.writeFormula(2, 1, "=Exchange_rate", .default);
     }
 }
 

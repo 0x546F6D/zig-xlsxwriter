@@ -15,14 +15,14 @@ pub fn main() !void {
     // Hide Sheet2. It won't be visible until it is unhidden in Excel.
     worksheet2.hide();
 
-    try worksheet1.writeString(0, 0, "Sheet2 is hidden", .none);
-    try worksheet2.writeString(0, 0, "Now it's my turn to find you!", .none);
-    try worksheet3.writeString(0, 0, "Sheet2 is hidden", .none);
+    try worksheet1.writeString(0, 0, "Sheet2 is hidden", .default);
+    try worksheet2.writeString(0, 0, "Now it's my turn to find you!", .default);
+    try worksheet3.writeString(0, 0, "Sheet2 is hidden", .default);
 
     // Make the first column wider to make the text clearer.
-    try worksheet1.setColumn(0, 0, 30, .none);
-    try worksheet2.setColumn(0, 0, 30, .none);
-    try worksheet3.setColumn(0, 0, 30, .none);
+    try worksheet1.setColumn(0, 0, 30, .default);
+    try worksheet2.setColumn(0, 0, 30, .default);
+    try worksheet3.setColumn(0, 0, 30, .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

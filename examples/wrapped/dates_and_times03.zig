@@ -14,7 +14,7 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Write some Unix datetimes with formatting.
 

@@ -10,7 +10,7 @@ pub fn main() !void {
     const worksheet = try workbook.addWorkSheet(null);
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Add some formats.
     const format1 = try workbook.addFormat();

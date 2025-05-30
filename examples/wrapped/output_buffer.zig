@@ -22,8 +22,8 @@ pub fn main() !void {
     const workbook = try xwz.initWorkBookOpt(null, null, options);
     const worksheet = try workbook.addWorkSheet(null);
 
-    try worksheet.writeString(0, 0, "Hello", .none);
-    try worksheet.writeNumber(1, 0, 123, .none);
+    try worksheet.writeString(0, 0, "Hello", .default);
+    try worksheet.writeNumber(1, 0, 123, .default);
 
     try workbook.deinit();
 

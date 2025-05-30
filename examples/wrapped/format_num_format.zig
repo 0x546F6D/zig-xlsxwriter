@@ -10,7 +10,7 @@ pub fn main() !void {
     const worksheet = try workbook.addWorkSheet(null);
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 30, .none);
+    try worksheet.setColumn(0, 0, 30, .default);
 
     // Add some formats.
     const format01 = try workbook.addFormat();
@@ -37,7 +37,7 @@ pub fn main() !void {
     format09.setNumFormat("0 \"dollar and\" .00 \"cents\"");
 
     // Write data using the formats.
-    try worksheet.writeNumber(0, 0, 3.1415926, .none); // 3.1415926
+    try worksheet.writeNumber(0, 0, 3.1415926, .default); // 3.1415926
     try worksheet.writeNumber(1, 0, 3.1415926, format01); // 3.142
     try worksheet.writeNumber(2, 0, 1234.56, format02); // 1,235
     try worksheet.writeNumber(3, 0, 1234.56, format03); // 1,234.56

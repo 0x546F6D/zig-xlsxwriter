@@ -2,7 +2,7 @@ const Format = @This();
 
 format_c: ?*c.lxw_format,
 
-pub const none: Format = .{
+pub const default: Format = .{
     .format_c = null,
 };
 

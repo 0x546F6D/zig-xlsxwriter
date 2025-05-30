@@ -31,8 +31,8 @@ pub fn main() !void {
     try workbook.setCustomPropertyBoolean("Signed off", false);
 
     // Add some text to the file.
-    try worksheet.setColumn(0, 0, 50, .none);
-    try worksheet.writeString(0, 0, "Select 'Workbook Properties' to see properties.", .none);
+    try worksheet.setColumn(0, 0, 50, .default);
+    try worksheet.writeString(0, 0, "Select 'Workbook Properties' to see properties.", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

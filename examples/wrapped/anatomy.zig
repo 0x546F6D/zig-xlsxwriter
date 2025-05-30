@@ -24,11 +24,11 @@ pub fn main() !void {
     myformat2.setNumFormat("$#,##0.00");
 
     // Widen the first column to make the text clearer
-    try worksheet1.setColumn(0, 0, 20, .none);
+    try worksheet1.setColumn(0, 0, 20, .default);
 
     // Write some unformatted data
-    try worksheet1.writeString(0, 0, "Peach", .none);
-    try worksheet1.writeString(1, 0, "Plum", .none);
+    try worksheet1.writeString(0, 0, "Peach", .default);
+    try worksheet1.writeString(1, 0, "Plum", .default);
 
     // Write formatted data
     try worksheet1.writeString(2, 0, "Pear", myformat1);
@@ -37,7 +37,7 @@ pub fn main() !void {
     try worksheet1.writeString(3, 0, "Persimmon", myformat1);
 
     // Write some numbers
-    try worksheet1.writeNumber(5, 0, 123, .none);
+    try worksheet1.writeNumber(5, 0, 123, .default);
     try worksheet1.writeNumber(6, 0, 4567.555, myformat2);
 
     // Write to the second worksheet

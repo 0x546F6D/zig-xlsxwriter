@@ -35,7 +35,7 @@ pub fn main() !void {
 
     // Iterate over the data and write it out element by element.
     for (expenses, 1..) |expense, row| {
-        try worksheet.writeString(@intCast(row), 0, expense.item, .none);
+        try worksheet.writeString(@intCast(row), 0, expense.item, .default);
         try worksheet.writeNumber(@intCast(row), 1, expense.cost, money);
     }
 

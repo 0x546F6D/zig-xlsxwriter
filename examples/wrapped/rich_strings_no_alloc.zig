@@ -31,7 +31,7 @@ pub fn main() !void {
     superscript.setFontScript(.superscript);
 
     // Make the first column wider for clarity.
-    try worksheet.setColumn(0, 0, 30, .none);
+    try worksheet.setColumn(0, 0, 30, .default);
 
     // Example 1: Bold and italic text
     // Write individual cells with appropriate formatting
@@ -55,7 +55,7 @@ pub fn main() !void {
         &fragment13,
         &fragment14,
     };
-    worksheet.writeRichStringNoAlloc(0, 0, rich_string1, .none) catch |err| {
+    worksheet.writeRichStringNoAlloc(0, 0, rich_string1, .default) catch |err| {
         std.debug.print("writeSrichString error: {s}\n", .{xwz.strError(err)});
         return err;
     };
@@ -82,7 +82,7 @@ pub fn main() !void {
         &fragment23,
         &fragment24,
     };
-    try worksheet.writeRichStringNoAlloc(2, 0, rich_string2, .none);
+    try worksheet.writeRichStringNoAlloc(2, 0, rich_string2, .default);
 
     // Example 3. A rich string plus cell formatting.
     const fragment31: xwz.RichStringTupleNoAlloc = .{

@@ -20,25 +20,25 @@ pub fn main() !void {
     red_format.setFontColor(@enumFromInt(0xFF0000));
 
     // Widen the first column to make the text clearer
-    try worksheet.setColumn(0, 0, 30, .none);
+    try worksheet.setColumn(0, 0, 30, .default);
 
     // Write a hyperlink. A default blue underline will be used if the format is NULL
-    try worksheet.writeUrl(0, 0, "http://libxlsxwriter.github.io", .none);
+    try worksheet.writeUrl(0, 0, "http://libxlsxwriter.github.io", .default);
 
     // Write a hyperlink but overwrite the displayed string. Note, we need to
     // specify the format for the string to match the default hyperlink
-    try worksheet.writeUrl(2, 0, "http://libxlsxwriter.github.io", .none);
+    try worksheet.writeUrl(2, 0, "http://libxlsxwriter.github.io", .default);
     try worksheet.writeString(2, 0, "Read the documentation.", url_format);
 
     // Write a hyperlink with a different format
     try worksheet.writeUrl(4, 0, "http://libxlsxwriter.github.io", red_format);
 
     // Write a mail hyperlink
-    try worksheet.writeUrl(6, 0, "mailto:jmcnamara@cpan.org", .none);
+    try worksheet.writeUrl(6, 0, "mailto:jmcnamara@cpan.org", .default);
 
     // Write a mail hyperlink and overwrite the displayed string. We again
     // specify the format for the string to match the default hyperlink
-    try worksheet.writeUrl(8, 0, "mailto:jmcnamara@cpan.org", .none);
+    try worksheet.writeUrl(8, 0, "mailto:jmcnamara@cpan.org", .default);
     try worksheet.writeString(8, 0, "Drop me a line.", url_format);
 }
 

@@ -19,10 +19,10 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .none);
+    try worksheet.setColumn(0, 0, 20, .default);
 
     // Write the number without formatting.
-    try worksheet.writeNumber(0, 0, number, .none);
+    try worksheet.writeNumber(0, 0, number, .default);
 
     // Write the number with formatting. Note: the worksheet_write_datetime()
     // or worksheet_write_unixtime() functions are preferable for writing

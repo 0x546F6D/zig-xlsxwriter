@@ -26,7 +26,7 @@ pub fn main() !void {
     while (row < row_max) : (row += 1) {
         var col: u16 = 0;
         while (col < col_max) : (col += 1) {
-            try worksheet.writeNumber(row, col, 123.45, .none);
+            try worksheet.writeNumber(row, col, 123.45, .default);
         }
     }
 }
