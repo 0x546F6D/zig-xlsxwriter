@@ -149,23 +149,20 @@ pub inline fn setVPageBreaks(
     ));
 }
 
-pub const Margins = extern struct {
-    left: f64 = 0,
-    right: f64 = 0,
-    top: f64 = 0,
-    bottom: f64 = 0,
-};
 // pub extern fn worksheet_set_margins(worksheet: [*c]lxw_worksheet, left: f64, right: f64, top: f64, bottom: f64) void;
 pub inline fn setMargins(
     self: WorkSheet,
-    margins: Margins,
+    left: f64,
+    right: f64,
+    top: f64,
+    bottom: f64,
 ) void {
     c.worksheet_set_margins(
         self.worksheet_c,
-        margins.left,
-        margins.right,
-        margins.top,
-        margins.bottom,
+        left,
+        right,
+        top,
+        bottom,
     );
 }
 
@@ -844,28 +841,6 @@ pub const ObjectPosition = enum(u8) {
     move_dont_size = c.LXW_OBJECT_MOVE_DONT_SIZE,
     dont_move_dont_size = c.LXW_OBJECT_DONT_MOVE_DONT_SIZE,
     move_and_size_after = c.LXW_OBJECT_MOVE_AND_SIZE_AFTER,
-};
-
-pub const ChartOptions = struct {
-    x_offset: i32 = 0,
-    y_offset: i32 = 0,
-    x_scale: f64 = 0,
-    y_scale: f64 = 0,
-    object_position: ObjectPosition = .default,
-    description: ?CString = null,
-    decorative: bool = false,
-
-    inline fn toC(self: ChartOptions) c.lxw_chart_options {
-        return c.lxw_chart_options{
-            .x_offset = self.x_offset,
-            .y_offset = self.y_offset,
-            .x_scale = self.x_scale,
-            .y_scale = self.y_scale,
-            .object_position = @intFromEnum(self.object_position),
-            .description = self.description,
-            .decorative = @intFromBool(self.decorative),
-        };
-    }
 };
 
 // pub extern fn worksheet_insert_chart(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart) lxw_error;
@@ -1776,12 +1751,13 @@ pub inline fn ignoreErrors(
 
 const std = @import("std");
 const c = @import("lxw");
-const xwz = @import("xlsxwriter.zig");
-const CString = xwz.CString;
-const CStringArray = xwz.CStringArray;
-const Bool = xwz.Boolean;
+const xlsxwriter = @import("xlsxwriter.zig");
+const CString = xlsxwriter.CString;
+const CStringArray = xlsxwriter.CStringArray;
+const Bool = xlsxwriter.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
+const ChartOptions = Chart.Options;
 const filter = @import("filter.zig");

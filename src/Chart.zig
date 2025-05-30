@@ -4,6 +4,29 @@ chart_c: ?*c.lxw_chart,
 x_axis: ChartAxis,
 y_axis: ChartAxis,
 
+// lxw_chart_options
+pub const Options = struct {
+    x_offset: i32 = 0,
+    y_offset: i32 = 0,
+    x_scale: f64 = 0,
+    y_scale: f64 = 0,
+    object_position: ObjectPosition = .default,
+    description: ?CString = null,
+    decorative: bool = false,
+
+    inline fn toC(self: Options) c.lxw_chart_options {
+        return c.lxw_chart_options{
+            .x_offset = self.x_offset,
+            .y_offset = self.y_offset,
+            .x_scale = self.x_scale,
+            .y_scale = self.y_scale,
+            .object_position = @intFromEnum(self.object_position),
+            .description = self.description,
+            .decorative = @intFromBool(self.decorative),
+        };
+    }
+};
+
 // lxw_chart_pattern
 pub const Pattern = struct {
     fg_color: DefinedColors = .default,
@@ -696,3 +719,4 @@ const XlsxError = @import("errors.zig").XlsxError;
 const DefinedColors = @import("format.zig").DefinedColors;
 const ChartSeries = @import("ChartSeries.zig");
 const ChartAxis = @import("ChartAxis.zig");
+const ObjectPosition = @import("WorkSheet.zig").ObjectPosition;
