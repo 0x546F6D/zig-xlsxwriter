@@ -139,11 +139,6 @@ pub const PatternType = enum(u8) {
     solid_diamond = c.LXW_CHART_PATTERN_SOLID_DIAMOND,
 };
 
-pub const AxisType = enum(u8) {
-    x = c.LXW_CHART_AXIS_TYPE_X,
-    y = c.LXW_CHART_AXIS_TYPE_Y,
-};
-
 pub const SubType = enum(u8) {
     none = c.LXW_CHART_SUBTYPE_NONE,
     stacked = c.LXW_CHART_SUBTYPE_STACKED,
@@ -155,46 +150,6 @@ pub const Grouping = enum(u8) {
     standard = c.LXW_GROUPING_STANDARD,
     percent_stacked = c.LXW_GROUPING_PERCENTSTACKED,
     stacked = c.LXW_GROUPING_STACKED,
-};
-
-pub const AxisTickPosition = enum(u8) {
-    default = c.LXW_CHART_AXIS_POSITION_DEFAULT,
-    on_tick = c.LXW_CHART_AXIS_POSITION_ON_TICK,
-    between = c.LXW_CHART_AXIS_POSITION_BETWEEN,
-};
-
-pub const AxisLabelPosition = enum(u8) {
-    next_to = c.LXW_CHART_AXIS_LABEL_POSITION_NEXT_TO,
-    high = c.LXW_CHART_AXIS_LABEL_POSITION_HIGH,
-    low = c.LXW_CHART_AXIS_LABEL_POSITION_LOW,
-    none = c.LXW_CHART_AXIS_LABEL_POSITION_NONE,
-};
-
-pub const AxisLabelAlignment = enum(u8) {
-    center = c.LXW_CHART_AXIS_LABEL_ALIGN_CENTER,
-    left = c.LXW_CHART_AXIS_LABEL_ALIGN_LEFT,
-    right = c.LXW_CHART_AXIS_LABEL_ALIGN_RIGHT,
-};
-
-pub const AxisDisplayUnit = enum(u8) {
-    none = c.LXW_CHART_AXIS_UNITS_NONE,
-    hundreds = c.LXW_CHART_AXIS_UNITS_HUNDREDS,
-    thousands = c.LXW_CHART_AXIS_UNITS_THOUSANDS,
-    ten_thousands = c.LXW_CHART_AXIS_UNITS_TEN_THOUSANDS,
-    hundred_thousands = c.LXW_CHART_AXIS_UNITS_HUNDRED_THOUSANDS,
-    millions = c.LXW_CHART_AXIS_UNITS_MILLIONS,
-    ten_millions = c.LXW_CHART_AXIS_UNITS_TEN_MILLIONS,
-    hundred_millions = c.LXW_CHART_AXIS_UNITS_HUNDRED_MILLIONS,
-    billions = c.LXW_CHART_AXIS_UNITS_BILLIONS,
-    trillions = c.LXW_CHART_AXIS_UNITS_TRILLIONS,
-};
-
-pub const TickMark = enum(u8) {
-    default = c.LXW_CHART_AXIS_TICK_MARK_DEFAULT,
-    none = c.LXW_CHART_AXIS_TICK_MARK_NONE,
-    inside = c.LXW_CHART_AXIS_TICK_MARK_INSIDE,
-    outside = c.LXW_CHART_AXIS_TICK_MARK_OUTSIDE,
-    crossing = c.LXW_CHART_AXIS_TICK_MARK_CROSSING,
 };
 
 // pub extern fn chart_title_set_name(chart: [*c]lxw_chart, name: [*c]const u8) void;
@@ -616,6 +571,19 @@ pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) Xls
     };
 }
 
+// pub extern fn chart_axis_get(chart: [*c]lxw_chart, axis_type: lxw_chart_axis_type) [*c]lxw_chart_axis;
+pub inline fn getAxis(
+    self: Chart,
+    axis_type: ChartAxis,
+) ChartAxis {
+    return ChartAxis{
+        .axis_c = c.chart_axis_get(
+            self.chart_c,
+            axis_type,
+        ),
+    };
+}
+
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
 const CString = xlsxwriter.CString;
@@ -625,4 +593,5 @@ const XlsxError = @import("errors.zig").XlsxError;
 const DefinedColors = @import("format.zig").DefinedColors;
 const ChartSeries = @import("ChartSeries.zig");
 const ChartAxis = @import("ChartAxis.zig");
+const ChartAxisType = ChartAxis.Type;
 const ObjectPosition = @import("WorkSheet.zig").ObjectPosition;
