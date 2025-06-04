@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Outlined Rows");
@@ -33,17 +33,17 @@ pub fn main() !void {
     const options2 = xwz.RowColOptions{ .level = 1 };
 
     // Set the row outline properties.
-    try worksheet.setRowOpt(1, def_row_height, .default, options1);
-    try worksheet.setRowOpt(2, def_row_height, .default, options1);
-    try worksheet.setRowOpt(3, def_row_height, .default, options1);
-    try worksheet.setRowOpt(4, def_row_height, .default, options1);
-    try worksheet.setRowOpt(5, def_row_height, .default, options2);
+    try worksheet.setRow(1, def_row_height, .default, options1);
+    try worksheet.setRow(2, def_row_height, .default, options1);
+    try worksheet.setRow(3, def_row_height, .default, options1);
+    try worksheet.setRow(4, def_row_height, .default, options1);
+    try worksheet.setRow(5, def_row_height, .default, options2);
 
-    try worksheet.setRowOpt(6, def_row_height, .default, options1);
-    try worksheet.setRowOpt(7, def_row_height, .default, options1);
-    try worksheet.setRowOpt(8, def_row_height, .default, options1);
-    try worksheet.setRowOpt(9, def_row_height, .default, options1);
-    try worksheet.setRowOpt(10, def_row_height, .default, options2);
+    try worksheet.setRow(6, def_row_height, .default, options1);
+    try worksheet.setRow(7, def_row_height, .default, options1);
+    try worksheet.setRow(8, def_row_height, .default, options1);
+    try worksheet.setRow(9, def_row_height, .default, options1);
+    try worksheet.setRow(10, def_row_height, .default, options2);
 
     // Write the sub-total data that is common to the row examples.
     try createRowExampleData(worksheet, bold);
@@ -56,18 +56,18 @@ pub fn main() !void {
     const options5 = xwz.RowColOptions{ .collapsed = true };
 
     // Set the row options with the outline level.
-    try worksheet.setRowOpt(1, def_row_height, .default, options3);
-    try worksheet.setRowOpt(2, def_row_height, .default, options3);
-    try worksheet.setRowOpt(3, def_row_height, .default, options3);
-    try worksheet.setRowOpt(4, def_row_height, .default, options3);
-    try worksheet.setRowOpt(5, def_row_height, .default, options4);
+    try worksheet.setRow(1, def_row_height, .default, options3);
+    try worksheet.setRow(2, def_row_height, .default, options3);
+    try worksheet.setRow(3, def_row_height, .default, options3);
+    try worksheet.setRow(4, def_row_height, .default, options3);
+    try worksheet.setRow(5, def_row_height, .default, options4);
 
-    try worksheet.setRowOpt(6, def_row_height, .default, options3);
-    try worksheet.setRowOpt(7, def_row_height, .default, options3);
-    try worksheet.setRowOpt(8, def_row_height, .default, options3);
-    try worksheet.setRowOpt(9, def_row_height, .default, options3);
-    try worksheet.setRowOpt(10, def_row_height, .default, options4);
-    try worksheet.setRowOpt(11, def_row_height, .default, options5);
+    try worksheet.setRow(6, def_row_height, .default, options3);
+    try worksheet.setRow(7, def_row_height, .default, options3);
+    try worksheet.setRow(8, def_row_height, .default, options3);
+    try worksheet.setRow(9, def_row_height, .default, options3);
+    try worksheet.setRow(10, def_row_height, .default, options4);
+    try worksheet.setRow(11, def_row_height, .default, options5);
 
     // Write the sub-total data that is common to the row examples.
     try createRowExampleData(worksheet, bold);
@@ -79,17 +79,17 @@ pub fn main() !void {
     const options7 = xwz.RowColOptions{ .level = 1, .collapsed = true };
 
     // Set the row options with the outline level.
-    try worksheet.setRowOpt(1, def_row_height, .default, options6);
-    try worksheet.setRowOpt(2, def_row_height, .default, options6);
-    try worksheet.setRowOpt(3, def_row_height, .default, options6);
-    try worksheet.setRowOpt(4, def_row_height, .default, options6);
-    try worksheet.setRowOpt(5, def_row_height, .default, options7);
+    try worksheet.setRow(1, def_row_height, .default, options6);
+    try worksheet.setRow(2, def_row_height, .default, options6);
+    try worksheet.setRow(3, def_row_height, .default, options6);
+    try worksheet.setRow(4, def_row_height, .default, options6);
+    try worksheet.setRow(5, def_row_height, .default, options7);
 
-    try worksheet.setRowOpt(6, def_row_height, .default, options6);
-    try worksheet.setRowOpt(7, def_row_height, .default, options6);
-    try worksheet.setRowOpt(8, def_row_height, .default, options6);
-    try worksheet.setRowOpt(9, def_row_height, .default, options6);
-    try worksheet.setRowOpt(10, def_row_height, .default, options7);
+    try worksheet.setRow(6, def_row_height, .default, options6);
+    try worksheet.setRow(7, def_row_height, .default, options6);
+    try worksheet.setRow(8, def_row_height, .default, options6);
+    try worksheet.setRow(9, def_row_height, .default, options6);
+    try worksheet.setRow(10, def_row_height, .default, options7);
 
     // Write the sub-total data that is common to the row examples.
     try createRowExampleData(worksheet, bold);
@@ -102,18 +102,18 @@ pub fn main() !void {
     const options10 = xwz.RowColOptions{ .collapsed = true };
 
     // Set the row options with the outline level.
-    try worksheet.setRowOpt(1, def_row_height, .default, options8);
-    try worksheet.setRowOpt(2, def_row_height, .default, options8);
-    try worksheet.setRowOpt(3, def_row_height, .default, options8);
-    try worksheet.setRowOpt(4, def_row_height, .default, options8);
-    try worksheet.setRowOpt(5, def_row_height, .default, options9);
+    try worksheet.setRow(1, def_row_height, .default, options8);
+    try worksheet.setRow(2, def_row_height, .default, options8);
+    try worksheet.setRow(3, def_row_height, .default, options8);
+    try worksheet.setRow(4, def_row_height, .default, options8);
+    try worksheet.setRow(5, def_row_height, .default, options9);
 
-    try worksheet.setRowOpt(6, def_row_height, .default, options8);
-    try worksheet.setRowOpt(7, def_row_height, .default, options8);
-    try worksheet.setRowOpt(8, def_row_height, .default, options8);
-    try worksheet.setRowOpt(9, def_row_height, .default, options8);
-    try worksheet.setRowOpt(10, def_row_height, .default, options9);
-    try worksheet.setRowOpt(11, def_row_height, .default, options10);
+    try worksheet.setRow(6, def_row_height, .default, options8);
+    try worksheet.setRow(7, def_row_height, .default, options8);
+    try worksheet.setRow(8, def_row_height, .default, options8);
+    try worksheet.setRow(9, def_row_height, .default, options8);
+    try worksheet.setRow(10, def_row_height, .default, options9);
+    try worksheet.setRow(11, def_row_height, .default, options10);
 
     // Write the sub-total data that is common to the row examples.
     try createRowExampleData(worksheet, bold);
@@ -126,12 +126,12 @@ pub fn main() !void {
     try createColExampleData(worksheet5, bold);
 
     // Add bold format to the first row.
-    try worksheet.setRow(0, def_row_height, bold);
+    try worksheet.setRow(0, def_row_height, bold, null);
 
     // Set column formatting and the outline level.
-    try worksheet.setColumn(0, 0, 10, bold);
-    try worksheet.setColumnOpt(1, 6, 5, .default, options11);
-    try worksheet.setColumn(7, 7, 10, .default);
+    try worksheet.setColumn(.{}, 10, bold, null);
+    try worksheet.setColumn(.{ .first = 1, .last = 6 }, 5, .default, options11);
+    try worksheet.setColumn(.{ .first = 7, .last = 7 }, 10, .default, null);
 
     // Example 6: Create a worksheet with outlined columns.
     worksheet = worksheet6;
@@ -148,101 +148,101 @@ pub fn main() !void {
     try createColExampleData(worksheet6, bold);
 
     // Add bold format to the first row.
-    try worksheet.setRow(0, def_row_height, bold);
+    try worksheet.setRow(0, def_row_height, bold, null);
 
     // Set column formatting and the outline level.
-    try worksheet.setColumn(0, 0, 10, bold);
-    try worksheet.setColumnOpt(1, 6, 5, .default, options12);
-    try worksheet.setColumnOpt(7, 7, 10, .default, options13);
+    try worksheet.setColumn(.{}, 10, bold, null);
+    try worksheet.setColumn(.{ .first = 1, .last = 6 }, 5, .default, options12);
+    try worksheet.setColumn(.{ .first = 7, .last = 7 }, 10, .default, options13);
 }
 
 // This function will generate the same data and sub-totals on each worksheet.
 // Used in the examples 1-4.
 fn createRowExampleData(worksheet: WorkSheet, bold: Format) !void {
     // Set the column width for clarity.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Add data and formulas to the worksheet.
-    try worksheet.writeString(0, 0, "Region", bold);
-    try worksheet.writeString(1, 0, "North", .default);
-    try worksheet.writeString(2, 0, "North", .default);
-    try worksheet.writeString(3, 0, "North", .default);
-    try worksheet.writeString(4, 0, "North", .default);
-    try worksheet.writeString(5, 0, "North Total", bold);
+    try worksheet.writeString(.{}, "Region", bold);
+    try worksheet.writeString(.{ .row = 1 }, "North", .default);
+    try worksheet.writeString(.{ .row = 2 }, "North", .default);
+    try worksheet.writeString(.{ .row = 3 }, "North", .default);
+    try worksheet.writeString(.{ .row = 4 }, "North", .default);
+    try worksheet.writeString(.{ .row = 5 }, "North Total", bold);
 
-    try worksheet.writeString(0, 1, "Sales", bold);
-    try worksheet.writeNumber(1, 1, 1000, .default);
-    try worksheet.writeNumber(2, 1, 1200, .default);
-    try worksheet.writeNumber(3, 1, 900, .default);
-    try worksheet.writeNumber(4, 1, 1200, .default);
-    try worksheet.writeFormula(5, 1, "=SUBTOTAL(9,B2:B5)", bold);
+    try worksheet.writeString(.{ .col = 1 }, "Sales", bold);
+    try worksheet.writeNumber(.{ .row = 1, .col = 1 }, 1000, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 1 }, 1200, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 1 }, 900, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 1 }, 1200, .default);
+    try worksheet.writeFormula(.{ .row = 5, .col = 1 }, "=SUBTOTAL(9,B2:B5)", bold);
 
-    try worksheet.writeString(6, 0, "South", .default);
-    try worksheet.writeString(7, 0, "South", .default);
-    try worksheet.writeString(8, 0, "South", .default);
-    try worksheet.writeString(9, 0, "South", .default);
-    try worksheet.writeString(10, 0, "South Total", bold);
+    try worksheet.writeString(.{ .row = 6 }, "South", .default);
+    try worksheet.writeString(.{ .row = 7 }, "South", .default);
+    try worksheet.writeString(.{ .row = 8 }, "South", .default);
+    try worksheet.writeString(.{ .row = 9 }, "South", .default);
+    try worksheet.writeString(.{ .row = 10 }, "South Total", bold);
 
-    try worksheet.writeNumber(6, 1, 400, .default);
-    try worksheet.writeNumber(7, 1, 600, .default);
-    try worksheet.writeNumber(8, 1, 500, .default);
-    try worksheet.writeNumber(9, 1, 600, .default);
-    try worksheet.writeFormula(10, 1, "=SUBTOTAL(9,B7:B10)", bold);
+    try worksheet.writeNumber(.{ .row = 6, .col = 1 }, 400, .default);
+    try worksheet.writeNumber(.{ .row = 7, .col = 1 }, 600, .default);
+    try worksheet.writeNumber(.{ .row = 8, .col = 1 }, 500, .default);
+    try worksheet.writeNumber(.{ .row = 9, .col = 1 }, 600, .default);
+    try worksheet.writeFormula(.{ .row = 10, .col = 1 }, "=SUBTOTAL(9,B7:B10)", bold);
 
-    try worksheet.writeString(11, 0, "Grand Total", bold);
-    try worksheet.writeFormula(11, 1, "=SUBTOTAL(9,B2:B10)", bold);
+    try worksheet.writeString(.{ .row = 11 }, "Grand Total", bold);
+    try worksheet.writeFormula(.{ .row = 11, .col = 1 }, "=SUBTOTAL(9,B2:B10)", bold);
 }
 
 // This function will generate the same data and sub-totals on each worksheet.
 // Used in the examples 5-6.
 fn createColExampleData(worksheet: WorkSheet, bold: Format) !void {
     // Add data and formulas to the worksheet.
-    try worksheet.writeString(0, 0, "Month", .default);
-    try worksheet.writeString(0, 1, "Jan", .default);
-    try worksheet.writeString(0, 2, "Feb", .default);
-    try worksheet.writeString(0, 3, "Mar", .default);
-    try worksheet.writeString(0, 4, "Apr", .default);
-    try worksheet.writeString(0, 5, "May", .default);
-    try worksheet.writeString(0, 6, "Jun", .default);
-    try worksheet.writeString(0, 7, "Total", .default);
+    try worksheet.writeString(.{}, "Month", .default);
+    try worksheet.writeString(.{ .col = 1 }, "Jan", .default);
+    try worksheet.writeString(.{ .col = 2 }, "Feb", .default);
+    try worksheet.writeString(.{ .col = 3 }, "Mar", .default);
+    try worksheet.writeString(.{ .col = 4 }, "Apr", .default);
+    try worksheet.writeString(.{ .col = 5 }, "May", .default);
+    try worksheet.writeString(.{ .col = 6 }, "Jun", .default);
+    try worksheet.writeString(.{ .col = 7 }, "Total", .default);
 
-    try worksheet.writeString(1, 0, "North", .default);
-    try worksheet.writeNumber(1, 1, 50, .default);
-    try worksheet.writeNumber(1, 2, 20, .default);
-    try worksheet.writeNumber(1, 3, 15, .default);
-    try worksheet.writeNumber(1, 4, 25, .default);
-    try worksheet.writeNumber(1, 5, 65, .default);
-    try worksheet.writeNumber(1, 6, 80, .default);
-    try worksheet.writeFormula(1, 7, "=SUM(B2:G2)", .default);
+    try worksheet.writeString(.{ .row = 1 }, "North", .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 1 }, 50, .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 2 }, 20, .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 3 }, 15, .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 4 }, 25, .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 5 }, 65, .default);
+    try worksheet.writeNumber(.{ .row = 1, .col = 6 }, 80, .default);
+    try worksheet.writeFormula(.{ .row = 1, .col = 7 }, "=SUM(B2:G2)", .default);
 
-    try worksheet.writeString(2, 0, "South", .default);
-    try worksheet.writeNumber(2, 1, 10, .default);
-    try worksheet.writeNumber(2, 2, 20, .default);
-    try worksheet.writeNumber(2, 3, 30, .default);
-    try worksheet.writeNumber(2, 4, 50, .default);
-    try worksheet.writeNumber(2, 5, 50, .default);
-    try worksheet.writeNumber(2, 6, 50, .default);
-    try worksheet.writeFormula(2, 7, "=SUM(B3:G3)", .default);
+    try worksheet.writeString(.{ .row = 2 }, "South", .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 1 }, 10, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 2 }, 20, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 3 }, 30, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 4 }, 50, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 5 }, 50, .default);
+    try worksheet.writeNumber(.{ .row = 2, .col = 6 }, 50, .default);
+    try worksheet.writeFormula(.{ .row = 2, .col = 7 }, "=SUM(B3:G3)", .default);
 
-    try worksheet.writeString(3, 0, "East", .default);
-    try worksheet.writeNumber(3, 1, 45, .default);
-    try worksheet.writeNumber(3, 2, 75, .default);
-    try worksheet.writeNumber(3, 3, 50, .default);
-    try worksheet.writeNumber(3, 4, 15, .default);
-    try worksheet.writeNumber(3, 5, 75, .default);
-    try worksheet.writeNumber(3, 6, 100, .default);
-    try worksheet.writeFormula(3, 7, "=SUM(B4:G4)", .default);
+    try worksheet.writeString(.{ .row = 3 }, "East", .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 1 }, 45, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 2 }, 75, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 3 }, 50, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 4 }, 15, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 5 }, 75, .default);
+    try worksheet.writeNumber(.{ .row = 3, .col = 6 }, 100, .default);
+    try worksheet.writeFormula(.{ .row = 3, .col = 7 }, "=SUM(B4:G4)", .default);
 
-    try worksheet.writeString(4, 0, "West", .default);
-    try worksheet.writeNumber(4, 1, 15, .default);
-    try worksheet.writeNumber(4, 2, 15, .default);
-    try worksheet.writeNumber(4, 3, 55, .default);
-    try worksheet.writeNumber(4, 4, 35, .default);
-    try worksheet.writeNumber(4, 5, 20, .default);
-    try worksheet.writeNumber(4, 6, 50, .default);
-    try worksheet.writeFormula(4, 7, "=SUM(B5:G5)", .default);
+    try worksheet.writeString(.{ .row = 4 }, "West", .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 1 }, 15, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 2 }, 15, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 3 }, 55, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 4 }, 35, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 5 }, 20, .default);
+    try worksheet.writeNumber(.{ .row = 4, .col = 6 }, 50, .default);
+    try worksheet.writeFormula(.{ .row = 4, .col = 7 }, "=SUM(B5:G5)", .default);
 
-    try worksheet.writeFormula(5, 7, "=SUM(H2:H5)", bold);
+    try worksheet.writeFormula(.{ .row = 5, .col = 7 }, "=SUM(H2:H5)", bold);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

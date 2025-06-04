@@ -5,12 +5,12 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Add some formats.
     const format1 = try workbook.addFormat();
@@ -28,9 +28,9 @@ pub fn main() !void {
     format3.setItalic();
 
     // Write some formatted strings.
-    try worksheet.writeString(0, 0, "This is bold", format1);
-    try worksheet.writeString(1, 0, "This is italic", format2);
-    try worksheet.writeString(2, 0, "Bold and italic", format3);
+    try worksheet.writeString(.{}, "This is bold", format1);
+    try worksheet.writeString(.{ .row = 1 }, "This is italic", format2);
+    try worksheet.writeString(.{ .row = 2 }, "Bold and italic", format3);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

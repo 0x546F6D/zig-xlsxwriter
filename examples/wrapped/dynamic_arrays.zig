@@ -32,7 +32,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Filter");
@@ -56,251 +56,235 @@ pub fn main() !void {
 
     // WorkSheet1: Example of using the FILTER() function.
     try worksheet1.writeDynamicFormula(
-        1,
-        5,
+        .{ .row = 1, .col = 5 },
         "=_xlfn._xlws.FILTER(A1:D17,C1:C17=K2)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet1.writeString(0, 10, "Product", header2);
-    try worksheet1.writeString(1, 10, "Apple", .default);
-    try worksheet1.writeString(0, 5, "Region", header2);
-    try worksheet1.writeString(0, 6, "Sales Rep", header2);
-    try worksheet1.writeString(0, 7, "Product", header2);
-    try worksheet1.writeString(0, 8, "Units", header2);
+    try worksheet1.writeString(.{ .col = 10 }, "Product", header2);
+    try worksheet1.writeString(.{ .row = 1, .col = 10 }, "Apple", .default);
+    try worksheet1.writeString(.{ .col = 5 }, "Region", header2);
+    try worksheet1.writeString(.{ .col = 6 }, "Sales Rep", header2);
+    try worksheet1.writeString(.{ .col = 7 }, "Product", header2);
+    try worksheet1.writeString(.{ .col = 8 }, "Units", header2);
 
     try writeWorksheetData(worksheet1, header1);
-    try worksheet1.setColumnPixels(4, 4, 20, .default);
-    try worksheet1.setColumnPixels(9, 9, 20, .default);
+    try worksheet1.setColumnPixels(.{ .first = 4, .last = 4 }, 20, .default, null);
+    try worksheet1.setColumnPixels(.{ .first = 9, .last = 9 }, 20, .default, null);
 
     // WorkSheet2: Example of using the UNIQUE() function.
     try worksheet2.writeDynamicFormula(
-        1,
-        5,
+        .{ .row = 1, .col = 5 },
         "=_xlfn.UNIQUE(B2:B17)",
         .default,
     );
 
     // A more complex example combining SORT and UNIQUE.
     try worksheet2.writeDynamicFormula(
-        1,
-        7,
+        .{ .row = 1, .col = 7 },
         "=_xlfn._xlws.SORT(_xlfn.UNIQUE(B2:B17))",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet2.writeString(0, 5, "Sales Rep", header2);
-    try worksheet2.writeString(0, 7, "Sales Rep", header2);
+    try worksheet2.writeString(.{ .col = 5 }, "Sales Rep", header2);
+    try worksheet2.writeString(.{ .col = 7 }, "Sales Rep", header2);
 
     try writeWorksheetData(worksheet2, header1);
-    try worksheet2.setColumnPixels(4, 4, 20, .default);
-    try worksheet2.setColumnPixels(6, 6, 20, .default);
+    try worksheet2.setColumnPixels(.{ .first = 4, .last = 4 }, 20, .default, null);
+    try worksheet2.setColumnPixels(.{ .first = 6, .last = 6 }, 20, .default, null);
 
     // WorkSheet3: Example of using the SORT() function.
     try worksheet3.writeDynamicFormula(
-        1,
-        5,
+        .{ .row = 1, .col = 5 },
         "=_xlfn._xlws.SORT(B2:B17)",
         .default,
     );
 
     // A more complex example combining SORT and FILTER.
     try worksheet3.writeDynamicFormula(
-        1,
-        7,
+        .{ .row = 1, .col = 7 },
         "=_xlfn._xlws.SORT(_xlfn._xlws.FILTER(C2:D17,D2:D17>5000,\"\"),2,1)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet3.writeString(0, 5, "Sales Rep", header2);
-    try worksheet3.writeString(0, 7, "Product", header2);
-    try worksheet3.writeString(0, 8, "Units", header2);
+    try worksheet3.writeString(.{ .col = 5 }, "Sales Rep", header2);
+    try worksheet3.writeString(.{ .col = 7 }, "Product", header2);
+    try worksheet3.writeString(.{ .col = 8 }, "Units", header2);
 
     try writeWorksheetData(worksheet3, header1);
-    try worksheet3.setColumnPixels(4, 4, 20, .default);
-    try worksheet3.setColumnPixels(6, 6, 20, .default);
+    try worksheet3.setColumnPixels(.{ .first = 4, .last = 4 }, 20, .default, null);
+    try worksheet3.setColumnPixels(.{ .first = 6, .last = 6 }, 20, .default, null);
 
     // WorkSheet4: Example of using the SORTBY() function.
     try worksheet4.writeDynamicFormula(
-        1,
-        3,
+        .{ .row = 1, .col = 3 },
         "=_xlfn.SORTBY(A2:B9,B2:B9)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet4.writeString(0, 0, "Name", header1);
-    try worksheet4.writeString(0, 1, "Age", header1);
+    try worksheet4.writeString(.{}, "Name", header1);
+    try worksheet4.writeString(.{ .col = 1 }, "Age", header1);
 
-    try worksheet4.writeString(1, 0, "Tom", .default);
-    try worksheet4.writeString(2, 0, "Fred", .default);
-    try worksheet4.writeString(3, 0, "Amy", .default);
-    try worksheet4.writeString(4, 0, "Sal", .default);
-    try worksheet4.writeString(5, 0, "Fritz", .default);
-    try worksheet4.writeString(6, 0, "Srivan", .default);
-    try worksheet4.writeString(7, 0, "Xi", .default);
-    try worksheet4.writeString(8, 0, "Hector", .default);
+    try worksheet4.writeString(.{ .row = 1 }, "Tom", .default);
+    try worksheet4.writeString(.{ .row = 2 }, "Fred", .default);
+    try worksheet4.writeString(.{ .row = 3 }, "Amy", .default);
+    try worksheet4.writeString(.{ .row = 4 }, "Sal", .default);
+    try worksheet4.writeString(.{ .row = 5 }, "Fritz", .default);
+    try worksheet4.writeString(.{ .row = 6 }, "Srivan", .default);
+    try worksheet4.writeString(.{ .row = 7 }, "Xi", .default);
+    try worksheet4.writeString(.{ .row = 8 }, "Hector", .default);
 
-    try worksheet4.writeNumber(1, 1, 52, .default);
-    try worksheet4.writeNumber(2, 1, 65, .default);
-    try worksheet4.writeNumber(3, 1, 22, .default);
-    try worksheet4.writeNumber(4, 1, 73, .default);
-    try worksheet4.writeNumber(5, 1, 19, .default);
-    try worksheet4.writeNumber(6, 1, 39, .default);
-    try worksheet4.writeNumber(7, 1, 19, .default);
-    try worksheet4.writeNumber(8, 1, 66, .default);
+    try worksheet4.writeNumber(.{ .row = 1, .col = 1 }, 52, .default);
+    try worksheet4.writeNumber(.{ .row = 2, .col = 1 }, 65, .default);
+    try worksheet4.writeNumber(.{ .row = 3, .col = 1 }, 22, .default);
+    try worksheet4.writeNumber(.{ .row = 4, .col = 1 }, 73, .default);
+    try worksheet4.writeNumber(.{ .row = 5, .col = 1 }, 19, .default);
+    try worksheet4.writeNumber(.{ .row = 6, .col = 1 }, 39, .default);
+    try worksheet4.writeNumber(.{ .row = 7, .col = 1 }, 19, .default);
+    try worksheet4.writeNumber(.{ .row = 8, .col = 1 }, 66, .default);
 
-    try worksheet4.writeString(0, 3, "Name", header2);
-    try worksheet4.writeString(0, 4, "Age", header2);
+    try worksheet4.writeString(.{ .col = 3 }, "Name", header2);
+    try worksheet4.writeString(.{ .col = 4 }, "Age", header2);
 
-    try worksheet4.setColumnPixels(2, 2, 20, .default);
+    try worksheet4.setColumnPixels(.{ .first = 2, .last = 2 }, 20, .default, null);
 
     // WorkSheet5: Example of using the XLOOKUP() function.
     try worksheet5.writeDynamicFormula(
-        0,
-        5,
+        .{ .col = 5 },
         "=_xlfn.XLOOKUP(E1,A2:A9,C2:C9)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet5.writeString(0, 0, "Country", header1);
-    try worksheet5.writeString(0, 1, "Abr", header1);
-    try worksheet5.writeString(0, 2, "Prefix", header1);
+    try worksheet5.writeString(.{}, "Country", header1);
+    try worksheet5.writeString(.{ .col = 1 }, "Abr", header1);
+    try worksheet5.writeString(.{ .col = 2 }, "Prefix", header1);
 
-    try worksheet5.writeString(1, 0, "China", .default);
-    try worksheet5.writeString(2, 0, "India", .default);
-    try worksheet5.writeString(3, 0, "United States", .default);
-    try worksheet5.writeString(4, 0, "Indonesia", .default);
-    try worksheet5.writeString(5, 0, "Brazil", .default);
-    try worksheet5.writeString(6, 0, "Pakistan", .default);
-    try worksheet5.writeString(7, 0, "Nigeria", .default);
-    try worksheet5.writeString(8, 0, "Bangladesh", .default);
+    try worksheet5.writeString(.{ .row = 1 }, "China", .default);
+    try worksheet5.writeString(.{ .row = 2 }, "India", .default);
+    try worksheet5.writeString(.{ .row = 3 }, "United States", .default);
+    try worksheet5.writeString(.{ .row = 4 }, "Indonesia", .default);
+    try worksheet5.writeString(.{ .row = 5 }, "Brazil", .default);
+    try worksheet5.writeString(.{ .row = 6 }, "Pakistan", .default);
+    try worksheet5.writeString(.{ .row = 7 }, "Nigeria", .default);
+    try worksheet5.writeString(.{ .row = 8 }, "Bangladesh", .default);
 
-    try worksheet5.writeString(1, 1, "CN", .default);
-    try worksheet5.writeString(2, 1, "IN", .default);
-    try worksheet5.writeString(3, 1, "US", .default);
-    try worksheet5.writeString(4, 1, "ID", .default);
-    try worksheet5.writeString(5, 1, "BR", .default);
-    try worksheet5.writeString(6, 1, "PK", .default);
-    try worksheet5.writeString(7, 1, "NG", .default);
-    try worksheet5.writeString(8, 1, "BD", .default);
+    try worksheet5.writeString(.{ .row = 1, .col = 1 }, "CN", .default);
+    try worksheet5.writeString(.{ .row = 2, .col = 1 }, "IN", .default);
+    try worksheet5.writeString(.{ .row = 3, .col = 1 }, "US", .default);
+    try worksheet5.writeString(.{ .row = 4, .col = 1 }, "ID", .default);
+    try worksheet5.writeString(.{ .row = 5, .col = 1 }, "BR", .default);
+    try worksheet5.writeString(.{ .row = 6, .col = 1 }, "PK", .default);
+    try worksheet5.writeString(.{ .row = 7, .col = 1 }, "NG", .default);
+    try worksheet5.writeString(.{ .row = 8, .col = 1 }, "BD", .default);
 
-    try worksheet5.writeNumber(1, 2, 86, .default);
-    try worksheet5.writeNumber(2, 2, 91, .default);
-    try worksheet5.writeNumber(3, 2, 1, .default);
-    try worksheet5.writeNumber(4, 2, 62, .default);
-    try worksheet5.writeNumber(5, 2, 55, .default);
-    try worksheet5.writeNumber(6, 2, 92, .default);
-    try worksheet5.writeNumber(7, 2, 234, .default);
-    try worksheet5.writeNumber(8, 2, 880, .default);
+    try worksheet5.writeNumber(.{ .row = 1, .col = 2 }, 86, .default);
+    try worksheet5.writeNumber(.{ .row = 2, .col = 2 }, 91, .default);
+    try worksheet5.writeNumber(.{ .row = 3, .col = 2 }, 1, .default);
+    try worksheet5.writeNumber(.{ .row = 4, .col = 2 }, 62, .default);
+    try worksheet5.writeNumber(.{ .row = 5, .col = 2 }, 55, .default);
+    try worksheet5.writeNumber(.{ .row = 6, .col = 2 }, 92, .default);
+    try worksheet5.writeNumber(.{ .row = 7, .col = 2 }, 234, .default);
+    try worksheet5.writeNumber(.{ .row = 8, .col = 2 }, 880, .default);
 
-    try worksheet5.writeString(0, 4, "Brazil", header2);
+    try worksheet5.writeString(.{ .col = 4 }, "Brazil", header2);
 
-    try worksheet5.setColumnPixels(0, 0, 100, .default);
-    try worksheet5.setColumnPixels(3, 3, 20, .default);
+    try worksheet5.setColumnPixels(.{}, 100, .default, null);
+    try worksheet5.setColumnPixels(.{ .first = 3, .last = 3 }, 20, .default, null);
 
     // WorkSheet6: Example of using the XMATCH() function.
     try worksheet6.writeDynamicFormula(
-        1,
-        3,
+        .{ .row = 1, .col = 3 },
         "=_xlfn.XMATCH(C2,A2:A6)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet6.writeString(0, 0, "Product", header1);
+    try worksheet6.writeString(.{}, "Product", header1);
 
-    try worksheet6.writeString(1, 0, "Apple", .default);
-    try worksheet6.writeString(2, 0, "Grape", .default);
-    try worksheet6.writeString(3, 0, "Pear", .default);
-    try worksheet6.writeString(4, 0, "Banana", .default);
-    try worksheet6.writeString(5, 0, "Cherry", .default);
+    try worksheet6.writeString(.{ .row = 1 }, "Apple", .default);
+    try worksheet6.writeString(.{ .row = 2 }, "Grape", .default);
+    try worksheet6.writeString(.{ .row = 3 }, "Pear", .default);
+    try worksheet6.writeString(.{ .row = 4 }, "Banana", .default);
+    try worksheet6.writeString(.{ .row = 5 }, "Cherry", .default);
 
-    try worksheet6.writeString(0, 2, "Product", header2);
-    try worksheet6.writeString(0, 3, "Position", header2);
-    try worksheet6.writeString(1, 2, "Grape", .default);
+    try worksheet6.writeString(.{ .col = 2 }, "Product", header2);
+    try worksheet6.writeString(.{ .col = 3 }, "Position", header2);
+    try worksheet6.writeString(.{ .row = 1, .col = 2 }, "Grape", .default);
 
-    try worksheet6.setColumnPixels(1, 1, 20, .default);
+    try worksheet6.setColumnPixels(.{ .first = 1, .last = 1 }, 20, .default, null);
 
     // WorkSheet7: Example of using the RANDARRAY() function.
     try worksheet7.writeDynamicFormula(
-        0,
-        0,
+        .{},
         "=_xlfn.RANDARRAY(5,3,1,100, TRUE)",
         .default,
     );
 
     // WorkSheet8: Example of using the SEQUENCE() function.
     try worksheet8.writeDynamicFormula(
-        0,
-        0,
+        .{},
         "=_xlfn.SEQUENCE(4,5)",
         .default,
     );
 
     // WorkSheet9: Example of using the Spill range operator.
     try worksheet9.writeDynamicFormula(
-        1,
-        7,
+        .{ .row = 1, .col = 7 },
         "=_xlfn.ANCHORARRAY(F2)",
         .default,
     );
 
     try worksheet9.writeDynamicFormula(
-        1,
-        9,
+        .{ .row = 1, .col = 9 },
         "=COUNTA(_xlfn.ANCHORARRAY(F2))",
         .default,
     );
 
     // Write the data the function will work on.
     try worksheet9.writeDynamicFormula(
-        1,
-        5,
+        .{ .row = 1, .col = 5 },
         "=_xlfn.UNIQUE(B2:B17)",
         .default,
     );
 
-    try worksheet9.writeString(0, 5, "Unique", header2);
-    try worksheet9.writeString(0, 7, "Spill", header2);
-    try worksheet9.writeString(0, 9, "Spill", header2);
+    try worksheet9.writeString(.{ .col = 5 }, "Unique", header2);
+    try worksheet9.writeString(.{ .col = 7 }, "Spill", header2);
+    try worksheet9.writeString(.{ .col = 9 }, "Spill", header2);
 
     try writeWorksheetData(worksheet9, header1);
-    try worksheet9.setColumnPixels(4, 4, 20, .default);
-    try worksheet9.setColumnPixels(6, 6, 20, .default);
-    try worksheet9.setColumnPixels(8, 8, 20, .default);
+    try worksheet9.setColumnPixels(.{ .first = 4, .last = 4 }, 20, .default, null);
+    try worksheet9.setColumnPixels(.{ .first = 6, .last = 6 }, 20, .default, null);
+    try worksheet9.setColumnPixels(.{ .first = 8, .last = 8 }, 20, .default, null);
 
     // WorkSheet10: Example of using dynamic ranges with older Excel functions.
     try worksheet10.writeDynamicArrayFormula(
-        0,
-        1,
-        2,
-        1,
+        .{ .first_col = 1, .last_row = 2, .last_col = 1 },
         "=LEN(A1:A3)",
         .default,
     );
 
     // Write the data the function will work on.
-    try worksheet10.writeString(0, 0, "Foo", .default);
-    try worksheet10.writeString(1, 0, "Food", .default);
-    try worksheet10.writeString(2, 0, "Frood", .default);
+    try worksheet10.writeString(.{}, "Foo", .default);
+    try worksheet10.writeString(.{ .row = 1 }, "Food", .default);
+    try worksheet10.writeString(.{ .row = 2 }, "Frood", .default);
 }
 
 fn writeWorksheetData(worksheet: WorkSheet, header: Format) !void {
-    try worksheet.writeString(0, 0, "Region", header);
-    try worksheet.writeString(0, 1, "Sales Rep", header);
-    try worksheet.writeString(0, 2, "Product", header);
-    try worksheet.writeString(0, 3, "Units", header);
+    try worksheet.writeString(.{}, "Region", header);
+    try worksheet.writeString(.{ .col = 1 }, "Sales Rep", header);
+    try worksheet.writeString(.{ .col = 2 }, "Product", header);
+    try worksheet.writeString(.{ .col = 3 }, "Units", header);
 
     for (data, 1..) |item, row| {
-        try worksheet.writeString(@intCast(row), 0, item.col1.ptr, .default);
-        try worksheet.writeString(@intCast(row), 1, item.col2.ptr, .default);
-        try worksheet.writeString(@intCast(row), 2, item.col3.ptr, .default);
-        try worksheet.writeNumber(@intCast(row), 3, @floatFromInt(item.col4), .default);
+        try worksheet.writeString(.{ .row = @intCast(row) }, item.col1, .default);
+        try worksheet.writeString(.{ .row = @intCast(row), .col = 1 }, item.col2, .default);
+        try worksheet.writeString(.{ .row = @intCast(row), .col = 2 }, item.col3, .default);
+        try worksheet.writeNumber(.{ .row = @intCast(row), .col = 3 }, @floatFromInt(item.col4), .default);
     }
 }
 

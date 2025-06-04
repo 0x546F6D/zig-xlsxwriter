@@ -7,17 +7,8 @@ pub fn main() !void {
     const xlsx_path = try h.getXlsxPath(alloc, @src().file);
     defer alloc.free(xlsx_path);
 
-    // Set the workbook options
-    const options: xwz.WorkBookOptions = .{
-        .constant_memory = true,
-        .tmpdir = null,
-        .use_zip64 = false,
-        .output_buffer = null,
-        .output_buffer_size = null,
-    };
-
     // Create a new workbook with options
-    const workbook = try xwz.initWorkBookOpt(null, xlsx_path.ptr, options);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, .{ .constant_memory = true });
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -26,7 +17,7 @@ pub fn main() !void {
     while (row < row_max) : (row += 1) {
         var col: u16 = 0;
         while (col < col_max) : (col += 1) {
-            try worksheet.writeNumber(row, col, 123.45, .default);
+            try worksheet.writeNumber(.{ .row = row, .col = col }, 123.45, .default);
         }
     }
 }

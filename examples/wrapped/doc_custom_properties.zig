@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -31,8 +31,8 @@ pub fn main() !void {
     try workbook.setCustomPropertyBoolean("Signed off", false);
 
     // Add some text to the file.
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, "Select 'Workbook Properties' to see properties.", .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, "Select 'Workbook Properties' to see properties.", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

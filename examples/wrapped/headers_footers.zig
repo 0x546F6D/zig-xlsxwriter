@@ -32,7 +32,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     // get image path
@@ -42,8 +42,8 @@ pub fn main() !void {
     const preview = "Select Print Preview to see the header and footer";
 
     var worksheet: xwz.WorkSheet = undefined;
-    var header: [*:0]const u8 = undefined;
-    var footer: [*:0]const u8 = undefined;
+    var header: [:0]const u8 = undefined;
+    var footer: [:0]const u8 = undefined;
 
     // A simple example to start
     const worksheet1 = try workbook.addWorkSheet("Simple");
@@ -51,11 +51,11 @@ pub fn main() !void {
     header = "&CHere is some centered text.";
     footer = "&LHere is some left aligned text.";
 
-    try worksheet.setHeader(header);
-    try worksheet.setFooter(footer);
+    try worksheet.setHeader(header, null);
+    try worksheet.setFooter(footer, null);
 
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
 
     // An example with an image
     const worksheet2 = try workbook.addWorkSheet("Image");
@@ -64,61 +64,54 @@ pub fn main() !void {
         .image_left = asset_path,
     };
 
-    try worksheet.setHeaderOpt("&L&[Picture]", header_options);
+    try worksheet.setHeader("&L&[Picture]", header_options);
 
-    const margins: xwz.Margins = .{
-        .left = -1,
-        .right = -1,
-        .top = 1.3,
-        .bottom = -1,
-    };
-    worksheet.setMargins(margins);
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
+    worksheet.setMargins(-1, -1, 1.3, -1);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
 
     // This is an example of some of the header/footer variables
     const worksheet3 = try workbook.addWorkSheet("Variables");
     worksheet = worksheet3;
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
-    try worksheet.writeString(20, 0, "Next page", .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
+    try worksheet.writeString(.{ .row = 20 }, "Next page", .default);
 
     header = "&LPage &P of &N" ++ "&CFilename: &F" ++ "&RSheetname: &A";
     footer = "&LCurrent date: &D" ++ "&RCurrent time: &T";
-    try worksheet.setHeader(header);
-    try worksheet.setFooter(footer);
+    try worksheet.setHeader(header, null);
+    try worksheet.setFooter(footer, null);
 
-    const breaks: xwz.RowBreaks = &.{20};
-    try worksheet.setHPageBreaks(breaks);
+    try worksheet.setHPageBreaks(&.{20});
 
     // This example shows how to use more than one font
     const worksheet4 = try workbook.addWorkSheet("Mixed fonts");
     worksheet = worksheet4;
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
 
     header = "&C&\"Courier New,Bold\"Hello &\"Arial,Italic\"World";
     footer = "&C&\"Symbol\"e&\"Arial\" = mc&X2";
-    try worksheet.setHeader(header);
-    try worksheet.setFooter(footer);
+    try worksheet.setHeader(header, null);
+    try worksheet.setFooter(footer, null);
 
     // Example of line wrapping
     const worksheet5 = try workbook.addWorkSheet("Word wrap");
     worksheet = worksheet5;
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
 
     header = "&CHeading 1\nHeading 2";
-    try worksheet.setHeader(header);
+    try worksheet.setHeader(header, null);
 
     // Example of inserting a literal ampersand &
     const worksheet6 = try workbook.addWorkSheet("Ampersand");
     worksheet = worksheet6;
-    try worksheet.setColumn(0, 0, 50, .default);
-    try worksheet.writeString(0, 0, preview, .default);
+    try worksheet.setColumn(.{}, 50, .default, null);
+    try worksheet.writeString(.{}, preview, .default);
 
     header = "&CCuriouser && Curiouser - Attorneys at Law";
-    try worksheet.setHeader(header);
+    try worksheet.setHeader(header, null);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

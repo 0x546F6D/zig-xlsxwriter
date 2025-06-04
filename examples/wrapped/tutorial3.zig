@@ -1,5 +1,5 @@
 const Expense = struct {
-    item: [*:0]const u8,
+    item: [:0]const u8,
     cost: f64,
     datetime: xwz.DateTime,
 };
@@ -29,7 +29,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -46,22 +46,22 @@ pub fn main() !void {
     date_format.setNumFormat("mmmm d yyyy");
 
     // Adjust the column width.
-    try worksheet.setColumn(0, 0, 15, .default);
+    try worksheet.setColumn(.{}, 15, .default, null);
 
     // Write some data header.
-    try worksheet.writeString(0, 0, "Item", bold);
-    try worksheet.writeString(0, 2, "Cost", bold);
+    try worksheet.writeString(.{}, "Item", bold);
+    try worksheet.writeString(.{ .col = 2 }, "Cost", bold);
 
     // Iterate over the data and write it out element by element.
     for (expenses, 1..) |expense, row| {
-        try worksheet.writeString(@intCast(row), 0, expense.item, .default);
-        try worksheet.writeDateTime(@intCast(row), 1, expense.datetime, date_format);
-        try worksheet.writeNumber(@intCast(row), 2, expense.cost, money);
+        try worksheet.writeString(.{ .row = @intCast(row) }, expense.item, .default);
+        try worksheet.writeDateTime(.{ .row = @intCast(row), .col = 1 }, expense.datetime, date_format);
+        try worksheet.writeNumber(.{ .row = @intCast(row), .col = 2 }, expense.cost, money);
     }
 
     // Write a total using a formula.
-    try worksheet.writeString(expenses.len + 1, 0, "Total", bold);
-    try worksheet.writeFormula(expenses.len + 1, 2, "=SUM(C2:C5)", money);
+    try worksheet.writeString(.{ .row = expenses.len + 1 }, "Total", bold);
+    try worksheet.writeFormula(.{ .row = expenses.len + 1, .col = 2 }, "=SUM(C2:C5)", money);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

@@ -17,7 +17,7 @@ pub inline fn setItalic(self: Format) void {
 }
 
 // pub extern fn format_set_num_format(format: [*c]lxw_format, num_format: [*c]const u8) void;
-pub inline fn setNumFormat(self: Format, num_format: ?CString) void {
+pub inline fn setNumFormat(self: Format, num_format: [:0]const u8) void {
     c.format_set_num_format(self.format_c, num_format);
 }
 
@@ -328,7 +328,7 @@ pub inline fn setFontOnly(self: Format) void {
 }
 
 // pub extern fn format_set_font_name(format: [*c]lxw_format, font_name: [*c]const u8) void;
-pub inline fn setFontName(self: Format, font_name: ?CString) void {
+pub inline fn setFontName(self: Format, font_name: [:0]const u8) void {
     c.format_set_font_name(self.format_c, font_name);
 }
 
@@ -406,7 +406,7 @@ pub inline fn setPattern(self: Format, index: FormatPattern) void {
 }
 
 // pub extern fn format_set_font_scheme(format: [*c]lxw_format, font_scheme: [*c]const u8) void;
-pub inline fn setFontScheme(self: Format, font_scheme: ?CString) void {
+pub inline fn setFontScheme(self: Format, font_scheme: [:0]const u8) void {
     c.format_set_font_scheme(self.format_c, font_scheme);
 }
 
@@ -426,5 +426,3 @@ pub inline fn setColorIndexed(self: Format, value: u8) void {
 }
 
 const c = @import("lxw");
-const CString = @import("xlsxwriter.zig").CString;
-const CStringArray = @import("xlsxwriter.zig").CStringArray;

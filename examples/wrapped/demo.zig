@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -16,29 +16,29 @@ pub fn main() !void {
     format.setBold();
 
     // Change the column width for clarity.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Write some simple text.
-    try worksheet.writeString(0, 0, "Hello", .default);
+    try worksheet.writeString(.{}, "Hello", .default);
 
     // Text with formatting.
-    try worksheet.writeString(1, 0, "World", format);
+    try worksheet.writeString(.{ .row = 1 }, "World", format);
 
     // Write some numbers.
-    try worksheet.writeNumber(2, 0, 123, .default);
-    try worksheet.writeNumber(3, 0, 123.456, .default);
+    try worksheet.writeNumber(.{ .row = 2 }, 123, .default);
+    try worksheet.writeNumber(.{ .row = 3 }, 123.456, .default);
 
     // Insert an image.
-    const use_buffer = true;
+    const use_buffer = false;
     if (use_buffer) {
         // using embed + insertImageBuffer
         const logo_data = @import("assets").logo_data;
-        try worksheet.insertImageBuffer(1, 2, logo_data, logo_data.len);
+        try worksheet.insertImageBuffer(.{ .row = 1, .col = 2 }, logo_data, null);
     } else {
         // using image path + insertImage
         const asset_path = try h.getAssetPath(alloc, "logo.png");
         defer alloc.free(asset_path);
-        try worksheet.insertImage(1, 2, asset_path);
+        try worksheet.insertImage(.{ .row = 1, .col = 2 }, asset_path, null);
     }
 }
 

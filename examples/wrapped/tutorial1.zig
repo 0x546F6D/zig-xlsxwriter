@@ -1,5 +1,5 @@
 const Expense = struct {
-    item: [*:0]const u8,
+    item: [:0]const u8,
     cost: f64,
 };
 
@@ -17,7 +17,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -27,13 +27,13 @@ pub fn main() !void {
 
     // Iterate over the data and write it out element by element.
     for (expenses) |expense| {
-        try worksheet.writeString(row, col, expense.item, .default);
-        try worksheet.writeNumber(row, col + 1, expense.cost, .default);
+        try worksheet.writeString(.{ .row = row, .col = col }, expense.item, .default);
+        try worksheet.writeNumber(.{ .row = row, .col = col + 1 }, expense.cost, .default);
         row += 1;
     }
 
-    try worksheet.writeString(row, col, "Total", .default);
-    try worksheet.writeFormula(row, col + 1, "=SUM(B1:B4)", .default);
+    try worksheet.writeString(.{ .row = row, .col = col }, "Total", .default);
+    try worksheet.writeFormula(.{ .row = row, .col = col + 1 }, "=SUM(B1:B4)", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

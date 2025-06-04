@@ -15,7 +15,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -24,13 +24,13 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Write the datetime without formatting.
-    try worksheet.writeDateTime(0, 0, datetime, .default);
+    try worksheet.writeDateTime(.{}, datetime, .default);
 
     // Write the datetime with formatting.
-    try worksheet.writeDateTime(1, 0, datetime, format);
+    try worksheet.writeDateTime(.{ .row = 1 }, datetime, format);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

@@ -59,7 +59,8 @@ pub const XlsxError = error{
     WorkseetMaxNumberUrlsExceeded,
     ImageDimensions,
     UnknownError,
-    NewWorkBook,
+    InitWorkBook,
+    InitWorkBookOutput,
     AddWorkSheet,
     GetWorkSheetName,
     GetWorkSheets,
@@ -143,7 +144,8 @@ pub inline fn strError(err: anyerror) []const u8 {
     if (error_code) |code| {
         return std.mem.span(c.lxw_strerror(@intCast(@intFromEnum(code))));
     } else return switch (err) {
-        error.NewWorkBook => "new_workbook() returned a null pointer.",
+        error.InitWorkBook => "new_workbook() returned a null pointer.",
+        error.InitWorkBookOutput => "initWorBook() is missing both a filename and an Output Buffer. One must be provided.",
         error.AddWorkSheet => "add_worksheet() returned a null pointer.",
         error.GetWorkSheetName => "Could Not get WorkSheet with provided name.",
         error.GetWorkSheets => "No Allocator provided to initWorkBook(), getWorkSheets() cannot be called.",

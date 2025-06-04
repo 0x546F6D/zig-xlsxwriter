@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet(null);
@@ -17,6 +17,7 @@ pub fn main() !void {
     const worksheet7 = try workbook.addWorkSheet(null);
     const worksheet8 = try workbook.addWorkSheet(null);
     const worksheet9 = try workbook.addWorkSheet(null);
+    var worksheet: WorkSheet = undefined;
 
     // Add a format. Light red fill with dark red text.
     const format1 = try workbook.addFormat();
@@ -32,11 +33,11 @@ pub fn main() !void {
     var conditional_format: xwz.ConditionalFormat = .default;
 
     // Example 1. Conditional formatting based on simple cell based criteria.
-    try writeWorksheetData(worksheet1);
+    worksheet = worksheet1;
+    try writeWorksheetData(worksheet);
 
-    try worksheet1.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Cells with values >= 50 are in light red. Values < 50 are in light green.",
         .default,
     );
@@ -45,18 +46,24 @@ pub fn main() !void {
     conditional_format.criteria = .greater_than_or_equal_to;
     conditional_format.value = 50;
     conditional_format.format = format1;
-    try worksheet1.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.criteria = .less_than;
     conditional_format.format = format2;
-    try worksheet1.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Example 2. Conditional formatting based on max and min values.
-    try writeWorksheetData(worksheet2);
+    worksheet = worksheet2;
+    try writeWorksheetData(worksheet);
 
-    try worksheet2.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Values between 30 and 70 are in light red. Values outside that range are in light green.",
         .default,
     );
@@ -65,38 +72,50 @@ pub fn main() !void {
     conditional_format.min_value = 30;
     conditional_format.max_value = 70;
     conditional_format.format = format1;
-    try worksheet2.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.criteria = .not_between;
     conditional_format.min_value = 30;
     conditional_format.max_value = 70;
     conditional_format.format = format2;
-    try worksheet2.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Example 3. Conditional formatting with duplicate and unique values.
-    try writeWorksheetData(worksheet3);
+    worksheet = worksheet3;
+    try writeWorksheetData(worksheet);
 
-    try worksheet3.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Duplicate values are in light red. Unique values are in light green.",
         .default,
     );
 
     conditional_format.type = .duplicate;
     conditional_format.format = format1;
-    try worksheet3.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.type = .unique;
     conditional_format.format = format2;
-    try worksheet3.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Example 4. Conditional formatting with above and below average values.
-    try writeWorksheetData(worksheet4);
+    worksheet = worksheet4;
+    try writeWorksheetData(worksheet);
 
-    try worksheet4.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Above average values are in light red. Below average values are in light green.",
         .default,
     );
@@ -104,19 +123,25 @@ pub fn main() !void {
     conditional_format.type = .average;
     conditional_format.criteria = .average_above;
     conditional_format.format = format1;
-    try worksheet4.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.criteria = .average_below;
     conditional_format.format = format2;
-    try worksheet4.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Example 5. Conditional formatting with top and bottom values.
-    try writeWorksheetData(worksheet5);
+    worksheet = worksheet5;
+    try writeWorksheetData(worksheet);
     conditional_format = .default;
 
-    try worksheet5.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Top 10 values are in light red. Bottom 10 values are in light green.",
         .default,
     );
@@ -124,19 +149,25 @@ pub fn main() !void {
     conditional_format.type = .top;
     conditional_format.value = 10;
     conditional_format.format = format1;
-    try worksheet5.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.type = .bottom;
     conditional_format.value = 10;
     conditional_format.format = format2;
-    try worksheet5.conditionalFormatRange(2, 5, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 5, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Example 6. Conditional formatting with multiple ranges.
-    try writeWorksheetData(worksheet6);
+    worksheet = worksheet6;
+    try writeWorksheetData(worksheet);
 
-    try worksheet6.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Cells with values >= 50 are in light red. Values < 50 are in light green. Non-contiguous ranges.",
         .default,
     );
@@ -146,158 +177,197 @@ pub fn main() !void {
     conditional_format.value = 50;
     conditional_format.format = format1;
     conditional_format.multi_range = "B3:K6 B9:K12";
-    try worksheet6.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     conditional_format.criteria = .less_than;
     conditional_format.value = 50;
     conditional_format.format = format2;
     conditional_format.multi_range = "B3:K6 B9:K12";
-    try worksheet6.conditionalFormatRange(2, 1, 11, 10, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 11, .last_col = 10 },
+        conditional_format,
+    );
 
     // Reset the options before the next example.
     conditional_format = .default;
 
     // Example 7. Conditional formatting with 2 color scales.
+    worksheet = worksheet7;
     // Write the worksheet data.
     for (1..13) |i| {
-        try worksheet7.writeNumber(@intCast(i + 1), 1, @floatFromInt(i), .default);
-        try worksheet7.writeNumber(@intCast(i + 1), 3, @floatFromInt(i), .default);
-        try worksheet7.writeNumber(@intCast(i + 1), 6, @floatFromInt(i), .default);
-        try worksheet7.writeNumber(@intCast(i + 1), 8, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 1 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 3 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 6 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 8 }, @floatFromInt(i), .default);
     }
 
-    try worksheet7.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Examples of color scales with default and user colors.",
         .default,
     );
 
-    try worksheet7.writeString(1, 1, "2 Color Scale", .default);
-    try worksheet7.writeString(1, 3, "2 Color Scale + user colors", .default);
-    try worksheet7.writeString(1, 6, "3 Color Scale", .default);
-    try worksheet7.writeString(1, 8, "3 Color Scale + user colors", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 1 }, "2 Color Scale", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 3 }, "2 Color Scale + user colors", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 6 }, "3 Color Scale", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 8 }, "3 Color Scale + user colors", .default);
 
     // 2 color scale with standard colors.
     conditional_format.type = .color_2_scale;
-    try worksheet7.conditionalFormatRange(2, 1, 13, 1, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 13, .last_col = 1 },
+        conditional_format,
+    );
 
     // 2 color scale with user defined colors.
     conditional_format.type = .color_2_scale;
     conditional_format.min_color = @enumFromInt(0xFF0000);
     conditional_format.max_color = @enumFromInt(0x00FF00);
-    try worksheet7.conditionalFormatRange(2, 3, 13, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 3, .last_row = 13, .last_col = 3 },
+        conditional_format,
+    );
 
     // Reset the colors before the next example.
     conditional_format = .default;
 
     // 3 color scale with standard colors.
     conditional_format.type = .color_3_scale;
-    try worksheet7.conditionalFormatRange(2, 6, 13, 6, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 6, .last_row = 13, .last_col = 6 },
+        conditional_format,
+    );
 
     // 3 color scale with user defined colors.
     conditional_format.type = .color_3_scale;
     conditional_format.min_color = @enumFromInt(0xC5D9F1);
     conditional_format.mid_color = @enumFromInt(0x8DB4E3);
     conditional_format.max_color = @enumFromInt(0x538ED5);
-    try worksheet7.conditionalFormatRange(2, 8, 13, 8, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 8, .last_row = 13, .last_col = 8 },
+        conditional_format,
+    );
 
     // Example 8. Conditional formatting with data bars.
+    worksheet = worksheet8;
     // First data bar example.
-    try worksheet8.writeString(
-        0,
-        0,
+    try worksheet.writeString(
+        .{},
         "Examples of data bars.",
         .default,
     );
 
     // Write the worksheet data.
     for (1..13) |i| {
-        try worksheet8.writeNumber(@intCast(i + 1), 1, @floatFromInt(i), .default);
-        try worksheet8.writeNumber(@intCast(i + 1), 3, @floatFromInt(i), .default);
-        try worksheet8.writeNumber(@intCast(i + 1), 5, @floatFromInt(i), .default);
-        try worksheet8.writeNumber(@intCast(i + 1), 7, @floatFromInt(i), .default);
-        try worksheet8.writeNumber(@intCast(i + 1), 9, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 1 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 3 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 5 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 7 }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 9 }, @floatFromInt(i), .default);
     }
     const data = [_]f64{ -1, -2, -3, -2, -1, 0, 1, 2, 3, 2, 1, 0 };
     for (data, 1..) |val, i| {
-        try worksheet8.writeNumber(@intCast(i + 1), 11, val, .default);
-        try worksheet8.writeNumber(@intCast(i + 1), 13, val, .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 11 }, val, .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i + 1), .col = 13 }, val, .default);
     }
 
-    try worksheet8.writeString(1, 1, "Default data bars", .default);
-    try worksheet8.writeString(1, 3, "Bars only", .default);
-    try worksheet8.writeString(1, 5, "With user color", .default);
-    try worksheet8.writeString(1, 7, "Solid bars", .default);
-    try worksheet8.writeString(1, 9, "Right to left", .default);
-    try worksheet8.writeString(1, 11, "Excel 2010 style", .default);
-    try worksheet8.writeString(1, 13, "Negative same as positive", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 1 }, "Default data bars", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 3 }, "Bars only", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 5 }, "With user color", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 7 }, "Solid bars", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 9 }, "Right to left", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 11 }, "Excel 2010 style", .default);
+    try worksheet.writeString(.{ .row = 1, .col = 13 }, "Negative same as positive", .default);
 
     // Default data bars.
     conditional_format.type = .data_bar;
-    try worksheet8.conditionalFormatRange(2, 1, 13, 1, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 13, .last_col = 1 },
+        conditional_format,
+    );
 
     // Data bars with border.
     conditional_format.bar_only = true;
     // conditional_format.bar_border_color = .black;
-    try worksheet8.conditionalFormatRange(2, 3, 13, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 3, .last_row = 13, .last_col = 3 },
+        conditional_format,
+    );
 
     // User defined color.
     conditional_format = .default;
     conditional_format.type = .data_bar;
     conditional_format.bar_color = @enumFromInt(0x63C384);
-    try worksheet8.conditionalFormatRange(2, 5, 13, 5, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 5, .last_row = 13, .last_col = 5 },
+        conditional_format,
+    );
 
     // Same color for negative values.
     conditional_format = .default;
     conditional_format.type = .data_bar;
     conditional_format.bar_solid = true;
     // conditional_format.bar_negative_color_same = 1;
-    try worksheet8.conditionalFormatRange(2, 7, 13, 7, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 7, .last_row = 13, .last_col = 7 },
+        conditional_format,
+    );
 
     // Right to left.
     conditional_format = .default;
     conditional_format.type = .data_bar;
     conditional_format.bar_direction = .right_to_left;
-    try worksheet8.conditionalFormatRange(2, 9, 13, 9, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 9, .last_row = 13, .last_col = 9 },
+        conditional_format,
+    );
 
     // Excel 2010 style.
     conditional_format = .default;
     conditional_format.type = .data_bar;
     conditional_format.data_bar_2010 = true;
-    try worksheet8.conditionalFormatRange(2, 11, 13, 11, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 11, .last_row = 13, .last_col = 11 },
+        conditional_format,
+    );
 
     // Zero axis.
     conditional_format = .default;
     conditional_format.type = .data_bar;
     conditional_format.bar_negative_color_same = true;
     conditional_format.bar_negative_border_color_same = true;
-    try worksheet8.conditionalFormatRange(2, 13, 13, 13, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 13, .last_row = 13, .last_col = 13 },
+        conditional_format,
+    );
 
     // Example 9. Conditional formatting with icon sets.
-    try worksheet9.writeString(
-        0,
-        0,
+    worksheet = worksheet9;
+    try worksheet.writeString(
+        .{},
         "Examples of conditional formats with icon sets.",
         .default,
     );
 
     // Write the worksheet data.
     for (1..4) |i| {
-        try worksheet9.writeNumber(2, @intCast(i), @floatFromInt(i), .default);
-        try worksheet9.writeNumber(3, @intCast(i), @floatFromInt(i), .default);
-        try worksheet9.writeNumber(4, @intCast(i), @floatFromInt(i), .default);
-        try worksheet9.writeNumber(5, @intCast(i), @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 2, .col = @intCast(i) }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 3, .col = @intCast(i) }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 4, .col = @intCast(i) }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 5, .col = @intCast(i) }, @floatFromInt(i), .default);
     }
 
     for (1..5) |i| {
-        try worksheet9.writeNumber(6, @intCast(i), @floatFromInt(i), .default);
-        try worksheet9.writeNumber(7, @intCast(i), @floatFromInt(i), .default);
-        try worksheet9.writeNumber(8, @intCast(i), @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 6, .col = @intCast(i) }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 7, .col = @intCast(i) }, @floatFromInt(i), .default);
+        try worksheet.writeNumber(.{ .row = 8, .col = @intCast(i) }, @floatFromInt(i), .default);
     }
 
-    try worksheet9.writeNumber(7, 5, 5, .default);
-    try worksheet9.writeNumber(8, 5, 5, .default);
+    try worksheet.writeNumber(.{ .row = 7, .col = 5 }, 5, .default);
+    try worksheet.writeNumber(.{ .row = 8, .col = 5 }, 5, .default);
 
     // Reset the conditional format.
     conditional_format = .default;
@@ -305,11 +375,17 @@ pub fn main() !void {
     // Three traffic lights (default style).
     conditional_format.type = .icon_sets;
     conditional_format.icon_style = .icons_3_traffic_lights_unrimmed;
-    try worksheet9.conditionalFormatRange(2, 1, 2, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 2, .first_col = 1, .last_row = 2, .last_col = 3 },
+        conditional_format,
+    );
 
     // Three traffic lights (unrimmed style).
     conditional_format.reverse_icons = true;
-    try worksheet9.conditionalFormatRange(3, 1, 3, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 3, .first_col = 1, .last_row = 3, .last_col = 3 },
+        conditional_format,
+    );
 
     // Three traffic lights (unrimmed style).
     conditional_format = .default;
@@ -317,25 +393,40 @@ pub fn main() !void {
     conditional_format.icon_style = .icons_3_traffic_lights_unrimmed;
     conditional_format.icons_only = true;
     // conditional_format.icon_style = .icons_3_traffic_lights_unrimmed;
-    try worksheet9.conditionalFormatRange(4, 1, 4, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 4, .first_col = 1, .last_row = 4, .last_col = 3 },
+        conditional_format,
+    );
 
     // Three arrows.
     conditional_format = .default;
     conditional_format.type = .icon_sets;
     conditional_format.icon_style = .icons_3_arrows_colored;
-    try worksheet9.conditionalFormatRange(5, 1, 5, 3, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 5, .first_col = 1, .last_row = 5, .last_col = 3 },
+        conditional_format,
+    );
 
     // Four arrows.
     conditional_format.icon_style = .icons_4_arrows_colored;
-    try worksheet9.conditionalFormatRange(6, 1, 6, 4, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 6, .first_col = 1, .last_row = 6, .last_col = 4 },
+        conditional_format,
+    );
 
     // Five arrows.
     conditional_format.icon_style = .icons_5_arrows_colored;
-    try worksheet9.conditionalFormatRange(7, 1, 7, 5, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 7, .first_col = 1, .last_row = 7, .last_col = 5 },
+        conditional_format,
+    );
 
     // Five ratings.
     conditional_format.icon_style = .icons_5_ratings;
-    try worksheet9.conditionalFormatRange(8, 1, 8, 5, conditional_format);
+    try worksheet.conditionalFormatRange(
+        .{ .first_row = 8, .first_col = 1, .last_row = 8, .last_col = 5 },
+        conditional_format,
+    );
 }
 
 // Write some data to the worksheet.
@@ -355,7 +446,7 @@ fn writeWorksheetData(worksheet: WorkSheet) !void {
 
     for (data, 0..) |array, row| {
         for (array, 0..) |val, col| {
-            try worksheet.writeNumber(@intCast(row + 2), @intCast(col + 1), @floatFromInt(val), .default);
+            try worksheet.writeNumber(.{ .row = @intCast(row + 2), .col = @intCast(col + 1) }, @floatFromInt(val), .default);
         }
     }
 }

@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);

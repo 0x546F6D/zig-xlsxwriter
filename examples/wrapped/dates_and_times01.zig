@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch |err| {
         std.debug.print("{}: {s}\n", .{ err, xwz.strError(err) });
     };
@@ -19,15 +19,15 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Write the number without formatting.
-    try worksheet.writeNumber(0, 0, number, .default);
+    try worksheet.writeNumber(.{}, number, .default);
 
     // Write the number with formatting. Note: the worksheet_write_datetime()
     // or worksheet_write_unixtime() functions are preferable for writing
     // dates and times. This is for demonstration purposes only.
-    try worksheet.writeNumber(1, 0, number, format);
+    try worksheet.writeNumber(.{ .row = 1 }, number, format);
 }
 
 const std = @import("std");

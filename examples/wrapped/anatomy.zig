@@ -5,7 +5,8 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    // const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
 
     // Add a worksheet with a user defined sheet name
     const worksheet1 = try workbook.addWorkSheet("Demo");
@@ -24,24 +25,24 @@ pub fn main() !void {
     myformat2.setNumFormat("$#,##0.00");
 
     // Widen the first column to make the text clearer
-    try worksheet1.setColumn(0, 0, 20, .default);
+    try worksheet1.setColumn(xwz.cols("A"), 20, .default, null);
 
     // Write some unformatted data
-    try worksheet1.writeString(0, 0, "Peach", .default);
-    try worksheet1.writeString(1, 0, "Plum", .default);
+    try worksheet1.writeString(xwz.cell("A1"), "Peach", .default);
+    try worksheet1.writeString(.{ .row = 1 }, "Plum", .default);
 
     // Write formatted data
-    try worksheet1.writeString(2, 0, "Pear", myformat1);
+    try worksheet1.writeString(.{ .row = 2 }, "Pear", myformat1);
 
     // Formats can be reused
-    try worksheet1.writeString(3, 0, "Persimmon", myformat1);
+    try worksheet1.writeString(.{ .row = 3 }, "Persimmon", myformat1);
 
     // Write some numbers
-    try worksheet1.writeNumber(5, 0, 123, .default);
-    try worksheet1.writeNumber(6, 0, 4567.555, myformat2);
+    try worksheet1.writeNumber(.{ .row = 5 }, 123, .default);
+    try worksheet1.writeNumber(.{ .row = 6 }, 4567.555, myformat2);
 
     // Write to the second worksheet
-    try worksheet2.writeString(0, 0, "Some text", myformat1);
+    try worksheet2.writeString(xwz.cell("A1"), "Some text", myformat1);
 
     // Close the workbook, save the file and free any memory
     workbook.deinit() catch |err| {
@@ -55,3 +56,4 @@ var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
 const xwz = @import("xlsxwriter");
+const cell = xwz.cell;

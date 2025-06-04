@@ -50,7 +50,7 @@ pub const TickMark = enum(u8) {
 // pub extern fn chart_axis_set_name(axis: [*c]lxw_chart_axis, name: [*c]const u8) void;
 pub inline fn setName(
     self: ChartAxis,
-    name: ?CString,
+    name: [:0]const u8,
 ) void {
     c.chart_axis_set_name(
         self.axis_c,
@@ -61,15 +61,14 @@ pub inline fn setName(
 // pub extern fn chart_axis_set_name_range(axis: [*c]lxw_chart_axis, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn setNameRange(
     self: ChartAxis,
-    sheetname: ?CString,
-    row: u32,
-    col: u16,
+    sheetname: [:0]const u8,
+    cell: Cell,
 ) void {
     c.chart_axis_set_name_range(
         self.axis_c,
         sheetname,
-        row,
-        col,
+        cell.row,
+        cell.col,
     );
 }
 
@@ -98,7 +97,7 @@ pub inline fn setNumFont(self: ChartAxis, font: ChartFont) void {
 }
 
 // pub extern fn chart_axis_set_num_format(axis: [*c]lxw_chart_axis, num_format: [*c]const u8) void;
-pub inline fn setNumFormat(self: ChartAxis, num_format: ?CString) void {
+pub inline fn setNumFormat(self: ChartAxis, num_format: [:0]const u8) void {
     c.chart_axis_set_num_format(
         self.axis_c,
         num_format,
@@ -273,7 +272,7 @@ pub inline fn setMinorGridLinesLine(self: ChartAxis, line: ChartLine) void {
 
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
-const CString = xlsxwriter.CString;
+const Cell = @import("utility.zig").Cell;
 const ChartFont = @import("Chart.zig").Font;
 const ChartLayout = @import("Chart.zig").Layout;
 const ChartLine = @import("Chart.zig").Line;

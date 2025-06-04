@@ -11,7 +11,7 @@ pub const Options = struct {
     x_scale: f64 = 0,
     y_scale: f64 = 0,
     object_position: ObjectPosition = .default,
-    description: ?CString = null,
+    description: ?[*:0]const u8 = null,
     decorative: bool = false,
 
     inline fn toC(self: Options) c.lxw_chart_options {
@@ -153,22 +153,26 @@ pub const Grouping = enum(u8) {
 };
 
 // pub extern fn chart_title_set_name(chart: [*c]lxw_chart, name: [*c]const u8) void;
-pub inline fn titleSetName(self: Chart, name: ?CString) void {
+pub inline fn titleSetName(self: Chart, name: [:0]const u8) void {
     c.chart_title_set_name(self.chart_c, name);
 }
 
 // pub extern fn chart_title_set_name_range(chart: [*c]lxw_chart, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn titleSetNameRange(
     self: Chart,
-    name: ?CString,
-    row: u32,
-    col: u16,
+    name: [:0]const u8,
+    cell: Cell,
 ) void {
-    c.chart_title_set_name_range(self.chart_c, name, row, col);
+    c.chart_title_set_name_range(
+        self.chart_c,
+        name,
+        cell.row,
+        cell.col,
+    );
 }
 
 pub const Font = struct {
-    name: ?CString = null,
+    name: ?[*:0]const u8 = null,
     size: f64 = 0,
     bold: bool = true,
     italic: bool = false,
@@ -565,9 +569,14 @@ pub inline fn plotAreaSetLayout(
 }
 
 // pub extern fn chart_add_series(chart: [*c]lxw_chart, categories: [*c]const u8, values: [*c]const u8) [*c]lxw_chart_series;
-pub inline fn addSeries(self: Chart, categories: ?CString, values: ?CString) XlsxError!ChartSeries {
+pub inline fn addSeries(self: Chart, categories: ?[*:0]const u8, values: ?[*:0]const u8) XlsxError!ChartSeries {
     return ChartSeries{
-        .chartseries_c = c.chart_add_series(self.chart_c, categories, values) orelse return XlsxError.ChartAddSeries,
+        .chartseries_c = c.chart_add_series(
+            self.chart_c,
+            categories,
+            values,
+        ) orelse
+            return XlsxError.ChartAddSeries,
     };
 }
 
@@ -586,10 +595,10 @@ pub inline fn getAxis(
 
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
-const CString = xlsxwriter.CString;
 const CStringArray = xlsxwriter.CStringArray;
 const Bool = xlsxwriter.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
+const Cell = @import("utility.zig").Cell;
 const DefinedColors = @import("format.zig").DefinedColors;
 const ChartSeries = @import("ChartSeries.zig");
 const ChartAxis = @import("ChartAxis.zig");

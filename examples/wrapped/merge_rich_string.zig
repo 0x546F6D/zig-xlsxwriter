@@ -7,7 +7,7 @@ pub fn main() !void {
     // Create a workbook and add worksheets.
     // pass an 'Allocator' to initWorkBook() because we use the writeRichString() function
     // Use writeRichStringNoAlloc() if you do not want to use allocation
-    const workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(alloc, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -51,12 +51,20 @@ pub fn main() !void {
     };
 
     // Write an empty string to the merged range.
-    try worksheet.mergeRange(1, 1, 4, 4, "", merge_format);
+    try worksheet.mergeRange(
+        .{ .first_row = 1, .first_col = 1, .last_row = 4, .last_col = 4 },
+        "",
+        merge_format,
+    );
 
     // We then overwrite the first merged cell with a rich string. Note that
     // we must also pass the cell format used in the merged cells format at
     // the end.
-    worksheet.writeRichString(1, 1, rich_string, merge_format) catch |err| {
+    worksheet.writeRichString(
+        .{ .row = 1, .col = 1 },
+        rich_string,
+        merge_format,
+    ) catch |err| {
         std.debug.print("writeSrichString error: {s}\n", .{xwz.strError(err)});
         return err;
     };

@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -25,10 +25,10 @@ pub fn main() !void {
     format4.setDiagBorder(.hair);
     format4.setDiagColor(.red);
 
-    try worksheet.writeString(2, 1, "Text", format1);
-    try worksheet.writeString(5, 1, "Text", format2);
-    try worksheet.writeString(8, 1, "Text", format3);
-    try worksheet.writeString(11, 1, "Text", format4);
+    try worksheet.writeString(.{ .row = 2, .col = 1 }, "Text", format1);
+    try worksheet.writeString(.{ .row = 5, .col = 1 }, "Text", format2);
+    try worksheet.writeString(.{ .row = 8, .col = 1 }, "Text", format3);
+    try worksheet.writeString(.{ .row = 11, .col = 1 }, "Text", format4);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

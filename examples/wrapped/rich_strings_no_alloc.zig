@@ -7,7 +7,7 @@ pub fn main() !void {
     // Create a workbook and add a worksheet.
     // No need to pass an 'Allocator' to initWorkBook()
     // because we use the writeRichStringNoAlloc() function
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -31,7 +31,7 @@ pub fn main() !void {
     superscript.setFontScript(.superscript);
 
     // Make the first column wider for clarity.
-    try worksheet.setColumn(0, 0, 30, .default);
+    try worksheet.setColumn(.{}, 30, .default, null);
 
     // Example 1: Bold and italic text
     // Write individual cells with appropriate formatting
@@ -55,7 +55,7 @@ pub fn main() !void {
         &fragment13,
         &fragment14,
     };
-    worksheet.writeRichStringNoAlloc(0, 0, rich_string1, .default) catch |err| {
+    worksheet.writeRichStringNoAlloc(.{}, rich_string1, .default) catch |err| {
         std.debug.print("writeSrichString error: {s}\n", .{xwz.strError(err)});
         return err;
     };
@@ -82,7 +82,7 @@ pub fn main() !void {
         &fragment23,
         &fragment24,
     };
-    try worksheet.writeRichStringNoAlloc(2, 0, rich_string2, .default);
+    try worksheet.writeRichStringNoAlloc(.{ .row = 2 }, rich_string2, .default);
 
     // Example 3. A rich string plus cell formatting.
     const fragment31: xwz.RichStringTupleNoAlloc = .{
@@ -100,7 +100,7 @@ pub fn main() !void {
         &fragment32,
         &fragment33,
     };
-    try worksheet.writeRichStringNoAlloc(4, 0, rich_string3, center);
+    try worksheet.writeRichStringNoAlloc(.{ .row = 4 }, rich_string3, center);
 
     // Example 4: Math example with superscript
     const fragment41: xwz.RichStringTupleNoAlloc = .{
@@ -115,7 +115,7 @@ pub fn main() !void {
         &fragment41,
         &fragment42,
     };
-    try worksheet.writeRichStringNoAlloc(6, 0, rich_string4, center);
+    try worksheet.writeRichStringNoAlloc(.{ .row = 6 }, rich_string4, center);
 }
 
 const std = @import("std");

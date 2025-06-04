@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -36,9 +36,15 @@ pub fn main() !void {
     // Add a second series and configure it programmatically
     series = try chart.addSeries(null, null);
 
-    series.setCategories("Sheet1", 1, 0, 6, 0);
-    series.setValues("Sheet1", 1, 2, 6, 2);
-    series.setNameRange("Sheet1", 0, 2);
+    series.setCategories(
+        "Sheet1",
+        .{ .first_row = 1, .last_row = 6 },
+    );
+    series.setValues(
+        "Sheet1",
+        .{ .first_row = 1, .first_col = 2, .last_row = 6, .last_col = 2 },
+    );
+    series.setNameRange("Sheet1", .{ .col = 2 });
 
     // Add chart title and axis labels
     chart.titleSetName("Results of sample analysis");
@@ -65,15 +71,17 @@ fn writeWorksheetData(worksheet: WorkSheet, bold: Format) !void {
         .{ 7, 50, 30 },
     };
 
-    try worksheet.writeString(0, 0, "Number", bold);
-    try worksheet.writeString(0, 1, "Batch 1", bold);
-    try worksheet.writeString(0, 2, "Batch 2", bold);
+    try worksheet.writeString(.{}, "Number", bold);
+    try worksheet.writeString(.{ .col = 1 }, "Batch 1", bold);
+    try worksheet.writeString(.{ .col = 2 }, "Batch 2", bold);
 
     for (data, 0..) |row, row_idx| {
         for (row, 0..) |value, col_idx| {
             try worksheet.writeNumber(
-                @intCast(row_idx + 1),
-                @intCast(col_idx),
+                .{
+                    .row = @intCast(row_idx + 1),
+                    .col = @intCast(col_idx),
+                },
                 @floatFromInt(value),
                 .default,
             );

@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -20,26 +20,26 @@ pub fn main() !void {
     red_format.setFontColor(@enumFromInt(0xFF0000));
 
     // Widen the first column to make the text clearer
-    try worksheet.setColumn(0, 0, 30, .default);
+    try worksheet.setColumn(.{}, 30, .default, null);
 
     // Write a hyperlink. A default blue underline will be used if the format is NULL
-    try worksheet.writeUrl(0, 0, "http://libxlsxwriter.github.io", .default);
+    try worksheet.writeUrl(.{}, "http://libxlsxwriter.github.io", .default, null);
 
     // Write a hyperlink but overwrite the displayed string. Note, we need to
     // specify the format for the string to match the default hyperlink
-    try worksheet.writeUrl(2, 0, "http://libxlsxwriter.github.io", .default);
-    try worksheet.writeString(2, 0, "Read the documentation.", url_format);
+    try worksheet.writeUrl(.{ .row = 2 }, "http://libxlsxwriter.github.io", .default, null);
+    try worksheet.writeString(.{ .row = 2 }, "Read the documentation.", url_format);
 
     // Write a hyperlink with a different format
-    try worksheet.writeUrl(4, 0, "http://libxlsxwriter.github.io", red_format);
+    try worksheet.writeUrl(.{ .row = 4 }, "http://libxlsxwriter.github.io", red_format, null);
 
     // Write a mail hyperlink
-    try worksheet.writeUrl(6, 0, "mailto:jmcnamara@cpan.org", .default);
+    try worksheet.writeUrl(.{ .row = 6 }, "mailto:jmcnamara@cpan.org", .default, null);
 
     // Write a mail hyperlink and overwrite the displayed string. We again
     // specify the format for the string to match the default hyperlink
-    try worksheet.writeUrl(8, 0, "mailto:jmcnamara@cpan.org", .default);
-    try worksheet.writeString(8, 0, "Drop me a line.", url_format);
+    try worksheet.writeUrl(.{ .row = 8 }, "mailto:jmcnamara@cpan.org", .default, null);
+    try worksheet.writeString(.{ .row = 8 }, "Drop me a line.", url_format);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

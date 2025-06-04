@@ -6,45 +6,39 @@ chartseries_c: ?*c.lxw_chart_series,
 // pub extern fn chart_series_set_categories(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
 pub inline fn setCategories(
     self: ChartSeries,
-    sheetname: ?CString,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    sheetname: [:0]const u8,
+    range: Range,
 ) void {
     c.chart_series_set_categories(
         self.chartseries_c,
         sheetname,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
     );
 }
 
 // pub extern fn chart_series_set_values(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
 pub inline fn setValues(
     self: ChartSeries,
-    sheetname: ?CString,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    sheetname: [:0]const u8,
+    range: Range,
 ) void {
     c.chart_series_set_values(
         self.chartseries_c,
         sheetname,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
     );
 }
 
 // pub extern fn chart_series_set_name(series: [*c]lxw_chart_series, name: [*c]const u8) void;
 pub inline fn setName(
     self: ChartSeries,
-    name: ?CString,
+    name: [:0]const u8,
 ) void {
     c.chart_series_set_name(
         self.chartseries_c,
@@ -55,15 +49,14 @@ pub inline fn setName(
 // pub extern fn chart_series_set_name_range(series: [*c]lxw_chart_series, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn setNameRange(
     self: ChartSeries,
-    sheetname: ?CString,
-    row: u32,
-    col: u16,
+    sheetname: [:0]const u8,
+    cell: Cell,
 ) void {
     c.chart_series_set_name_range(
         self.chartseries_c,
         sheetname,
-        row,
-        col,
+        cell.row,
+        cell.col,
     );
 }
 
@@ -117,38 +110,6 @@ pub const MarkerType = enum(u8) {
     long_dash = c.LXW_CHART_MARKER_LONG_DASH,
     circle = c.LXW_CHART_MARKER_CIRCLE,
     plus = c.LXW_CHART_MARKER_PLUS,
-};
-
-// lxw_chart_marker
-pub const Marker = struct {
-    type: MarkerType = .automatic,
-    size: u8 = 0,
-    line: ?*ChartLine = null,
-    fill: ?*ChartFill = null,
-    pattern: ?*ChartPattern = null,
-
-    pub const default = Marker{
-        .type = .automatic,
-        .size = 0,
-        .line = null,
-        .fill = null,
-        .pattern = null,
-    };
-
-    inline fn toC(
-        self: Marker,
-        line: ?*c.lxw_chart_line,
-        fill: ?*c.lxw_chart_fill,
-        pattern: ?*c.lxw_chart_pattern,
-    ) c.lxw_chart_marker {
-        return c.lxw_chart_marker{
-            .type = @intFromEnum(self.type),
-            .size = self.size,
-            .line = @ptrCast(line),
-            .fill = @ptrCast(fill),
-            .pattern = @ptrCast(pattern),
-        };
-    }
 };
 
 // pub extern fn chart_series_set_marker_type(series: [*c]lxw_chart_series, @"type": u8) void;
@@ -266,7 +227,7 @@ pub inline fn setLabelsOptions(
 }
 
 pub const ChartDataLabel = struct {
-    value: ?CString = null,
+    value: ?[:0]const u8 = null,
     hide: bool = false,
     font: ?*ChartFont = null,
     line: ?*ChartLine = null,
@@ -366,7 +327,7 @@ pub inline fn setLabelsPercentage(self: ChartSeries) void {
 // pub extern fn chart_series_set_labels_num_format(series: [*c]lxw_chart_series, num_format: [*c]const u8) void;
 pub inline fn setLabelsNumFormat(
     self: ChartSeries,
-    num_format: ?CString,
+    num_format: [:0]const u8,
 ) void {
     c.chart_series_set_labels_position(
         self.chartseries_c,
@@ -474,7 +435,7 @@ pub inline fn setTrendlineIntercept(
 // pub extern fn chart_series_set_trendline_name(series: [*c]lxw_chart_series, name: [*c]const u8) void;
 pub inline fn setTrendlineName(
     self: ChartSeries,
-    name: ?CString,
+    name: [:0]const u8,
 ) void {
     c.chart_series_set_trendline_intercept(
         self.chartseries_c,
@@ -508,9 +469,10 @@ pub inline fn getErrorBars(
 
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
-const CString = xlsxwriter.CString;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
+const Cell = @import("utility.zig").Cell;
+const Range = @import("utility.zig").Range;
 const ChartFont = @import("Chart.zig").Font;
 const ChartLine = @import("Chart.zig").Line;
 const ChartFill = @import("Chart.zig").Fill;

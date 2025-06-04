@@ -7,7 +7,7 @@ pub fn main() !void {
     // Create a workbook and add worksheets.
     // pass an 'Allocator' to initWorkBook() because we use the addTable() function
     // Use addTableNoAlloc() if you do not want to use allocation
-    const workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(alloc, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet(null);
@@ -33,7 +33,10 @@ pub fn main() !void {
         worksheet1,
         "Default table with no data.",
     );
-    worksheet1.addTable(2, 1, 6, 5, .default) catch |err| {
+    worksheet1.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        .default,
+    ) catch |err| {
         std.debug.print("addTable error: {s}\n", .{xwz.strError(err)});
         return err;
     };
@@ -44,7 +47,10 @@ pub fn main() !void {
         "Default table with data.",
     );
     try write_worksheet_data(worksheet2, .default);
-    try worksheet2.addTable(2, 1, 6, 5, .default);
+    try worksheet2.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        .default,
+    );
 
     // Example 3: Table without autofilter
     try write_worksheet(
@@ -55,7 +61,10 @@ pub fn main() !void {
     const options3 = xwz.TableOptions{
         .no_autofilter = true,
     };
-    try worksheet3.addTable(2, 1, 6, 5, options3);
+    try worksheet3.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        options3,
+    );
 
     // Example 4: Table without default header row
     try write_worksheet(
@@ -66,7 +75,10 @@ pub fn main() !void {
     const options4 = xwz.TableOptions{
         .no_header_row = true,
     };
-    try worksheet4.addTable(3, 1, 6, 5, options4);
+    try worksheet4.addTable(
+        .{ .first_row = 3, .first_col = 1, .last_row = 6, .last_col = 5 },
+        options4,
+    );
 
     // Example 5: Default table with "First Column" and "Last Column" options
     try write_worksheet(
@@ -78,7 +90,10 @@ pub fn main() !void {
         .last_column = true,
     };
     try write_worksheet_data(worksheet5, .default);
-    try worksheet5.addTable(2, 1, 6, 5, options5);
+    try worksheet5.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        options5,
+    );
 
     // Example 6: Table with banded columns but without default banded rows
     try write_worksheet(
@@ -90,7 +105,10 @@ pub fn main() !void {
         .no_banded_rows = true,
         .banded_columns = true,
     };
-    try worksheet6.addTable(2, 1, 6, 5, options6);
+    try worksheet6.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        options6,
+    );
 
     // Example 7: Table with user defined column headers
     try write_worksheet(
@@ -113,7 +131,10 @@ pub fn main() !void {
     const options7 = xwz.TableOptions{
         .columns = columns7,
     };
-    try worksheet7.addTable(2, 1, 6, 5, options7);
+    try worksheet7.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 5 },
+        options7,
+    );
 
     // Example 8: Table with user defined column headers and formula
     try write_worksheet(
@@ -141,7 +162,10 @@ pub fn main() !void {
     const options8 = xwz.TableOptions{
         .columns = columns8,
     };
-    try worksheet8.addTable(2, 1, 6, 6, options8);
+    try worksheet8.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 6, .last_col = 6 },
+        options8,
+    );
 
     // Example 9: Table with totals row (but no caption or totals)
     try write_worksheet(
@@ -170,7 +194,10 @@ pub fn main() !void {
         .total_row = true,
         .columns = columns9,
     };
-    try worksheet9.addTable(2, 1, 7, 6, options9);
+    try worksheet9.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 7, .last_col = 6 },
+        options9,
+    );
 
     // Example 10: Table with totals row with user captions and functions
     try write_worksheet(
@@ -215,7 +242,10 @@ pub fn main() !void {
         .total_row = true,
         .columns = columns10,
     };
-    try worksheet10.addTable(2, 1, 7, 6, options10);
+    try worksheet10.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 7, .last_col = 6 },
+        options10,
+    );
 
     // Example 11: Table with alternative Excel style
     try write_worksheet(
@@ -262,7 +292,10 @@ pub fn main() !void {
         .total_row = true,
         .columns = columns11,
     };
-    try worksheet11.addTable(2, 1, 7, 6, options11);
+    try worksheet11.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 7, .last_col = 6 },
+        options11,
+    );
 
     // Example 12: Table with Excel style removed
     try write_worksheet(
@@ -308,7 +341,10 @@ pub fn main() !void {
         .total_row = true,
         .columns = columns12,
     };
-    try worksheet12.addTable(2, 1, 7, 6, options12);
+    try worksheet12.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 7, .last_col = 6 },
+        options12,
+    );
 
     // Example 13: Table with column formats
     try write_worksheet(
@@ -358,16 +394,19 @@ pub fn main() !void {
         .total_row = true,
         .columns = columns13,
     };
-    try worksheet13.addTable(2, 1, 7, 6, options13);
+    try worksheet13.addTable(
+        .{ .first_row = 2, .first_col = 1, .last_row = 7, .last_col = 6 },
+        options13,
+    );
 }
 
 fn write_worksheet(
     worksheet: WorkSheet,
-    title: [*c]const u8,
+    title: [:0]const u8,
 ) !void {
     // Example 1: Default table with no data
-    try worksheet.setColumn(1, 6, 12, .default);
-    try worksheet.writeString(0, 1, title, .default);
+    try worksheet.setColumn(.{ .first = 1, .last = 6 }, 12, .default, null);
+    try worksheet.writeString(.{ .col = 1 }, title, .default);
 }
 
 fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {
@@ -386,12 +425,12 @@ fn write_worksheet_data(worksheet: WorkSheet, format: Format) !void {
 
     for (rowDescriptions, start_row..) |str, i| {
         // Write the first row strings
-        try worksheet.writeString(@intCast(i), 1, str, format);
+        try worksheet.writeString(.{ .row = @intCast(i), .col = 1 }, str, format);
     }
 
     for (data, start_row..) |row, i| {
         for (row, 2..) |value, j| {
-            try worksheet.writeNumber(@intCast(i), @intCast(j), value, format);
+            try worksheet.writeNumber(.{ .row = @intCast(i), .col = @intCast(j) }, value, format);
         }
     }
 }

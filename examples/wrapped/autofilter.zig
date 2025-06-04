@@ -65,7 +65,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     // set header format
@@ -102,7 +102,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "East")) {
-            try worksheet2.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet2.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -125,7 +125,7 @@ pub fn main() !void {
         if (!std.mem.eql(u8, row.region, "East") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet3.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet3.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -153,7 +153,7 @@ pub fn main() !void {
         if (!std.mem.eql(u8, row.region, "East") or
             row.volume < 3000 or row.volume > 8000)
         {
-            try worksheet4.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet4.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -170,7 +170,7 @@ pub fn main() !void {
             !std.mem.eql(u8, row.region, "North") and
             !std.mem.eql(u8, row.region, "South"))
         {
-            try worksheet5.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet5.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -187,7 +187,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (!std.mem.eql(u8, row.region, "")) {
-            try worksheet6.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet6.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 
@@ -201,7 +201,7 @@ pub fn main() !void {
     // Hide rows that don't match the filter
     for (data, 1..) |row, i| {
         if (std.mem.eql(u8, row.region, "")) {
-            try worksheet7.setRowOpt(@intCast(i), xwz.def_row_height, .default, hidden);
+            try worksheet7.setRow(@intCast(i), xwz.def_row_height, .default, hidden);
         }
     }
 }
@@ -212,27 +212,27 @@ fn prepWorkSheet(worksheet: WorkSheet, header: Format) !void {
     // write the data table
     try writeData(worksheet);
     // Add the autofilter range
-    try worksheet.autoFilter(0, 0, 50, 3);
+    try worksheet.autoFilter(.{ .last_row = 50, .last_col = 3 });
 }
 
 fn writeWorksheetHeader(worksheet: WorkSheet, header: Format) !void {
     // Make the columns wider for clarity
-    try worksheet.setColumn(0, 3, 12, .default);
+    try worksheet.setColumn(.{ .last = 3 }, 12, .default, null);
 
     // Write the column headers
-    try worksheet.setRow(0, 20, header);
-    try worksheet.writeString(0, 0, "Region", .default);
-    try worksheet.writeString(0, 1, "Item", .default);
-    try worksheet.writeString(0, 2, "Volume", .default);
-    try worksheet.writeString(0, 3, "Month", .default);
+    try worksheet.setRow(0, 20, header, null);
+    try worksheet.writeString(.{ .col = 0 }, "Region", .default);
+    try worksheet.writeString(.{ .col = 1 }, "Item", .default);
+    try worksheet.writeString(.{ .col = 2 }, "Volume", .default);
+    try worksheet.writeString(.{ .col = 3 }, "Month", .default);
 }
 
 fn writeData(worksheet: WorkSheet) !void {
     for (data, 1..) |row, i| {
-        try worksheet.writeString(@intCast(i), 0, row.region, .default);
-        try worksheet.writeString(@intCast(i), 1, row.item, .default);
-        try worksheet.writeNumber(@intCast(i), 2, @floatFromInt(row.volume), .default);
-        try worksheet.writeString(@intCast(i), 3, row.month, .default);
+        try worksheet.writeString(.{ .row = @intCast(i), .col = 0 }, row.region, .default);
+        try worksheet.writeString(.{ .row = @intCast(i), .col = 1 }, row.item, .default);
+        try worksheet.writeNumber(.{ .row = @intCast(i), .col = 2 }, @floatFromInt(row.volume), .default);
+        try worksheet.writeString(.{ .row = @intCast(i), .col = 3 }, row.month, .default);
     }
 }
 

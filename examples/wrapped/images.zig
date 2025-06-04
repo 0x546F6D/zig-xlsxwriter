@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -14,48 +14,39 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Change some of the column widths for clarity.
-    const cols = xwz.cols("A:A");
-    try worksheet.setColumn(cols.first_col, cols.last_col, 30, .default);
+    try worksheet.setColumn(xwz.cols("A:A"), 30, .default, null);
 
     // Insert an image.
-    var cell = xwz.cell("A2");
-    try worksheet.writeString(cell.row, cell.col, "Insert an image in a cell:", .default);
+    try worksheet.writeString(xwz.cell("A2"), "Insert an image in a cell:", .default);
 
-    cell = xwz.cell("B2");
-    try worksheet.insertImage(cell.row, cell.col, asset_path);
+    try worksheet.insertImage(xwz.cell("B2"), asset_path, null);
 
     // Insert an image offset in the cell.
-    cell = xwz.cell("A12");
-    try worksheet.writeString(cell.row, cell.col, "Insert an offset image:", .default);
+    try worksheet.writeString(xwz.cell("A12"), "Insert an offset image:", .default);
 
     const options1 = xwz.ImageOptions{
         .x_offset = 15,
         .y_offset = 10,
     };
 
-    cell = xwz.cell("B12");
-    try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options1);
+    try worksheet.insertImage(xwz.cell("B12"), asset_path, options1);
 
     // Insert an image with scaling.
-    cell = xwz.cell("A22");
-    try worksheet.writeString(cell.row, cell.col, "Insert a scaled image:", .default);
+    try worksheet.writeString(xwz.cell("A22"), "Insert a scaled image:", .default);
 
     const options2 = xwz.ImageOptions{
         .x_scale = 0.5,
         .y_scale = 0.5,
     };
 
-    cell = xwz.cell("B22");
-    try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options2);
+    try worksheet.insertImage(xwz.cell("B22"), asset_path, options2);
 
     // Insert an image with a hyperlink.
-    cell = xwz.cell("A32");
-    try worksheet.writeString(cell.row, cell.col, "Insert an image with a hyperlink:", .default);
+    try worksheet.writeString(xwz.cell("A32"), "Insert an image with a hyperlink:", .default);
 
     const options3 = xwz.ImageOptions{ .url = "https://github.com/jmcnamara" };
 
-    cell = xwz.cell("B32");
-    try worksheet.insertImageOpt(cell.row, cell.col, asset_path, options3);
+    try worksheet.insertImage(xwz.cell("B32"), asset_path, options3);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

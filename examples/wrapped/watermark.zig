@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(asset_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -16,7 +16,7 @@ pub fn main() !void {
     // Set a worksheet header with the watermark image.
     const header_options = xwz.HeaderFooterOptions{ .image_center = asset_path };
 
-    try worksheet.setHeaderOpt("&C&[Picture]", header_options);
+    try worksheet.setHeader("&C&[Picture]", header_options);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

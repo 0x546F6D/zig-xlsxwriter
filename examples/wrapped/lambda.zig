@@ -5,21 +5,16 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
-
-    // Convert cell references to row/col format
-    const cell1 = xwz.cell("A1");
-    const cell2 = xwz.cell("A2");
 
     // Note that the formula name is prefixed with "_xlfn." and that the
     // lambda function parameters are prefixed with "_xlpm.". These prefixes
     // won't show up in Excel.
     try worksheet.writeDynamicFormula(
-        cell1.row,
-        cell1.col,
+        xwz.cell("A1"),
         "=_xlfn.LAMBDA(_xlpm.temp, (5/9) * (_xlpm.temp-32))(32)",
         .default,
     );
@@ -31,8 +26,7 @@ pub fn main() !void {
     );
 
     try worksheet.writeDynamicFormula(
-        cell2.row,
-        cell2.col,
+        xwz.cell("A2"),
         "=ToCelsius(212)",
         .default,
     );

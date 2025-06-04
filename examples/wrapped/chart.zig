@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -31,7 +31,7 @@ pub fn main() !void {
 
     // Insert the chart into the worksheet.
     const cell = xwz.cell("B7");
-    try worksheet.insertChart(cell.row, cell.col, chart);
+    try worksheet.insertChart(cell, chart, null);
 }
 
 fn write_worksheet_data(worksheet: xwz.WorkSheet) !void {
@@ -45,7 +45,7 @@ fn write_worksheet_data(worksheet: xwz.WorkSheet) !void {
 
     for (data, 0..) |set, row| {
         for (set, 0..) |cell, col| {
-            try worksheet.writeNumber(@intCast(row), @intCast(col), cell, .default);
+            try worksheet.writeNumber(.{ .row = @intCast(row), .col = @intCast(col) }, cell, .default);
         }
     }
 }

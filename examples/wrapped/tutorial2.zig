@@ -1,5 +1,5 @@
 const Expense = struct {
-    item: [*:0]const u8,
+    item: [:0]const u8,
     cost: f64,
 };
 
@@ -17,7 +17,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -30,18 +30,18 @@ pub fn main() !void {
     money.setNumFormat("$#,##0");
 
     // Write some data header.
-    try worksheet.writeString(0, 0, "Item", bold);
-    try worksheet.writeString(0, 1, "Cost", bold);
+    try worksheet.writeString(.{}, "Item", bold);
+    try worksheet.writeString(.{ .col = 1 }, "Cost", bold);
 
     // Iterate over the data and write it out element by element.
     for (expenses, 1..) |expense, row| {
-        try worksheet.writeString(@intCast(row), 0, expense.item, .default);
-        try worksheet.writeNumber(@intCast(row), 1, expense.cost, money);
+        try worksheet.writeString(.{ .row = @intCast(row), .col = 0 }, expense.item, .default);
+        try worksheet.writeNumber(.{ .row = @intCast(row), .col = 1 }, expense.cost, money);
     }
 
     // Write a total using a formula.
-    try worksheet.writeString(expenses.len + 1, 0, "Total", bold);
-    try worksheet.writeFormula(expenses.len + 1, 1, "=SUM(B2:B5)", money);
+    try worksheet.writeString(.{ .row = expenses.len + 1 }, "Total", bold);
+    try worksheet.writeFormula(.{ .row = expenses.len + 1, .col = 1 }, "=SUM(B2:B5)", money);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

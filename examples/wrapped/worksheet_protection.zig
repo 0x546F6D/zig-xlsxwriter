@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -20,16 +20,16 @@ pub fn main() !void {
     hidden.setHidden();
 
     // Widen the first column to make the text clearer
-    try worksheet.setColumn(0, 0, 40, .default);
+    try worksheet.setColumn(.{}, 40, .default, null);
 
     // Write a locked, unlocked and hidden cell
-    try worksheet.writeString(0, 0, "B1 is locked. It cannot be edited.", .default);
-    try worksheet.writeString(1, 0, "B2 is unlocked. It can be edited.", .default);
-    try worksheet.writeString(2, 0, "B3 is hidden. The formula isn't visible.", .default);
+    try worksheet.writeString(.{}, "B1 is locked. It cannot be edited.", .default);
+    try worksheet.writeString(.{ .row = 1 }, "B2 is unlocked. It can be edited.", .default);
+    try worksheet.writeString(.{ .row = 2 }, "B3 is hidden. The formula isn't visible.", .default);
 
-    try worksheet.writeFormula(0, 1, "=1+2", .default); // Locked by default
-    try worksheet.writeFormula(1, 1, "=1+2", unlocked);
-    try worksheet.writeFormula(2, 1, "=1+2", hidden);
+    try worksheet.writeFormula(.{ .col = 1 }, "=1+2", .default); // Locked by default
+    try worksheet.writeFormula(.{ .row = 1, .col = 1 }, "=1+2", unlocked);
+    try worksheet.writeFormula(.{ .row = 2, .col = 1 }, "=1+2", hidden);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

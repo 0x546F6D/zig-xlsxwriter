@@ -61,7 +61,7 @@ pub inline fn setTabColor(
 // pub extern fn chartsheet_protect(chartsheet: [*c]lxw_chartsheet, password: [*c]const u8, options: [*c]lxw_protection) void;
 pub inline fn protect(
     self: ChartSheet,
-    password: ?CString,
+    password: [:0]const u8,
     options: Protection,
 ) void {
     c.chartsheet_protect(
@@ -110,19 +110,19 @@ pub inline fn setMargins(
 }
 
 // pub extern fn chartsheet_set_header(chartsheet: [*c]lxw_chartsheet, string: [*c]const u8) lxw_error;
-pub inline fn setHeader(self: ChartSheet, string: ?CString) XlsxError!void {
+pub inline fn setHeader(self: ChartSheet, string: ?[:0]const u8) XlsxError!void {
     try check(c.chartsheet_set_header(self.chartsheet_c, string));
 }
 
 // pub extern fn chartsheet_set_footer(chartsheet: [*c]lxw_chartsheet, string: [*c]const u8) lxw_error;
-pub inline fn setFooter(self: ChartSheet, string: ?CString) XlsxError!void {
+pub inline fn setFooter(self: ChartSheet, string: ?[:0]const u8) XlsxError!void {
     try check(c.chartsheet_set_footer(self.chartsheet_c, string));
 }
 
 // pub extern fn chartsheet_set_header_opt(chartsheet: [*c]lxw_chartsheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
 pub inline fn setHeaderOpt(
     self: ChartSheet,
-    string: ?CString,
+    string: [:0]const u8,
     options: HeaderFooterOptions,
 ) XlsxError!void {
     try check(c.chartsheet_set_header_opt(
@@ -135,7 +135,7 @@ pub inline fn setHeaderOpt(
 // pub extern fn chartsheet_set_footer_opt(chartsheet: [*c]lxw_chartsheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
 pub inline fn setFooterOpt(
     self: ChartSheet,
-    string: ?CString,
+    string: [:0]const u8,
     options: HeaderFooterOptions,
 ) XlsxError!void {
     try check(c.chartsheet_set_footer_opt(
@@ -147,7 +147,6 @@ pub inline fn setFooterOpt(
 
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
-const CString = xlsxwriter.CString;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
 const Chart = @import("Chart.zig");

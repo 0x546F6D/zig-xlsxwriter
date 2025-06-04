@@ -5,11 +5,11 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
-    try worksheet.writeString(2, 1, "Это фраза на русском!", .default);
+    try worksheet.writeString(.{ .row = 2, .col = 1 }, "Это фраза на русском!", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

@@ -8,7 +8,7 @@ pub fn main() !void {
     defer alloc.free(xlsm_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsm_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsm_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -16,12 +16,12 @@ pub fn main() !void {
     const asset_path = try h.getAssetPath(alloc, "vbaProject.bin");
     defer alloc.free(asset_path);
 
-    try worksheet.setColumn(0, 0, 30, .default);
+    try worksheet.setColumn(.{}, 30, .default, null);
 
     // Add a macro file extracted from an Excel workbook
     try workbook.addVbaProject(asset_path);
 
-    try worksheet.writeString(2, 0, "Press the button to say hello.", .default);
+    try worksheet.writeString(.{ .row = 2 }, "Press the button to say hello.", .default);
 
     const options = xwz.ButtonOptions{
         .caption = "Press Me",
@@ -30,7 +30,7 @@ pub fn main() !void {
         .height = 30,
     };
 
-    try worksheet.insertButton(2, 1, options);
+    try worksheet.insertButton(.{ .row = 2, .col = 1 }, options);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

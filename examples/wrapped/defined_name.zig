@@ -7,7 +7,7 @@ pub fn main() !void {
     // Create a workbook and add a worksheet.
     // pass an 'Allocator' to initWorkBook() because we use the getWorkSheets() function
     // use 'var workbook' instead of 'const' because we use the getWorkSheets() function
-    var workbook = try xwz.initWorkBook(alloc, xlsx_path.ptr);
+    var workbook = try xwz.initWorkBook(alloc, xlsx_path, null);
     defer workbook.deinit() catch {};
     // We don't use the returned worksheets in this example and use a generic
     // loop below instead.
@@ -30,11 +30,11 @@ pub fn main() !void {
     const worksheets = if (worksheets_o) |worksheets| worksheets else return;
 
     for (worksheets) |worksheet| {
-        try worksheet.setColumn(0, 0, 45, .default);
-        try worksheet.writeString(0, 0, "This worksheet contains some defined names.", .default);
-        try worksheet.writeString(1, 0, "See Formulas -> Name Manager above.", .default);
-        try worksheet.writeString(2, 0, "Example formula in cell B3 ->", .default);
-        try worksheet.writeFormula(2, 1, "=Exchange_rate", .default);
+        try worksheet.setColumn(.{}, 45, .default, null);
+        try worksheet.writeString(.{}, "This worksheet contains some defined names.", .default);
+        try worksheet.writeString(.{ .row = 1 }, "See Formulas -> Name Manager above.", .default);
+        try worksheet.writeString(.{ .row = 2 }, "Example formula in cell B3 ->", .default);
+        try worksheet.writeFormula(.{ .row = 2, .col = 1 }, "=Exchange_rate", .default);
     }
 }
 

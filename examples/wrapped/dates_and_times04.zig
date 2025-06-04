@@ -10,7 +10,7 @@ var datetime: xwz.DateTime = .{
 
 // Examples date and time formats. In the output file compare how changing
 // the format strings changes the appearance of the date.
-const date_formats: []const ?CString = &.{
+const date_formats: []const [:0]const u8 = &.{
     "dd/mm/yy",
     "mm/dd/yy",
     "dd m yy",
@@ -34,7 +34,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -43,11 +43,11 @@ pub fn main() !void {
     bold.setBold();
 
     // Write the column headers.
-    try worksheet.writeString(0, 0, "Formatted date", bold);
-    try worksheet.writeString(0, 1, "Format", bold);
+    try worksheet.writeString(.{}, "Formatted date", bold);
+    try worksheet.writeString(.{ .col = 1 }, "Format", bold);
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Write the same date and time using each of the above formats.
     for (date_formats, 1..) |date_format, row| {
@@ -58,10 +58,10 @@ pub fn main() !void {
         format.setAlign(.left);
 
         // Write the datetime with each format.
-        try worksheet.writeDateTime(@intCast(row), 0, datetime, format);
+        try worksheet.writeDateTime(.{ .row = @intCast(row) }, datetime, format);
 
         // Also write the format string for comparison.
-        try worksheet.writeString(@intCast(row), 1, date_format, .default);
+        try worksheet.writeString(.{ .row = @intCast(row), .col = 1 }, date_format, .default);
     }
 }
 
@@ -69,4 +69,3 @@ var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
 const xwz = @import("xlsxwriter");
-const CString = xwz.CString;

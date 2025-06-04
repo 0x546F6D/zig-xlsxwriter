@@ -18,118 +18,164 @@ pub const RowColOptions = struct {
     }
 };
 
+// pub inline fn setRow(
+//     self: WorkSheet,
+//     row: u32,
+//     height: f64,
+//     format: Format,
+// ) XlsxError!void {
+//     try check(c.worksheet_set_row(
+//         self.worksheet_c,
+//         row,
+//         height,
+//         format.format_c,
+//     ));
+// }
+
 // pub extern fn worksheet_set_row(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format) lxw_error;
+// pub extern fn worksheet_set_row_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
 pub inline fn setRow(
     self: WorkSheet,
     row: u32,
     height: f64,
     format: Format,
+    options: ?RowColOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_row(
-        self.worksheet_c,
-        row,
-        height,
-        format.format_c,
-    ));
-}
-
-// pub extern fn worksheet_set_row_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
-pub inline fn setRowOpt(
-    self: WorkSheet,
-    row: u32,
-    height: f64,
-    format: Format,
-    options: RowColOptions,
-) XlsxError!void {
-    try check(c.worksheet_set_row_opt(
-        self.worksheet_c,
-        row,
-        height,
-        format.format_c,
-        @constCast(&options.toC()),
-    ));
+    try check(if (options) |rc_options|
+        c.worksheet_set_row_opt(
+            self.worksheet_c,
+            row,
+            height,
+            format.format_c,
+            @constCast(&rc_options.toC()),
+        )
+    else
+        c.worksheet_set_row(
+            self.worksheet_c,
+            row,
+            height,
+            format.format_c,
+        ));
 }
 
 // pub extern fn worksheet_set_row_pixels(worksheet: [*c]lxw_worksheet, row: lxw_row_t, pixels: u32, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_set_row_pixels_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, pixels: u32, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
-
-// pub extern fn worksheet_set_column(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, width: f64, format: [*c]lxw_format) lxw_error;
-pub inline fn setColumn(
+pub inline fn setRowPixels(
     self: WorkSheet,
-    first_col: u16,
-    last_col: u16,
-    width: f64,
+    row: u32,
+    pixels: u32,
     format: Format,
+    options: ?RowColOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_column(
-        self.worksheet_c,
-        first_col,
-        last_col,
-        width,
-        format.format_c,
-    ));
+    try check(if (options) |rc_options|
+        c.worksheet_set_row_pixels_opt(
+            self.worksheet_c,
+            row,
+            pixels,
+            format.format_c,
+            @constCast(&rc_options.toC()),
+        )
+    else
+        c.worksheet_set_row_pixels(
+            self.worksheet_c,
+            row,
+            pixels,
+            format.format_c,
+        ));
 }
 
+// pub extern fn worksheet_set_column(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, width: f64, format: [*c]lxw_format) lxw_error;
+// pub inline fn setColumn(
+//     self: WorkSheet,
+//     first_col: u16,
+//     last_col: u16,
+//     width: f64,
+//     format: Format,
+// ) XlsxError!void {
+//     try check(c.worksheet_set_column(
+//         self.worksheet_c,
+//         first_col,
+//         last_col,
+//         width,
+//         format.format_c,
+//     ));
+// }
+//
 // pub extern fn worksheet_set_column_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, width: f64, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
-pub inline fn setColumnOpt(
+pub inline fn setColumn(
     self: WorkSheet,
-    first_col: u16,
-    last_col: u16,
+    cols: Cols,
     width: f64,
     format: Format,
-    options: RowColOptions,
+    options: ?RowColOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_column_opt(
-        self.worksheet_c,
-        first_col,
-        last_col,
-        width,
-        format.format_c,
-        @constCast(&options.toC()),
-    ));
+    try check(if (options) |rc_options|
+        c.worksheet_set_column_opt(
+            self.worksheet_c,
+            cols.first,
+            cols.last,
+            width,
+            format.format_c,
+            @constCast(&rc_options.toC()),
+        )
+    else
+        c.worksheet_set_column(
+            self.worksheet_c,
+            cols.first,
+            cols.last,
+            width,
+            format.format_c,
+        ));
 }
 
 // pub extern fn worksheet_set_column_pixels(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format) lxw_error;
-pub inline fn setColumnPixels(
-    self: WorkSheet,
-    first_col: u16,
-    last_col: u16,
-    pixels: u32,
-    format: Format,
-) XlsxError!void {
-    try check(c.worksheet_set_column_pixels(
-        self.worksheet_c,
-        first_col,
-        last_col,
-        pixels,
-        format.format_c,
-    ));
-}
+// pub inline fn setColumnPixels(
+//     self: WorkSheet,
+//     first_col: u16,
+//     last_col: u16,
+//     pixels: u32,
+//     format: Format,
+// ) XlsxError!void {
+//     try check(c.worksheet_set_column_pixels(
+//         self.worksheet_c,
+//         first_col,
+//         last_col,
+//         pixels,
+//         format.format_c,
+//     ));
+// }
 
 // pub extern fn worksheet_set_column_pixels_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
-pub inline fn setColumnPixelsOpt(
+pub inline fn setColumnPixels(
     self: WorkSheet,
-    first_col: u16,
-    last_col: u16,
+    cols: Cols,
     pixels: u32,
     format: Format,
-    options: RowColOptions,
+    options: ?RowColOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_column_pixels_opt(
-        self.worksheet_c,
-        first_col,
-        last_col,
-        pixels,
-        format.format_c,
-        @constCast(&options.toC()),
-    ));
+    try check(if (options) |rc_options|
+        c.worksheet_set_column_pixels_opt(
+            self.worksheet_c,
+            cols.first,
+            cols.last,
+            pixels,
+            format.format_c,
+            @constCast(&rc_options.toC()),
+        )
+    else
+        c.worksheet_set_column_pixels(
+            self.worksheet_c,
+            cols.first,
+            cols.last,
+            pixels,
+            format.format_c,
+        ));
 }
 
 // pub extern fn worksheet_set_h_pagebreaks(worksheet: [*c]lxw_worksheet, breaks: [*c]lxw_row_t) lxw_error;
-pub const RowBreaks = [*:0]const u32;
 pub inline fn setHPageBreaks(
     self: WorkSheet,
-    breaks: RowBreaks,
+    breaks: [:0]const u32,
 ) XlsxError!void {
     try check(c.worksheet_set_h_pagebreaks(
         self.worksheet_c,
@@ -138,10 +184,9 @@ pub inline fn setHPageBreaks(
 }
 
 // pub extern fn worksheet_set_v_pagebreaks(worksheet: [*c]lxw_worksheet, breaks: [*c]lxw_col_t) lxw_error;
-pub const ColBreaks = [*:0]const u16;
 pub inline fn setVPageBreaks(
     self: WorkSheet,
-    breaks: ColBreaks,
+    breaks: [:0]const u16,
 ) XlsxError!void {
     try check(c.worksheet_set_v_pagebreaks(
         self.worksheet_c,
@@ -182,27 +227,23 @@ pub inline fn setDefaultRow(
 // pub extern fn worksheet_set_selection(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) lxw_error;
 pub inline fn setSelection(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    range: Range,
 ) XlsxError!void {
     try check(c.worksheet_set_selection(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
     ));
 }
 
 // pub extern fn worksheet_set_top_left_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn setTopLeftCell(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
 ) void {
-    c.worksheet_set_top_left_cell(self.worksheet_c, row, col);
+    c.worksheet_set_top_left_cell(self.worksheet_c, cell.row, cell.col);
 }
 
 // pub extern fn worksheet_set_landscape(worksheet: [*c]lxw_worksheet) void;
@@ -242,15 +283,12 @@ pub inline fn setPrintScale(self: WorkSheet, scale: u16) void {
 }
 
 // pub extern fn worksheet_set_vba_name(worksheet: [*c]lxw_worksheet, name: [*c]const u8) lxw_error;
-pub inline fn setVbaName(
-    self: WorkSheet,
-    name: ?CString,
-) XlsxError!void {
+pub inline fn setVbaName(self: WorkSheet, name: [:0]const u8) XlsxError!void {
     try check(c.worksheet_set_vba_name(self.worksheet_c, name));
 }
 
 // pub extern fn worksheet_set_comments_author(worksheet: [*c]lxw_worksheet, author: [*c]const u8) void;
-pub inline fn setCommentsAuthor(self: WorkSheet, author: ?CString) void {
+pub inline fn setCommentsAuthor(self: WorkSheet, author: [:0]const u8) void {
     c.worksheet_set_comments_author(self.worksheet_c, author);
 }
 
@@ -267,15 +305,14 @@ pub inline fn setErrorCell(self: WorkSheet, object_props: ObjectProperties) void
 // pub extern fn worksheet_write_number(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, number: f64, format: [*c]lxw_format) lxw_error;
 pub inline fn writeNumber(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     number: f64,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_number(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         number,
         format.format_c,
     ));
@@ -284,15 +321,14 @@ pub inline fn writeNumber(
 // pub extern fn worksheet_write_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, format: [*c]lxw_format) lxw_error;
 pub inline fn writeString(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    string: ?CString,
+    cell: Cell,
+    string: [:0]const u8,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_string(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         string,
         format.format_c,
     ));
@@ -301,95 +337,206 @@ pub inline fn writeString(
 // pub extern fn worksheet_write_formula(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
 pub inline fn writeFormula(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    formula: ?CString,
+    cell: Cell,
+    formula: [:0]const u8,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_formula(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         formula,
         format.format_c,
+    ));
+}
+
+// pub extern fn worksheet_write_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
+pub inline fn writeFormulaNum(
+    self: WorkSheet,
+    cell: Cell,
+    formula: [:0]const u8,
+    format: Format,
+    result: f64,
+) XlsxError!void {
+    try check(c.worksheet_write_formula_num(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        formula,
+        format.format_c,
+        result,
+    ));
+}
+
+// pub extern fn worksheet_write_formula_str(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: [*c]const u8) lxw_error;
+pub inline fn writeFormulaStr(
+    self: WorkSheet,
+    cell: Cell,
+    formula: [:0]const u8,
+    format: Format,
+    result: [:0]const u8,
+) XlsxError!void {
+    try check(c.worksheet_write_formula_str(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        formula,
+        format.format_c,
+        result,
     ));
 }
 
 // pub extern fn worksheet_write_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
 pub inline fn writeArrayFormula(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
-    formula: ?CString,
+    range: Range,
+    formula: [:0]const u8,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_array_formula(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
-        formula,
-        format.format_c,
-    ));
-}
-
-// pub extern fn worksheet_write_dynamic_formula(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
-pub inline fn writeDynamicFormula(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    formula: ?CString,
-    format: Format,
-) XlsxError!void {
-    try check(c.worksheet_write_dynamic_formula(
-        self.worksheet_c,
-        row,
-        col,
-        formula,
-        format.format_c,
-    ));
-}
-
-// pub extern fn worksheet_write_dynamic_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
-pub inline fn writeDynamicArrayFormula(
-    self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
-    formula: ?CString,
-    format: Format,
-) XlsxError!void {
-    try check(c.worksheet_write_dynamic_array_formula(
-        self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         formula,
         format.format_c,
     ));
 }
 
 // pub extern fn worksheet_write_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
-// pub extern fn worksheet_write_dynamic_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
+pub inline fn writeArrayFormulaNum(
+    self: WorkSheet,
+    range: Range,
+    formula: [:0]const u8,
+    format: Format,
+    result: f64,
+) XlsxError!void {
+    try check(c.worksheet_write_array_formula_num(
+        self.worksheet_c,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
+        formula,
+        format.format_c,
+        result,
+    ));
+}
+
+// pub extern fn worksheet_write_dynamic_formula(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn writeDynamicFormula(
+    self: WorkSheet,
+    cell: Cell,
+    formula: [:0]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_formula(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        formula,
+        format.format_c,
+    ));
+}
+
 // pub extern fn worksheet_write_dynamic_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
+pub inline fn writeDynamicFormulaNum(
+    self: WorkSheet,
+    cell: Cell,
+    formula: [:0]const u8,
+    format: Format,
+    result: f64,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_formula_num(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        formula,
+        format.format_c,
+        result,
+    ));
+}
+
+// pub extern fn worksheet_write_dynamic_array_formula(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format) lxw_error;
+pub inline fn writeDynamicArrayFormula(
+    self: WorkSheet,
+    range: Range,
+    formula: [:0]const u8,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_array_formula(
+        self.worksheet_c,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
+        formula,
+        format.format_c,
+    ));
+}
+
+// pub extern fn worksheet_write_dynamic_array_formula_num(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
+pub inline fn writeDynamicArrayFormulaNum(
+    self: WorkSheet,
+    range: Range,
+    formula: [:0]const u8,
+    format: Format,
+    result: f64,
+) XlsxError!void {
+    try check(c.worksheet_write_dynamic_array_formula_num(
+        self.worksheet_c,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
+        formula,
+        format.format_c,
+        result,
+    ));
+}
+
+// pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
+pub inline fn writeBoolean(
+    self: WorkSheet,
+    cell: Cell,
+    value: bool,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_boolean(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        @intFromBool(value),
+        format.format_c,
+    ));
+}
+
+// pub extern fn worksheet_write_blank(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, format: [*c]lxw_format) lxw_error;
+pub inline fn writeBlank(
+    self: WorkSheet,
+    cell: Cell,
+    format: Format,
+) XlsxError!void {
+    try check(c.worksheet_write_blank(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        format.format_c,
+    ));
+}
 
 // pub extern fn worksheet_write_datetime(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, datetime: [*c]lxw_datetime, format: [*c]lxw_format) lxw_error;
 pub inline fn writeDateTime(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     datetime: c.lxw_datetime,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_datetime(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         @constCast(&datetime),
         format.format_c,
     ));
@@ -398,66 +545,70 @@ pub inline fn writeDateTime(
 // pub extern fn worksheet_write_unixtime(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, unixtime: i64, format: [*c]lxw_format) lxw_error;
 pub inline fn writeUnixTime(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     unixtime: i64,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_unixtime(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         unixtime,
         format.format_c,
     ));
 }
 
+// pub inline fn writeUrl(
+//     self: WorkSheet,
+//     cell: Cell,
+//     url: [:0]const u8,
+//     format: Format,
+// ) XlsxError!void {
+//     try check(c.worksheet_write_url(
+//         self.worksheet_c,
+//         cell.row,
+//         cell.col,
+//         url,
+//         format.format_c,
+//     ));
+// }
+
+pub const UrlOptions = struct {
+    string: ?[*:0]const u8,
+    tooltip: ?[*:0]const u8,
+};
 // pub extern fn worksheet_write_url(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format) lxw_error;
+// pub extern fn worksheet_write_url_opt(worksheet: [*c]lxw_worksheet, row_num: lxw_row_t, col_num: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format, string: [*c]const u8, tooltip: [*c]const u8) lxw_error;
 pub inline fn writeUrl(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    url: ?CString,
+    cell: Cell,
+    url: [:0]const u8,
     format: Format,
+    options: ?UrlOptions,
 ) XlsxError!void {
-    try check(c.worksheet_write_url(
-        self.worksheet_c,
-        row,
-        col,
-        url,
-        format.format_c,
-    ));
-}
-
-// pub extern fn worksheet_write_url_opt(worksheet: [*c]lxw_worksheet, row_num: lxw_row_t, col_num: lxw_col_t, url: [*c]const u8, format: [*c]lxw_format, string: [*c]const u8, tooltip: [*c]const u8) lxw_error;
-pub inline fn writeUrlOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    url: ?CString,
-    format: Format,
-    string: ?CString,
-    tooltip: ?CString,
-) XlsxError!void {
-    try check(c.worksheet_write_url_opt(
-        self.worksheet_c,
-        row,
-        col,
-        url,
-        format.format_c,
-        string,
-        tooltip,
-    ));
+    try check(if (options) |url_options|
+        c.worksheet_write_url_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            url,
+            format.format_c,
+            url_options.string,
+            url_options.tooltip,
+        )
+    else
+        c.worksheet_write_url(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            url,
+            format.format_c,
+        ));
 }
 
 pub const RichStringTuple = struct {
     format: Format = .default,
-    string: ?CString,
-
-    pub const default = RichStringTuple{
-        .format = .default,
-        .string = null,
-    };
+    string: [:0]const u8,
 
     inline fn toC(self: RichStringTuple) c.lxw_rich_string_tuple {
         return c.lxw_rich_string_tuple{
@@ -470,8 +621,7 @@ pub const RichStringTuple = struct {
 // pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_tuple, format: [*c]lxw_format) lxw_error;
 pub inline fn writeRichString(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     rich_string: []const RichStringTuple,
     format: Format,
 ) !void {
@@ -492,8 +642,8 @@ pub inline fn writeRichString(
 
     try check(c.worksheet_write_rich_string(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         @ptrCast(rich_string_c),
         format.format_c,
     ));
@@ -501,42 +651,27 @@ pub inline fn writeRichString(
 
 pub const RichStringTupleNoAlloc = extern struct {
     format_c: ?*c.lxw_format = null,
-    string: [*c]const u8,
+    string: ?[*:0]const u8 = null,
 };
 
 pub const RichStringNoAllocArray: type = [:null]const ?*const RichStringTupleNoAlloc;
 // pub extern fn worksheet_write_rich_string(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, rich_string: [*c][*c]lxw_rich_string_t uple, format: [*c]lxw_format) lxw_error;
 pub inline fn writeRichStringNoAlloc(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     rich_string: RichStringNoAllocArray,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_write_rich_string(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         @ptrCast(@constCast(rich_string)),
         format.format_c,
     ));
 }
 
 // pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
-pub inline fn writeComment(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    string: ?CString,
-) XlsxError!void {
-    try check(c.worksheet_write_comment(
-        self.worksheet_c,
-        row,
-        col,
-        string,
-    ));
-}
-
 pub const CommentDisplayTypes = enum(u8) {
     default = c.LXW_COMMENT_DISPLAY_DEFAULT,
     hidden = c.LXW_COMMENT_DISPLAY_HIDDEN,
@@ -545,13 +680,13 @@ pub const CommentDisplayTypes = enum(u8) {
 
 pub const CommentOptions = extern struct {
     visible: CommentDisplayTypes = .default,
-    author: ?CString = null,
+    author: ?[*:0]const u8 = null,
     width: u16 = 0,
     height: u16 = 0,
     x_scale: f64 = 1,
     y_scale: f64 = 1,
     color: Format.DefinedColors = .default,
-    font_name: ?CString = null,
+    font_name: ?[*:0]const u8 = null,
     font_size: f64 = 8,
     font_family: u8 = 0,
     start_row: u32 = 0,
@@ -596,32 +731,48 @@ pub const CommentOptions = extern struct {
     }
 };
 
+// pub inline fn writeComment(
+//     self: WorkSheet,
+//     cell: Cell,
+//     string: [:0]const u8,
+// ) XlsxError!void {
+//     try check(c.worksheet_write_comment(
+//         self.worksheet_c,
+//         cell.row,
+//         cell.col,
+//         string,
+//     ));
+// }
+
+// pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
 // pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
-pub inline fn writeCommentOpt(
+pub inline fn writeComment(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    string: ?CString,
-    options: CommentOptions,
+    cell: Cell,
+    string: [:0]const u8,
+    options: ?CommentOptions,
 ) XlsxError!void {
-    try check(c.worksheet_write_comment_opt(
-        self.worksheet_c,
-        row,
-        col,
-        string,
-        @constCast(&options.toC()),
-    ));
+    try check(if (options) |c_options|
+        c.worksheet_write_comment_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            string,
+            @constCast(&c_options.toC()),
+        )
+    else
+        c.worksheet_write_comment(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            string,
+        ));
 }
 
 // pub extern fn worksheet_show_comments(worksheet: [*c]lxw_worksheet) void;
 pub inline fn showComments(self: WorkSheet) void {
     c.worksheet_show_comments(self.worksheet_c);
 }
-
-// pub extern fn worksheet_write_boolean(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, value: c_int, format: [*c]lxw_format) lxw_error;
-// pub extern fn worksheet_write_blank(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, format: [*c]lxw_format) lxw_error;
-// pub extern fn worksheet_write_formula_num(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: f64) lxw_error;
-// pub extern fn worksheet_write_formula_str(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, formula: [*c]const u8, format: [*c]lxw_format, result: [*c]const u8) lxw_error;
 
 // image functions
 pub const ImageOptions = struct {
@@ -630,10 +781,10 @@ pub const ImageOptions = struct {
     x_scale: f64 = 0,
     y_scale: f64 = 0,
     object_position: u8 = 0,
-    description: ?CString = null,
+    description: ?[*:0]const u8 = null,
     decorative: bool = false,
-    url: ?CString = null,
-    tip: ?CString = null,
+    url: ?[*:0]const u8 = null,
+    tip: ?[*:0]const u8 = null,
     cell_format: Format = .default,
 
     pub const default = ImageOptions{
@@ -665,146 +816,173 @@ pub const ImageOptions = struct {
     }
 };
 
+// pub inline fn insertImage(
+//     self: WorkSheet,
+//     cell: Cell,
+//     filename: [:0]const u8,
+// ) XlsxError!void {
+//     try check(c.worksheet_insert_image(
+//         self.worksheet_c,
+//         cell.row,
+//         cell.col,
+//         filename,
+//     ));
+// }
+
 // pub extern fn worksheet_insert_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
+// pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 pub inline fn insertImage(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    filename: ?CString,
+    cell: Cell,
+    filename: [:0]const u8,
+    options: ?ImageOptions,
 ) XlsxError!void {
-    try check(c.worksheet_insert_image(
-        self.worksheet_c,
-        row,
-        col,
-        filename,
-    ));
+    try check(if (options) |img_options|
+        c.worksheet_insert_image_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            filename,
+            @constCast(&img_options.toC()),
+        )
+    else
+        c.worksheet_insert_image(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            filename,
+        ));
 }
 
-// pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
-pub inline fn insertImageOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    filename: ?CString,
-    options: ImageOptions,
-) XlsxError!void {
-    try check(c.worksheet_insert_image_opt(
-        self.worksheet_c,
-        row,
-        col,
-        filename,
-        @constCast(&options.toC()),
-    ));
-}
+// pub inline fn insertImageBuffer(
+//     self: WorkSheet,
+//     cell: Cell,
+//     image_buffer: [:0]const u8,
+// ) XlsxError!void {
+//     try check(c.worksheet_insert_image_buffer(
+//         self.worksheet_c,
+//         cell.row,
+//         cell.col,
+//         image_buffer,
+//         image_buffer.len,
+//     ));
+// }
 
 // pub extern fn worksheet_insert_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+// pub extern fn worksheet_insert_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
 pub inline fn insertImageBuffer(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    image_buffer: ?CString,
-    image_size: usize,
+    cell: Cell,
+    image_buffer: [:0]const u8,
+    // image_size: usize,
+    options: ?ImageOptions,
 ) XlsxError!void {
-    try check(c.worksheet_insert_image_buffer(
-        self.worksheet_c,
-        row,
-        col,
-        image_buffer,
-        image_size,
-    ));
+    try check(if (options) |img_options|
+        c.worksheet_insert_image_buffer_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            image_buffer,
+            image_buffer.len,
+            @constCast(&img_options.toC()),
+        )
+    else
+        c.worksheet_insert_image_buffer(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            image_buffer,
+            image_buffer.len,
+        ));
 }
 
-// pub extern fn worksheet_insert_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
-pub inline fn insertImageBufferOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    image_buffer: ?CString,
-    image_size: usize,
-    options: ImageOptions,
-) XlsxError!void {
-    try check(c.worksheet_insert_image_buffer_opt(
-        self.worksheet_c,
-        row,
-        col,
-        image_buffer,
-        image_size,
-        @constCast(&options.toC()),
-    ));
-}
+// pub inline fn embedImage(
+//     self: WorkSheet,
+//     row: u32,
+//     col: u16,
+//     filename: ?[:0]const u8,
+// ) XlsxError!void {
+//     try check(c.worksheet_embed_image(
+//         self.worksheet_c,
+//         row,
+//         col,
+//         filename,
+//     ));
+// }
 
 // pub extern fn worksheet_embed_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
+// pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 pub inline fn embedImage(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    filename: ?CString,
+    cell: Cell,
+    filename: [:0]const u8,
+    options: ?ImageOptions,
 ) XlsxError!void {
-    try check(c.worksheet_embed_image(
-        self.worksheet_c,
-        row,
-        col,
-        filename,
-    ));
+    try check(if (options) |img_options|
+        c.worksheet_embed_image_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            filename,
+            @constCast(&img_options.toC()),
+        )
+    else
+        c.worksheet_embed_image(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            filename,
+        ));
 }
 
-// pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
-pub inline fn embedImageOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    filename: ?CString,
-    options: ImageOptions,
-) XlsxError!void {
-    try check(c.worksheet_embed_image_opt(
-        self.worksheet_c,
-        row,
-        col,
-        filename,
-        @constCast(&options.toC()),
-    ));
-}
+// pub inline fn embedImageBuffer(
+//     self: WorkSheet,
+//     row: u32,
+//     col: u16,
+//     image_buffer: ?[:0]const u8,
+//     // image_size: usize,
+// ) XlsxError!void {
+//     try check(c.worksheet_embed_image_buffer(
+//         self.worksheet_c,
+//         row,
+//         col,
+//         image_buffer,
+//         // image_size,
+//         image_buffer.?.len,
+//     ));
+// }
 
 // pub extern fn worksheet_embed_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
+// pub extern fn worksheet_embed_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
 pub inline fn embedImageBuffer(
     self: WorkSheet,
-    row: u32,
-    col: u16,
-    image_buffer: ?CString,
-    image_size: usize,
+    cell: Cell,
+    image_buffer: [:0]const u8,
+    options: ?ImageOptions,
 ) XlsxError!void {
-    try check(c.worksheet_embed_image_buffer(
-        self.worksheet_c,
-        row,
-        col,
-        image_buffer,
-        image_size,
-    ));
-}
-
-// pub extern fn worksheet_embed_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
-pub inline fn embedImageBufferOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    image_buffer: ?CString,
-    image_size: usize,
-    options: ImageOptions,
-) XlsxError!void {
-    try check(c.worksheet_embed_image_buffer_opt(
-        self.worksheet_c,
-        row,
-        col,
-        image_buffer,
-        image_size,
-        @constCast(&options.toC()),
-    ));
+    try check(if (options) |img_options|
+        c.worksheet_embed_image_buffer_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            image_buffer,
+            image_buffer.len,
+            @constCast(&img_options.toC()),
+        )
+    else
+        c.worksheet_embed_image_buffer(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            image_buffer,
+            image_buffer.len,
+        ));
 }
 
 // pub extern fn worksheet_set_background(worksheet: [*c]lxw_worksheet, filename: [*c]const u8) lxw_error;
 pub inline fn setBackGround(
     self: WorkSheet,
-    filename: ?CString,
+    filename: [:0]const u8,
 ) XlsxError!void {
     try check(c.worksheet_set_background(
         self.worksheet_c,
@@ -815,13 +993,12 @@ pub inline fn setBackGround(
 // pub extern fn worksheet_set_background_buffer(worksheet: [*c]lxw_worksheet, image_buffer: [*c]const u8, image_size: usize) lxw_error;
 pub inline fn setBackGroundBuffer(
     self: WorkSheet,
-    image_buffer: ?CString,
-    image_size: usize,
+    image_buffer: [:0]const u8,
 ) XlsxError!void {
     try check(c.worksheet_set_background_buffer(
         self.worksheet_c,
         image_buffer,
-        image_size,
+        image_buffer.len,
     ));
 }
 
@@ -843,36 +1020,43 @@ pub const ObjectPosition = enum(u8) {
     move_and_size_after = c.LXW_OBJECT_MOVE_AND_SIZE_AFTER,
 };
 
+// pub inline fn insertChart(
+//     self: WorkSheet,
+//     row: u32,
+//     col: u16,
+//     chart: Chart,
+// ) XlsxError!void {
+//     try check(c.worksheet_insert_chart(
+//         self.worksheet_c,
+//         row,
+//         col,
+//         chart.chart_c,
+//     ));
+// }
+
 // pub extern fn worksheet_insert_chart(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart) lxw_error;
+// pub extern fn worksheet_insert_chart_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart, user_options: [*c]lxw_chart_options) lxw_error;
 pub inline fn insertChart(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     chart: Chart,
+    user_options: ?ChartOptions,
 ) XlsxError!void {
-    try check(c.worksheet_insert_chart(
-        self.worksheet_c,
-        row,
-        col,
-        chart.chart_c,
-    ));
-}
-
-// pub extern fn worksheet_insert_chart_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart, user_options: [*c]lxw_chart_options) lxw_error;
-pub inline fn insertChartOpt(
-    self: WorkSheet,
-    row: u32,
-    col: u16,
-    chart: Chart,
-    user_options: ChartOptions,
-) XlsxError!void {
-    try check(c.worksheet_insert_chart_opt(
-        self.worksheet_c,
-        row,
-        col,
-        chart.chart_c,
-        @constCast(&user_options.toC()),
-    ));
+    try check(if (user_options) |chart_options|
+        c.worksheet_insert_chart_opt(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            chart.chart_c,
+            @constCast(&chart_options.toC()),
+        )
+    else
+        c.worksheet_insert_chart(
+            self.worksheet_c,
+            cell.row,
+            cell.col,
+            chart.chart_c,
+        ));
 }
 
 // filter functions
@@ -885,31 +1069,27 @@ pub const filterList = filter.filterList;
 // pub extern fn worksheet_freeze_panes(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn freezePanes(
     self: WorkSheet,
-    top_row: u32,
-    left_col: u16,
+    cell: Cell,
 ) void {
     c.worksheet_freeze_panes(
         self.worksheet_c,
-        top_row,
-        left_col,
+        cell.row,
+        cell.col,
     );
 }
 
 // pub extern fn worksheet_freeze_panes_opt(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, top_row: lxw_row_t, left_col: lxw_col_t, @"type": u8) void;
 pub inline fn freezePanesOpt(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    top_row: u32,
-    left_col: u16,
+    range: Range,
     @"type": bool,
 ) void {
     c.worksheet_freeze_panes_opt(
         self.worksheet_c,
-        first_row,
-        first_col,
-        top_row,
-        left_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         @intFromBool(@"type"),
     );
 }
@@ -932,15 +1112,14 @@ pub inline fn splitPanesOpt(
     self: WorkSheet,
     vertical: f64,
     horizontal: f64,
-    top_row: u32,
-    left_col: u16,
+    cell: Cell,
 ) void {
     c.worksheet_split_panes_opt(
         self.worksheet_c,
         vertical,
         horizontal,
-        top_row,
-        left_col,
+        cell.row,
+        cell.col,
     );
 }
 
@@ -948,19 +1127,16 @@ pub inline fn splitPanesOpt(
 // pub extern fn worksheet_merge_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, string: [*c]const u8, format: [*c]lxw_format) lxw_error;
 pub inline fn mergeRange(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
-    string: ?CString,
+    range: Range,
+    string: ?[*:0]const u8,
     format: Format,
 ) XlsxError!void {
     try check(c.worksheet_merge_range(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         string,
         format.format_c,
     ));
@@ -1015,19 +1191,19 @@ pub const DataValidation = struct {
     error_type: ValidationErrorTypes = .stop,
     dropdown: ValidationBoolean = .default,
     value_number: f64 = 0,
-    value_formula: ?CString = null,
+    value_formula: ?[*:0]const u8 = null,
     value_list: CStringArray = &.{},
     value_datetime: c.lxw_datetime = .{},
     minimum_number: f64 = 0,
-    minimum_formula: ?CString = null,
+    minimum_formula: ?[*:0]const u8 = null,
     minimum_datetime: c.lxw_datetime = .{},
     maximum_number: f64 = 0,
-    maximum_formula: ?CString = null,
+    maximum_formula: ?[*:0]const u8 = null,
     maximum_datetime: c.lxw_datetime = .{},
-    input_title: ?CString = null,
-    input_message: ?CString = null,
-    error_title: ?CString = null,
-    error_message: ?CString = null,
+    input_title: ?[*:0]const u8 = null,
+    input_message: ?[*:0]const u8 = null,
+    error_title: ?[*:0]const u8 = null,
+    error_message: ?[*:0]const u8 = null,
 
     pub const default = DataValidation{
         .validate = .none,
@@ -1083,14 +1259,29 @@ pub const DataValidation = struct {
 // pub extern fn worksheet_data_validation_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 pub inline fn dataValidationCell(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     validation: DataValidation,
 ) XlsxError!void {
     try check(c.worksheet_data_validation_cell(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
+        @constCast(&validation.toC()),
+    ));
+}
+
+// pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
+pub inline fn dataValidationRange(
+    self: WorkSheet,
+    range: Range,
+    validation: DataValidation,
+) XlsxError!void {
+    try check(c.worksheet_data_validation_range(
+        self.worksheet_c,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         @constCast(&validation.toC()),
     ));
 }
@@ -1202,18 +1393,18 @@ pub const ConditionalFormat = struct {
     type: ConditionalFormatTypes = .none,
     criteria: ConditionalCriteria = .none,
     value: f64 = 0,
-    value_string: ?CString = null,
+    value_string: ?[*:0]const u8 = null,
     format: Format = .default,
     min_value: f64 = 0,
-    min_value_string: ?CString = null,
+    min_value_string: ?[*:0]const u8 = null,
     min_rule_type: ConditionalFormatRuleTypes = .none,
     min_color: Format.DefinedColors = .default,
     mid_value: f64 = 0,
-    mid_value_string: ?CString = null,
+    mid_value_string: ?[*:0]const u8 = null,
     mid_rule_type: ConditionalFormatRuleTypes = .none,
     mid_color: Format.DefinedColors = .default,
     max_value: f64 = 0,
-    max_value_string: ?CString = null,
+    max_value_string: ?[*:0]const u8 = null,
     max_rule_type: ConditionalFormatRuleTypes = .none,
     max_color: Format.DefinedColors = .default,
     bar_color: Format.DefinedColors = .default,
@@ -1232,7 +1423,7 @@ pub const ConditionalFormat = struct {
     icon_style: ConditionalIconTypes = .icons_3_arrows_colored,
     reverse_icons: bool = false,
     icons_only: bool = false,
-    multi_range: ?CString = null,
+    multi_range: ?[*:0]const u8 = null,
     stop_if_true: bool = false,
 
     pub const default: ConditionalFormat = .{
@@ -1317,23 +1508,32 @@ pub const ConditionalFormat = struct {
 // pub extern fn worksheet_conditional_format_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
 pub inline fn conditionalFormatRange(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    range: Range,
     conditional_format: ConditionalFormat,
 ) XlsxError!void {
     try check(c.worksheet_conditional_format_range(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         @constCast(&conditional_format.toC()),
     ));
 }
 
 // pub extern fn worksheet_conditional_format_cell(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, conditional_format: [*c]lxw_conditional_format) lxw_error;
+pub inline fn conditionalFormatCell(
+    self: WorkSheet,
+    cell: Cell,
+    conditional_format: ConditionalFormat,
+) XlsxError!void {
+    try check(c.worksheet_conditional_format_cell(
+        self.worksheet_c,
+        cell.row,
+        cell.col,
+        @constCast(&conditional_format.toC()),
+    ));
+}
 
 pub const TableStyleType = enum(u8) {
     default = c.LXW_TABLE_STYLE_TYPE_DEFAULT,
@@ -1354,9 +1554,9 @@ pub const TableTotalFunctions = enum(u8) {
 };
 
 pub const TableColumn = struct {
-    header: ?CString = null,
-    formula: ?CString = null,
-    total_string: ?CString = null,
+    header: ?[*:0]const u8 = null,
+    formula: ?[*:0]const u8 = null,
+    total_string: ?[*:0]const u8 = null,
     total_function: TableTotalFunctions = .none,
     header_format: Format = .default,
     format: Format = .default,
@@ -1386,7 +1586,7 @@ pub const TableColumn = struct {
 };
 
 pub const TableOptions = struct {
-    name: ?CString = null,
+    name: ?[*:0]const u8 = null,
     no_header_row: bool = false,
     no_autofilter: bool = false,
     no_banded_rows: bool = false,
@@ -1432,10 +1632,7 @@ pub const TableOptions = struct {
 // pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, options: [*c]lxw_table_options) lxw_error;
 pub inline fn addTable(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    range: Range,
     options: TableOptions,
 ) !void {
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
@@ -1456,18 +1653,18 @@ pub inline fn addTable(
 
     try check(c.worksheet_add_table(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         @constCast(&options.toC(table_column_c)),
     ));
 }
 
 pub const TableColumnNoAlloc = extern struct {
-    header: ?CString = null,
-    formula: ?CString = null,
-    total_string: ?CString = null,
+    header: ?[*:0]const u8 = null,
+    formula: ?[*:0]const u8 = null,
+    total_string: ?[*:0]const u8 = null,
     total_function: TableTotalFunctions = .none,
     header_format_c: ?*c.lxw_format = null,
     format_c: ?*c.lxw_format = null,
@@ -1486,7 +1683,7 @@ pub const TableColumnNoAlloc = extern struct {
 pub const TableColumnNoAllocArray = [:null]const ?*const TableColumnNoAlloc;
 
 pub const TableOptionsNoAlloc = struct {
-    name: ?CString = null,
+    name: ?[*:0]const u8 = null,
     no_header_row: Bool = Bool.false,
     no_autofilter: Bool = Bool.false,
     no_banded_rows: Bool = Bool.false,
@@ -1532,58 +1729,67 @@ pub const TableOptionsNoAlloc = struct {
 // pub extern fn worksheet_add_table(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw _col_t, options: [*c]lxw_table_options) lxw_error;
 pub inline fn addTableNoAlloc(
     self: WorkSheet,
-    first_row: u32,
-    first_col: u16,
-    last_row: u32,
-    last_col: u16,
+    range: Range,
     options: TableOptionsNoAlloc,
 ) XlsxError!void {
     try check(c.worksheet_add_table(
         self.worksheet_c,
-        first_row,
-        first_col,
-        last_row,
-        last_col,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
         @constCast(&options.toC()),
     ));
 }
 
 pub const HeaderFooterOptions = c.lxw_header_footer_options;
 
+// pub inline fn setHeader(self: WorkSheet, string: [:0]const u8) XlsxError!void {
+//     try check(c.worksheet_set_header(self.worksheet_c, string));
+// }
+//
 // pub extern fn worksheet_set_header(worksheet: [*c]lxw_worksheet, string: [*c]const u8) lxw_error;
-pub inline fn setHeader(self: WorkSheet, string: ?CString) XlsxError!void {
-    try check(c.worksheet_set_header(self.worksheet_c, string));
-}
-
-// pub extern fn worksheet_set_footer(worksheet: [*c]lxw_worksheet, string: [*c]const u8) lxw_error;
-pub inline fn setFooter(self: WorkSheet, string: ?CString) XlsxError!void {
-    try check(c.worksheet_set_footer(self.worksheet_c, string));
-}
-
 // pub extern fn worksheet_set_header_opt(worksheet: [*c]lxw_worksheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
-pub inline fn setHeaderOpt(
+pub inline fn setHeader(
     self: WorkSheet,
-    string: ?CString,
-    options: HeaderFooterOptions,
+    string: [:0]const u8,
+    options: ?HeaderFooterOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_header_opt(
-        self.worksheet_c,
-        string,
-        @constCast(&options),
-    ));
+    try check(if (options) |hf_options|
+        c.worksheet_set_header_opt(
+            self.worksheet_c,
+            string,
+            @constCast(&hf_options),
+        )
+    else
+        c.worksheet_set_header(
+            self.worksheet_c,
+            string,
+        ));
 }
 
+// pub inline fn setFooter(self: WorkSheet, string: [:0]const u8) XlsxError!void {
+//     try check(c.worksheet_set_footer(self.worksheet_c, string));
+// }
+//
+// pub extern fn worksheet_set_footer(worksheet: [*c]lxw_worksheet, string: [*c]const u8) lxw_error;
 // pub extern fn worksheet_set_footer_opt(worksheet: [*c]lxw_worksheet, string: [*c]const u8, options: [*c]lxw_header_footer_options) lxw_error;
-pub inline fn setFooterOpt(
+pub inline fn setFooter(
     self: WorkSheet,
-    string: ?CString,
-    options: HeaderFooterOptions,
+    string: [:0]const u8,
+    options: ?HeaderFooterOptions,
 ) XlsxError!void {
-    try check(c.worksheet_set_footer_opt(
-        self.worksheet_c,
-        string,
-        @constCast(&options),
-    ));
+    try check(if (options) |hf_options|
+        c.worksheet_set_footer_opt(
+            self.worksheet_c,
+            string,
+            @constCast(&hf_options),
+        )
+    else
+        c.worksheet_set_footer(
+            self.worksheet_c,
+            string,
+        ));
 }
 
 // pub extern fn worksheet_hide(worksheet: [*c]lxw_worksheet) void;
@@ -1656,7 +1862,7 @@ pub const Protection = extern struct {
 // pub extern fn worksheet_protect(worksheet: [*c]lxw_worksheet, password: [*c]const u8, options: [*c]lxw_protection) void;
 pub inline fn protect(
     self: WorkSheet,
-    password: ?CString,
+    password: ?[*:0]const u8,
     options: Protection,
 ) void {
     c.worksheet_protect(
@@ -1667,9 +1873,9 @@ pub inline fn protect(
 }
 
 pub const ButtonOptions = extern struct {
-    caption: ?CString = null,
-    macro: ?CString = null,
-    description: ?CString = null,
+    caption: ?[*:0]const u8 = null,
+    macro: ?[*:0]const u8 = null,
+    description: ?[*:0]const u8 = null,
     width: u16 = 0,
     height: u16 = 0,
     x_scale: f64 = 0,
@@ -1693,14 +1899,13 @@ pub const ButtonOptions = extern struct {
 // pub extern fn worksheet_insert_button(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, options: [*c]lxw_button_options) lxw_error;
 pub inline fn insertButton(
     self: WorkSheet,
-    row: u32,
-    col: u16,
+    cell: Cell,
     options: ButtonOptions,
 ) XlsxError!void {
     try check(c.worksheet_insert_button(
         self.worksheet_c,
-        row,
-        col,
+        cell.row,
+        cell.col,
         @ptrCast(@constCast(&options)),
     ));
 }
@@ -1722,7 +1927,7 @@ pub const IgnoreErrors = enum(u8) {
 pub inline fn ignoreErrors(
     self: WorkSheet,
     @"type": IgnoreErrors,
-    range: ?CString,
+    range: [:0]const u8,
 ) XlsxError!void {
     try check(c.worksheet_ignore_errors(
         self.worksheet_c,
@@ -1731,32 +1936,146 @@ pub inline fn ignoreErrors(
     ));
 }
 
-// pub extern fn worksheet_data_validation_range(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t, validation: [*c]lxw_data_validation) lxw_error;
 // pub extern fn worksheet_activate(worksheet: [*c]lxw_worksheet) void;
+pub inline fn activate(self: WorkSheet) XlsxError!void {
+    c.worksheet_activate(self.worksheet_c);
+}
+
 // pub extern fn worksheet_select(worksheet: [*c]lxw_worksheet) void;
+pub inline fn select(self: WorkSheet) XlsxError!void {
+    c.worksheet_select(self.worksheet_c);
+}
+
 // pub extern fn worksheet_set_first_sheet(worksheet: [*c]lxw_worksheet) void;
+pub inline fn setFirstSheet(self: WorkSheet) XlsxError!void {
+    c.worksheet_set_first_sheet(self.worksheet_c);
+}
+
 // pub extern fn worksheet_print_across(worksheet: [*c]lxw_worksheet) void;
+pub inline fn printAcross(self: WorkSheet) XlsxError!void {
+    c.worksheet_print_across(self.worksheet_c);
+}
+
+pub const GridLines = enum(u8) {
+    hide_all = c.LXW_HIDE_ALL_GRIDLINES,
+    show_screen = c.LXW_SHOW_SCREEN_GRIDLINES,
+    show_print = c.LXW_SHOW_PRINT_GRIDLINES,
+    show_all = c.LXW_SHOW_ALL_GRIDLINES,
+};
 // pub extern fn worksheet_gridlines(worksheet: [*c]lxw_worksheet, option: u8) void;
+pub inline fn gridlines(self: WorkSheet, option: GridLines) XlsxError!void {
+    c.worksheet_gridlines(self.worksheet_c, @intFromEnum(option));
+}
+
 // pub extern fn worksheet_center_horizontally(worksheet: [*c]lxw_worksheet) void;
+pub inline fn centerHorizontally(self: WorkSheet) XlsxError!void {
+    c.worksheet_center_horizontally(self.worksheet_c);
+}
+
 // pub extern fn worksheet_center_vertically(worksheet: [*c]lxw_worksheet) void;
+pub inline fn centerVertically(self: WorkSheet) XlsxError!void {
+    c.worksheet_center_vertically(self.worksheet_c);
+}
+
 // pub extern fn worksheet_print_row_col_headers(worksheet: [*c]lxw_worksheet) void;
+pub inline fn printRowColHeaders(self: WorkSheet) XlsxError!void {
+    c.worksheet_print_row_col_headers(self.worksheet_c);
+}
+
 // pub extern fn worksheet_repeat_rows(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, last_row: lxw_row_t) lxw_error;
+pub inline fn repeatRows(
+    self: WorkSheet,
+    rows: Rows,
+) XlsxError!void {
+    try check(c.worksheet_repeat_rows(
+        self.worksheet_c,
+        rows.first,
+        rows.last,
+    ));
+}
+
 // pub extern fn worksheet_repeat_columns(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t) lxw_error;
+pub inline fn repeatCols(
+    self: WorkSheet,
+    cols: Cols,
+) XlsxError!void {
+    try check(c.worksheet_repeat_columns(
+        self.worksheet_c,
+        cols.first,
+        cols.last,
+    ));
+}
+
 // pub extern fn worksheet_print_area(worksheet: [*c]lxw_worksheet, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) lxw_error;
+pub inline fn printArea(
+    self: WorkSheet,
+    range: Range,
+) XlsxError!void {
+    try check(c.worksheet_print_area(
+        self.worksheet_c,
+        range.first_row,
+        range.first_col,
+        range.last_row,
+        range.last_col,
+    ));
+}
+
 // pub extern fn worksheet_fit_to_pages(worksheet: [*c]lxw_worksheet, width: u16, height: u16) void;
+pub inline fn fitToPages(
+    self: WorkSheet,
+    width: u16,
+    height: u16,
+) XlsxError!void {
+    try check(c.worksheet_fit_to_pages(
+        self.worksheet_c,
+        width,
+        height,
+    ));
+}
 // pub extern fn worksheet_print_black_and_white(worksheet: [*c]lxw_worksheet) void;
+pub inline fn printBlackAndWhite(self: WorkSheet) XlsxError!void {
+    c.worksheet_print_black_and_white(self.worksheet_c);
+}
+
 // pub extern fn worksheet_right_to_left(worksheet: [*c]lxw_worksheet) void;
+pub inline fn rightToLeft(self: WorkSheet) XlsxError!void {
+    c.worksheet_right_to_left(self.worksheet_c);
+}
+
 // pub extern fn worksheet_hide_zero(worksheet: [*c]lxw_worksheet) void;
+pub inline fn hideZero(self: WorkSheet) XlsxError!void {
+    c.worksheet_hide_zero(self.worksheet_c);
+}
+
 // pub extern fn worksheet_outline_settings(worksheet: [*c]lxw_worksheet, visible: u8, symbols_below: u8, symbols_right: u8, auto_style: u8) void;
+pub inline fn outlineSettings(
+    self: WorkSheet,
+    visible: bool,
+    symbols_below: bool,
+    symbols_right: bool,
+    auto_style: bool,
+) XlsxError!void {
+    try check(c.worksheet_outline_settings(
+        self.worksheet_c,
+        @intFromBool(visible),
+        @intFromBool(symbols_below),
+        @intFromBool(symbols_right),
+        @intFromBool(auto_style),
+    ));
+}
 
 const std = @import("std");
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
-const CString = xlsxwriter.CString;
 const CStringArray = xlsxwriter.CStringArray;
 const Bool = xlsxwriter.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
 const check = @import("errors.zig").checkResult;
+const utility = @import("utility.zig");
+const Cell = utility.Cell;
+const Rows = utility.Rows;
+const Cols = utility.Cols;
+const Range = utility.Range;
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
 const ChartOptions = Chart.Options;

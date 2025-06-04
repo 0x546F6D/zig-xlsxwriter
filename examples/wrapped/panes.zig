@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet("Panes 1");
@@ -30,69 +30,69 @@ pub fn main() !void {
 
     // Example 1. Freeze pane on the top row.
     worksheet = worksheet1;
-    worksheet.freezePanes(1, 0);
+    worksheet.freezePanes(.{ .row = 1 });
 
     // Some sheet formatting.
-    try worksheet.setColumn(0, 8, 16, .default);
-    try worksheet.setRow(0, 20, .default);
-    try worksheet.setSelection(4, 3, 4, 3);
+    try worksheet.setColumn(.{ .last = 8 }, 16, .default, null);
+    try worksheet.setRow(0, 20, .default, null);
+    try worksheet.setSelection(.{ .first_row = 4, .first_col = 3, .last_row = 4, .last_col = 3 });
 
     // Some worksheet text to demonstrate scrolling.
     col = 0;
     while (col < 9) : (col += 1) {
-        try worksheet.writeString(0, col, "Scroll down", header);
+        try worksheet.writeString(.{ .col = col }, "Scroll down", header);
     }
 
     row = 1;
     while (row < 100) : (row += 1) {
         col = 0;
         while (col < 9) : (col += 1) {
-            try worksheet.writeNumber(row, col, @floatFromInt(row + 1), center);
+            try worksheet.writeNumber(.{ .row = row, .col = col }, @floatFromInt(row + 1), center);
         }
     }
 
     // Example 2. Freeze pane on the left column.
     worksheet = worksheet2;
-    worksheet.freezePanes(0, 1);
+    worksheet.freezePanes(.{ .col = 1 });
 
     // Some sheet formatting.
-    try worksheet.setColumn(0, 0, 16, .default);
-    try worksheet.setSelection(4, 3, 4, 3);
+    try worksheet.setColumn(.{}, 16, .default, null);
+    try worksheet.setSelection(.{ .first_row = 4, .first_col = 3, .last_row = 4, .last_col = 3 });
 
     // Some worksheet text to demonstrate scrolling.
     row = 0;
     while (row < 50) : (row += 1) {
-        try worksheet.writeString(row, 0, "Scroll right", header);
+        try worksheet.writeString(.{ .row = row }, "Scroll right", header);
 
         col = 1;
         while (col < 26) : (col += 1) {
-            try worksheet.writeNumber(row, col, @floatFromInt(col), center);
+            try worksheet.writeNumber(.{ .row = row, .col = col }, @floatFromInt(col), center);
         }
     }
 
     // Example 3. Freeze pane on the top row and left column.
     worksheet = worksheet3;
-    worksheet.freezePanes(1, 1);
+    worksheet.freezePanes(.{ .row = 1, .col = 1 });
 
     // Some sheet formatting.
-    try worksheet.setColumn(0, 25, 16, .default);
-    try worksheet.setRow(0, 20, .default);
-    try worksheet.writeString(0, 0, "", header);
-    try worksheet.setSelection(4, 3, 4, 3);
+    try worksheet.setColumn(.{ .last = 25 }, 16, .default, null);
+    try worksheet.setRow(0, 20, .default, null);
+    try worksheet.writeString(.{}, "", header);
+    try worksheet.setSelection(.{ .first_row = 4, .first_col = 3, .last_row = 4, .last_col = 3 });
 
     // Some worksheet text to demonstrate scrolling.
     col = 1;
     while (col < 26) : (col += 1) {
-        try worksheet.writeString(0, col, "Scroll down", header);
+        try worksheet.writeString(.{ .col = col }, "Scroll down", header);
     }
 
     row = 1;
     while (row < 50) : (row += 1) {
-        try worksheet.writeString(row, 0, "Scroll right", header);
+        try worksheet.writeString(.{ .row = row }, "Scroll right", header);
 
         col = 1;
         while (col < 26) : (col += 1) {
-            try worksheet.writeNumber(row, col, @floatFromInt(col), center);
+            try worksheet.writeNumber(.{ .row = row, .col = col }, @floatFromInt(col), center);
         }
     }
 
@@ -106,16 +106,16 @@ pub fn main() !void {
     // Some worksheet text to demonstrate scrolling.
     col = 1;
     while (col < 26) : (col += 1) {
-        try worksheet.writeString(0, col, "Scroll", center);
+        try worksheet.writeString(.{ .col = col }, "Scroll", center);
     }
 
     row = 1;
     while (row < 50) : (row += 1) {
-        try worksheet.writeString(row, 0, "Scroll", center);
+        try worksheet.writeString(.{ .row = row }, "Scroll", center);
 
         col = 1;
         while (col < 26) : (col += 1) {
-            try worksheet.writeNumber(row, col, @floatFromInt(col), center);
+            try worksheet.writeNumber(.{ .row = row, .col = col }, @floatFromInt(col), center);
         }
     }
 }

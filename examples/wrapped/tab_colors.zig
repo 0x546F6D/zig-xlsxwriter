@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet1 = try workbook.addWorkSheet(null);
@@ -19,7 +19,7 @@ pub fn main() !void {
     worksheet3.setTabColor(@enumFromInt(0xFF9900)); // Orange.
 
     // worksheet4 will have the default color.
-    try worksheet4.writeString(0, 0, "Hello", .default);
+    try worksheet4.writeString(.{}, "Hello", .default);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

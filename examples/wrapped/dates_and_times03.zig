@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -14,18 +14,18 @@ pub fn main() !void {
     format.setNumFormat("mmm d yyyy hh:mm AM/PM");
 
     // Widen the first column to make the text clearer.
-    try worksheet.setColumn(0, 0, 20, .default);
+    try worksheet.setColumn(.{}, 20, .default, null);
 
     // Write some Unix datetimes with formatting.
 
     // 1970-01-01. The Unix epoch.
-    try worksheet.writeUnixTime(0, 0, 0, format);
+    try worksheet.writeUnixTime(.{}, 0, format);
 
     // 2000-01-01.
-    try worksheet.writeUnixTime(1, 0, 1577836800, format);
+    try worksheet.writeUnixTime(.{ .row = 1 }, 1577836800, format);
 
     // 1900-01-01.
-    try worksheet.writeUnixTime(2, 0, -2208988800, format);
+    try worksheet.writeUnixTime(.{ .row = 2 }, -2208988800, format);
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;

@@ -1,5 +1,5 @@
 // Simple array with some PNG data
-const image_buffer: CString = &.{
+const image_buffer: [:0]const u8 = &.{
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20,
     0x08, 0x02, 0x00, 0x00, 0x00, 0xfc, 0x18, 0xed, 0xa3, 0x00, 0x00, 0x00,
@@ -28,24 +28,16 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
 
     // Embed the image from the buffer
-    // In Zig, we need to convert the cell reference "B3" to row and column
-    const row_b3 = xwz.nameToRow("B3");
-    const col_b3 = xwz.nameToCol("B3");
-
-    // Get a pointer to the image buffer
-    // const image_ptr = @as([*c]const u8, &image_buffer);
-
     try worksheet.embedImageBuffer(
-        row_b3,
-        col_b3,
+        xwz.cell("B3"),
         image_buffer,
-        image_size,
+        null,
     );
 }
 
@@ -53,4 +45,3 @@ var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
 const xwz = @import("xlsxwriter");
-const CString = xwz.CString;

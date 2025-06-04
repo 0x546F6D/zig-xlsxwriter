@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add worksheets.
-    const workbook = try xwz.initWorkBook(null, xlsx_path.ptr);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
 
     const worksheet = try workbook.addWorkSheet(null);
@@ -20,16 +20,25 @@ pub fn main() !void {
     merge_format.setBorder(.thin);
 
     // Increase the cell size of the merged cells to highlight the formatting.
-    try worksheet.setColumn(1, 3, 12, .default);
-    try worksheet.setRow(3, 30, .default);
-    try worksheet.setRow(6, 30, .default);
-    try worksheet.setRow(7, 30, .default);
+    try worksheet.setColumn(.{ .first = 1, .last = 3 }, 12, .default, null);
+    try worksheet.setRow(3, 30, .default, null);
+    try worksheet.setRow(6, 30, .default, null);
+    try worksheet.setRow(7, 30, .default, null);
 
     // Merge 3 cells.
-    try worksheet.mergeRange(3, 1, 3, 3, "Merged Range", merge_format);
+    try worksheet.mergeRange(
+        .{ .first_row = 3, .first_col = 1, .last_row = 3, .last_col = 3 },
+
+        "Merged Range",
+        merge_format,
+    );
 
     // Merge 3 cells over two rows.
-    try worksheet.mergeRange(6, 1, 7, 3, "Merged Range", merge_format);
+    try worksheet.mergeRange(
+        .{ .first_row = 6, .first_col = 1, .last_row = 7, .last_col = 3 },
+        "Merged Range",
+        merge_format,
+    );
 }
 
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
