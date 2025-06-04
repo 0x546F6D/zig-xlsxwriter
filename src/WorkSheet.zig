@@ -18,20 +18,6 @@ pub const RowColOptions = struct {
     }
 };
 
-// pub inline fn setRow(
-//     self: WorkSheet,
-//     row: u32,
-//     height: f64,
-//     format: Format,
-// ) XlsxError!void {
-//     try check(c.worksheet_set_row(
-//         self.worksheet_c,
-//         row,
-//         height,
-//         format.format_c,
-//     ));
-// }
-
 // pub extern fn worksheet_set_row(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format) lxw_error;
 // pub extern fn worksheet_set_row_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, height: f64, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
 pub inline fn setRow(
@@ -85,22 +71,6 @@ pub inline fn setRowPixels(
 }
 
 // pub extern fn worksheet_set_column(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, width: f64, format: [*c]lxw_format) lxw_error;
-// pub inline fn setColumn(
-//     self: WorkSheet,
-//     first_col: u16,
-//     last_col: u16,
-//     width: f64,
-//     format: Format,
-// ) XlsxError!void {
-//     try check(c.worksheet_set_column(
-//         self.worksheet_c,
-//         first_col,
-//         last_col,
-//         width,
-//         format.format_c,
-//     ));
-// }
-//
 // pub extern fn worksheet_set_column_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, width: f64, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
 pub inline fn setColumn(
     self: WorkSheet,
@@ -129,22 +99,6 @@ pub inline fn setColumn(
 }
 
 // pub extern fn worksheet_set_column_pixels(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format) lxw_error;
-// pub inline fn setColumnPixels(
-//     self: WorkSheet,
-//     first_col: u16,
-//     last_col: u16,
-//     pixels: u32,
-//     format: Format,
-// ) XlsxError!void {
-//     try check(c.worksheet_set_column_pixels(
-//         self.worksheet_c,
-//         first_col,
-//         last_col,
-//         pixels,
-//         format.format_c,
-//     ));
-// }
-
 // pub extern fn worksheet_set_column_pixels_opt(worksheet: [*c]lxw_worksheet, first_col: lxw_col_t, last_col: lxw_col_t, pixels: u32, format: [*c]lxw_format, options: [*c]lxw_row_col_options) lxw_error;
 pub inline fn setColumnPixels(
     self: WorkSheet,
@@ -558,21 +512,6 @@ pub inline fn writeUnixTime(
     ));
 }
 
-// pub inline fn writeUrl(
-//     self: WorkSheet,
-//     cell: Cell,
-//     url: [:0]const u8,
-//     format: Format,
-// ) XlsxError!void {
-//     try check(c.worksheet_write_url(
-//         self.worksheet_c,
-//         cell.row,
-//         cell.col,
-//         url,
-//         format.format_c,
-//     ));
-// }
-
 pub const UrlOptions = struct {
     string: ?[*:0]const u8,
     tooltip: ?[*:0]const u8,
@@ -731,19 +670,6 @@ pub const CommentOptions = extern struct {
     }
 };
 
-// pub inline fn writeComment(
-//     self: WorkSheet,
-//     cell: Cell,
-//     string: [:0]const u8,
-// ) XlsxError!void {
-//     try check(c.worksheet_write_comment(
-//         self.worksheet_c,
-//         cell.row,
-//         cell.col,
-//         string,
-//     ));
-// }
-
 // pub extern fn worksheet_write_comment(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8) lxw_error;
 // pub extern fn worksheet_write_comment_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, string: [*c]const u8, options: [*c]lxw_comment_options) lxw_error;
 pub inline fn writeComment(
@@ -816,19 +742,6 @@ pub const ImageOptions = struct {
     }
 };
 
-// pub inline fn insertImage(
-//     self: WorkSheet,
-//     cell: Cell,
-//     filename: [:0]const u8,
-// ) XlsxError!void {
-//     try check(c.worksheet_insert_image(
-//         self.worksheet_c,
-//         cell.row,
-//         cell.col,
-//         filename,
-//     ));
-// }
-
 // pub extern fn worksheet_insert_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
 // pub extern fn worksheet_insert_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 pub inline fn insertImage(
@@ -853,20 +766,6 @@ pub inline fn insertImage(
             filename,
         ));
 }
-
-// pub inline fn insertImageBuffer(
-//     self: WorkSheet,
-//     cell: Cell,
-//     image_buffer: [:0]const u8,
-// ) XlsxError!void {
-//     try check(c.worksheet_insert_image_buffer(
-//         self.worksheet_c,
-//         cell.row,
-//         cell.col,
-//         image_buffer,
-//         image_buffer.len,
-//     ));
-// }
 
 // pub extern fn worksheet_insert_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
 // pub extern fn worksheet_insert_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
@@ -896,20 +795,6 @@ pub inline fn insertImageBuffer(
         ));
 }
 
-// pub inline fn embedImage(
-//     self: WorkSheet,
-//     row: u32,
-//     col: u16,
-//     filename: ?[:0]const u8,
-// ) XlsxError!void {
-//     try check(c.worksheet_embed_image(
-//         self.worksheet_c,
-//         row,
-//         col,
-//         filename,
-//     ));
-// }
-
 // pub extern fn worksheet_embed_image(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8) lxw_error;
 // pub extern fn worksheet_embed_image_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, filename: [*c]const u8, options: [*c]lxw_image_options) lxw_error;
 pub inline fn embedImage(
@@ -934,23 +819,6 @@ pub inline fn embedImage(
             filename,
         ));
 }
-
-// pub inline fn embedImageBuffer(
-//     self: WorkSheet,
-//     row: u32,
-//     col: u16,
-//     image_buffer: ?[:0]const u8,
-//     // image_size: usize,
-// ) XlsxError!void {
-//     try check(c.worksheet_embed_image_buffer(
-//         self.worksheet_c,
-//         row,
-//         col,
-//         image_buffer,
-//         // image_size,
-//         image_buffer.?.len,
-//     ));
-// }
 
 // pub extern fn worksheet_embed_image_buffer(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize) lxw_error;
 // pub extern fn worksheet_embed_image_buffer_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, image_buffer: [*c]const u8, image_size: usize, options: [*c]lxw_image_options) lxw_error;
@@ -1019,20 +887,6 @@ pub const ObjectPosition = enum(u8) {
     dont_move_dont_size = c.LXW_OBJECT_DONT_MOVE_DONT_SIZE,
     move_and_size_after = c.LXW_OBJECT_MOVE_AND_SIZE_AFTER,
 };
-
-// pub inline fn insertChart(
-//     self: WorkSheet,
-//     row: u32,
-//     col: u16,
-//     chart: Chart,
-// ) XlsxError!void {
-//     try check(c.worksheet_insert_chart(
-//         self.worksheet_c,
-//         row,
-//         col,
-//         chart.chart_c,
-//     ));
-// }
 
 // pub extern fn worksheet_insert_chart(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart) lxw_error;
 // pub extern fn worksheet_insert_chart_opt(worksheet: [*c]lxw_worksheet, row: lxw_row_t, col: lxw_col_t, chart: [*c]lxw_chart, user_options: [*c]lxw_chart_options) lxw_error;

@@ -186,6 +186,7 @@ pub inline fn addChart(self: WorkBook, chart_type: ChartType) XlsxError!Chart {
     const chart = c.workbook_add_chart(self.workbook_c, @intFromEnum(chart_type)) orelse
         return XlsxError.AddChart;
     return Chart{
+        .alloc = self.alloc,
         .chart_c = chart,
         .x_axis = ChartAxis{ .axis_c = chart.*.x_axis },
         .y_axis = ChartAxis{ .axis_c = chart.*.y_axis },

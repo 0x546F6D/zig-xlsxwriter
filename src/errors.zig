@@ -73,6 +73,7 @@ pub const XlsxError = error{
     GetErrorBars,
     WriteRichString,
     AddTable,
+    SetPoints,
 };
 
 pub inline fn checkResult(error_code: c_uint) XlsxError!void {
@@ -164,11 +165,13 @@ pub inline fn strError(err: anyerror) []const u8 {
         \\No Allocator provided to initWorkBook(), addTables() cannot be called,
         \\ > Provide Allocator or use addTablesNoAlloc() instead.
         ,
+        error.SetPoints =>
+        \\No Allocator provided to initWorkBook(), setPoints() cannot be called,
+        \\ > Provide Allocator or use setPointsNoAlloc() instead.
+        ,
         else => "unknown error, might not be an xlsxwriter error",
     };
 }
 
 const std = @import("std");
 const c = @import("lxw");
-const CString = @import("xlsxwriter.zig").CString;
-const CStringArray = @import("xlsxwriter.zig").CStringArray;

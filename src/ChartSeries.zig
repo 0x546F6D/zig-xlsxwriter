@@ -1,6 +1,6 @@
 const ChartSeries = @This();
 
-// alloc: ?std.mem.Allocator,
+alloc: ?std.mem.Allocator,
 chartseries_c: ?*c.lxw_chart_series,
 
 // pub extern fn chart_series_set_categories(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
@@ -94,7 +94,7 @@ pub inline fn setPattern(
 ) void {
     c.chart_series_set_pattern(
         self.chartseries_c,
-        @intFromEnum(pattern),
+        @constCast(&pattern.toC()),
     );
 }
 
@@ -163,39 +163,73 @@ pub inline fn setMarkerPattern(
 ) void {
     c.chart_series_set_marker_pattern(
         self.chartseries_c,
-        @intFromEnum(pattern),
+        @constCast(&pattern.toC()),
     );
 }
 
 // lxw_chart_point
 pub const Point = extern struct {
-    line: ?*ChartLine = null,
-    fill: ?*ChartFill = null,
-    pattern: ?*ChartPattern = null,
+    line: ?*const ChartLine = null,
+    fill: ?*const ChartFill = null,
+    pattern: ?*const ChartPattern = null,
 
     pub const default = Point{
         .line = null,
         .fill = null,
         .pattern = null,
     };
-
-    inline fn toC(
-        self: Point,
-    ) c.lxw_chart_point {
-        return c.lxw_chart_point{
-            .line = @ptrCast(self.line),
-            .fill = @ptrCast(self.fill),
-            .pattern = @ptrCast(self.pattern),
-        };
-    }
 };
-pub const ChartPointArray = [:null]Point;
+
 // pub extern fn chart_series_set_points(series: [*c]lxw_chart_series, points: [*c][*c]lxw_chart_point) lxw_error;
-pub inline fn setPoints(self: ChartSeries, points: ChartPointArray) void {
-    c.chart_series_set_points(
+pub inline fn setPoints(self: ChartSeries, points: []const Point) !void {
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.SetPoints;
+
+    var line_array = try allocator.alloc(c.lxw_chart_line, points.len);
+    defer allocator.free(line_array);
+    var fill_array = try allocator.alloc(c.lxw_chart_fill, points.len);
+    defer allocator.free(fill_array);
+    var pattern_array = try allocator.alloc(c.lxw_chart_pattern, points.len);
+    defer allocator.free(pattern_array);
+    var point_array = try allocator.alloc(c.lxw_chart_point, points.len);
+    defer allocator.free(point_array);
+    var point_c = try allocator.allocSentinel(?*c.lxw_chart_point, points.len, null);
+    defer allocator.free(point_c);
+
+    for (points, 0..) |point, i| {
+        if (point.line) |line| {
+            line_array[i] = line.toC();
+            point_array[i].line = &line_array[i];
+        } else point_array[i].line = null;
+
+        if (point.fill) |fill| {
+            fill_array[i] = fill.toC();
+            point_array[i].fill = &fill_array[i];
+        } else point_array[i].fill = null;
+
+        if (point.pattern) |pattern| {
+            pattern_array[i] = pattern.toC();
+            point_array[i].pattern = &pattern_array[i];
+        } else point_array[i].pattern = null;
+
+        point_c[i] = &point_array[i];
+    }
+
+    try check(c.chart_series_set_points(
+        self.chartseries_c,
+        @ptrCast(point_c.ptr),
+    ));
+}
+
+pub const PointNoAlloc = c.lxw_chart_point;
+pub const PointNoAllocArray = [:null]const ?*const PointNoAlloc;
+pub inline fn setPointsNoAlloc(self: ChartSeries, points: PointNoAllocArray) !void {
+    try check(c.chart_series_set_points(
         self.chartseries_c,
         @ptrCast(@constCast(points)),
-    );
+    ));
 }
 
 // pub extern fn chart_series_set_smooth(series: [*c]lxw_chart_series, smooth: u8) void;
@@ -232,7 +266,7 @@ pub const ChartDataLabel = struct {
     font: ?*ChartFont = null,
     line: ?*ChartLine = null,
     fill: ?*ChartFill = null,
-    pattern: ?*ChartPattern = .none,
+    pattern: ?*ChartPattern = null,
 
     pub const default = ChartDataLabel{
         .value = null,
@@ -240,7 +274,7 @@ pub const ChartDataLabel = struct {
         .font = null,
         .line = null,
         .fill = null,
-        .pattern = .none,
+        .pattern = null,
     };
 
     inline fn toC(self: ChartDataLabel) c.lxw_chart_data_label {
@@ -250,7 +284,7 @@ pub const ChartDataLabel = struct {
             .font = @ptrCast(self.font),
             .line = @ptrCast(self.line),
             .fill = @ptrCast(self.fill),
-            .pattern = @intFromEnum(self.pattern),
+            .pattern = @ptrCast(self.pattern),
         };
     }
 };
@@ -372,7 +406,7 @@ pub inline fn setLabelsPattern(
 ) void {
     c.chart_series_set_labels_pattern(
         self.chartseries_c,
-        @intFromEnum(pattern),
+        @constCast(&pattern.toC()),
     );
 }
 
@@ -467,6 +501,7 @@ pub inline fn getErrorBars(
     };
 }
 
+const std = @import("std");
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
 const XlsxError = @import("errors.zig").XlsxError;
@@ -476,6 +511,7 @@ const Range = @import("utility.zig").Range;
 const ChartFont = @import("Chart.zig").Font;
 const ChartLine = @import("Chart.zig").Line;
 const ChartFill = @import("Chart.zig").Fill;
-const ChartPattern = @import("Chart.zig").PatternType;
+const ChartPattern = @import("Chart.zig").Pattern;
+const PatternType = @import("Chart.zig").PatternType;
 const ErrorBars = @import("ErrorBars.zig");
 const ErrorBarsAxis = ErrorBars.Axis;

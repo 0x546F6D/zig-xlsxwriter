@@ -5,7 +5,7 @@ pub fn main() !void {
     defer alloc.free(xlsx_path);
 
     // Create a workbook and add a worksheet.
-    const workbook = try xwz.initWorkBook(alloc, xlsx_path, null);
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
     defer workbook.deinit() catch {};
     const worksheet = try workbook.addWorkSheet(null);
 
@@ -46,20 +46,25 @@ pub fn main() !void {
     // Add a chart title.
     chart.titleSetName("Pie Chart with user defined colors");
 
+    // Add fills for use in the chart.
+    const fill1 = xwz.ChartFill{ .color = @enumFromInt(0x5ABA10) };
+    const fill2 = xwz.ChartFill{ .color = @enumFromInt(0xFE110E) };
+    const fill3 = xwz.ChartFill{ .color = @enumFromInt(0xCA5C05) };
+
     // Add some points with fills.
-    const point1: Point = .{ .fill = &.{ .color = @enumFromInt(0x5ABA10) } };
-    const point2: Point = .{ .fill = &.{ .color = @enumFromInt(0xFE110E) } };
-    const point3: Point = .{ .fill = &.{ .color = @enumFromInt(0xCA5C05) } };
+    const point1: PointNoAlloc = .{ .fill = @constCast(&fill1.toC()) };
+    const point2: PointNoAlloc = .{ .fill = @constCast(&fill2.toC()) };
+    const point3: PointNoAlloc = .{ .fill = @constCast(&fill3.toC()) };
 
     // Create an array of the point objects.
-    const points_array = &.{
-        point1,
-        point2,
-        point3,
+    const points_array: PointNoAllocArray = &.{
+        &point1,
+        &point2,
+        &point3,
     };
 
     // Add/override the points/segments of the chart.
-    try series.setPoints(points_array);
+    try series.setPointsNoAlloc(points_array);
 
     // Insert the chart into the worksheet.
     try worksheet.insertChart(.{ .row = 17, .col = 3 }, chart, null);
@@ -103,4 +108,5 @@ const h = @import("_helper.zig");
 const xwz = @import("xlsxwriter");
 const WorkSheet = xwz.WorkSheet;
 const Format = xwz.Format;
-const Point = xwz.ChartSeriesPoint;
+const PointNoAlloc = xwz.ChartSeriesPointNoAlloc;
+const PointNoAllocArray = xwz.ChartSeriesPointNoAllocArray;

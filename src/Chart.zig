@@ -1,5 +1,6 @@
 const Chart = @This();
 
+alloc: ?std.mem.Allocator,
 chart_c: ?*c.lxw_chart,
 x_axis: ChartAxis,
 y_axis: ChartAxis,
@@ -39,7 +40,7 @@ pub const Pattern = struct {
         .type = .none,
     };
 
-    inline fn toC(self: Pattern) c.lxw_chart_pattern {
+    pub inline fn toC(self: Pattern) c.lxw_chart_pattern {
         return c.lxw_chart_pattern{
             .fg_color = @intFromEnum(self.fg_color),
             .bg_color = @intFromEnum(self.bg_color),
@@ -328,7 +329,7 @@ pub const Line = struct {
         .transparency = 0,
     };
 
-    inline fn toC(self: Line) c.lxw_chart_line {
+    pub inline fn toC(self: Line) c.lxw_chart_line {
         return c.lxw_chart_line{
             .color = @intFromEnum(self.color),
             .none = @intFromBool(self.none),
@@ -343,7 +344,7 @@ pub const Line = struct {
 pub const Fill = struct {
     color: DefinedColors = .default,
     none: bool = false,
-    transparency: u8 = 100,
+    transparency: u8 = 0,
 
     pub const default = Fill{
         .color = .default,
@@ -351,7 +352,7 @@ pub const Fill = struct {
         .transparency = 0,
     };
 
-    inline fn toC(self: Fill) c.lxw_chart_fill {
+    pub inline fn toC(self: Fill) c.lxw_chart_fill {
         return c.lxw_chart_fill{
             .color = @intFromEnum(self.color),
             .none = @intFromBool(self.none),
@@ -571,6 +572,7 @@ pub inline fn plotAreaSetLayout(
 // pub extern fn chart_add_series(chart: [*c]lxw_chart, categories: [*c]const u8, values: [*c]const u8) [*c]lxw_chart_series;
 pub inline fn addSeries(self: Chart, categories: ?[*:0]const u8, values: ?[*:0]const u8) XlsxError!ChartSeries {
     return ChartSeries{
+        .alloc = self.alloc,
         .chartseries_c = c.chart_add_series(
             self.chart_c,
             categories,
@@ -593,6 +595,7 @@ pub inline fn getAxis(
     };
 }
 
+const std = @import("std");
 const c = @import("lxw");
 const xlsxwriter = @import("xlsxwriter.zig");
 const CStringArray = xlsxwriter.CStringArray;
@@ -600,7 +603,10 @@ const Bool = xlsxwriter.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
 const Cell = @import("utility.zig").Cell;
 const DefinedColors = @import("format.zig").DefinedColors;
-const ChartSeries = @import("ChartSeries.zig");
-const ChartAxis = @import("ChartAxis.zig");
-const ChartAxisType = ChartAxis.Type;
+pub const ChartSeries = @import("ChartSeries.zig");
+pub const ChartSeriesPoint = ChartSeries.Point;
+pub const ChartSeriesPointNoAlloc = ChartSeries.PointNoAlloc;
+pub const ChartSeriesPointNoAllocArray = ChartSeries.PointNoAllocArray;
+pub const ChartAxis = @import("ChartAxis.zig");
+pub const ChartAxisType = ChartAxis.Type;
 const ObjectPosition = @import("WorkSheet.zig").ObjectPosition;

@@ -61,10 +61,20 @@ pub const Scripts = Format.Scripts;
 pub const Chart = @import("Chart.zig");
 
 pub const ChartType = Chart.Type;
-
 pub const ChartFont = Chart.Font;
+pub const ChartLine = Chart.Line;
+pub const ChartFill = Chart.Fill;
+pub const ChartPattern = Chart.Pattern;
+pub const PatternType = Chart.PatternType;
+pub const ErrorBars = @import("ErrorBars.zig");
+pub const ErrorBarsAxis = ErrorBars.Axis;
 
-pub const ChartSeries = Chart.Series;
+pub const ChartSeries = Chart.ChartSeries;
+pub const ChartSeriesPoint = ChartSeries.Point;
+pub const ChartSeriesPointNoAlloc = ChartSeries.PointNoAlloc;
+pub const ChartSeriesPointNoAllocArray = ChartSeries.PointNoAllocArray;
+pub const ChartAxis = Chart.ChartAxis;
+pub const ChartAxisType = ChartAxis.Type;
 
 pub const errors = @import("errors.zig");
 pub const XlsxError = errors.XlsxError;
