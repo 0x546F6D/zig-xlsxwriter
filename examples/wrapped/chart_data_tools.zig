@@ -1,20 +1,154 @@
-//
-// A demo of an various Excel chart data tools that are available via a
-// libxlsxwriter chart.
-//
-// These include Drop Lines and High-Low Lines.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
+pub fn main() !void {
+    defer _ = dbga.deinit();
 
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
+    defer workbook.deinit() catch {};
+    const worksheet = try workbook.addWorkSheet(null);
+
+    // Add a bold format to use to highlight the header cells
+    const bold = try workbook.addFormat();
+    bold.setBold();
+
+    // Write some data for the chart
+    try writeWorksheetData(worksheet, bold);
+
+    // Chart 1. Example with High Low Lines
+    var chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with High-Low Lines");
+
+    // Add the first series to the chart
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add high-low lines to the chart
+    chart.setHighLowLines(null);
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 1, .col = 4 }, chart, null);
+
+    // Chart 2. Example with Drop Lines
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with Drop Lines");
+
+    // Add the first series to the chart
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add drop lines to the chart
+    chart.setDropLines(null);
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 17, .col = 4 }, chart, null);
+
+    // Chart 3. Example with Up-Down bars
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with Up-Down bars");
+
+    // Add the first series to the chart
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add Up-Down bars to the chart
+    chart.setUpDownBars();
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 33, .col = 4 }, chart, null);
+
+    // Chart 4. Example with Up-Down bars with formatting
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with Up-Down bars");
+
+    // Add the first series to the chart
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add Up-Down bars to the chart, with formatting
+    const line = xwz.ChartLine{ .color = .black };
+    const up_fill = xwz.ChartFill{ .color = @enumFromInt(0x00B050) };
+    const down_fill = xwz.ChartFill{ .color = .red };
+
+    chart.setUpDownBarsFormat(line, up_fill, line, down_fill);
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 49, .col = 4 }, chart, null);
+
+    // Chart 5. Example with Markers and data labels
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with Data Labels and Markers");
+
+    // Add the first series to the chart
+    var series = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add series markers
+    series.setMarkerType(.circle);
+
+    // Add series data labels
+    series.setLabels();
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 65, .col = 4 }, chart, null);
+
+    // Chart 6. Example with Error Bars
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with Error Bars");
+
+    // Add the first series to the chart
+    series = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add error bars to show Standard Error
+    series.y_error_bars.setType(.std_error, 0);
+
+    // Add series data labels
+    series.setLabels();
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 81, .col = 4 }, chart, null);
+
+    // Chart 7. Example with a trendline
+    chart = try workbook.addChart(.line);
+
+    // Add a chart title
+    chart.titleSetName("Chart with a Trendline");
+
+    // Add the first series to the chart
+    series = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
+    _ = try chart.addSeries("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+
+    // Add a polynomial trendline
+    const poly_line = xwz.ChartLine{
+        .color = .gray,
+        .dash_type = .long_dash,
+    };
+
+    series.setTrendline(.poly, 3);
+    series.setTrendlineLine(poly_line);
+
+    // Insert the chart into the worksheet
+    try worksheet.insertChart(.{ .row = 97, .col = 4 }, chart, null);
+}
 
 // Write some data to the worksheet
-fn writeWorksheetData(worksheet: *xlsxwriter.lxw_worksheet, bold: *xlsxwriter.lxw_format) void {
+fn writeWorksheetData(worksheet: WorkSheet, bold: Format) !void {
+    // Three columns of data
     const data = [_][3]u8{
-        // Three columns of data
         [_]u8{ 2, 10, 30 },
         [_]u8{ 3, 40, 60 },
         [_]u8{ 4, 50, 70 },
@@ -23,165 +157,24 @@ fn writeWorksheetData(worksheet: *xlsxwriter.lxw_worksheet, bold: *xlsxwriter.lx
         [_]u8{ 7, 50, 30 },
     };
 
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 0, "Number", bold);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 1, "Batch 1", bold);
-    _ = xlsxwriter.worksheet_write_string(worksheet, 0, 2, "Batch 2", bold);
+    try worksheet.writeString(.{}, "Number", bold);
+    try worksheet.writeString(.{ .col = 1 }, "Batch 1", bold);
+    try worksheet.writeString(.{ .col = 2 }, "Batch 2", bold);
 
     for (data, 0..) |row, row_idx| {
         for (row, 0..) |value, col_idx| {
-            _ = xlsxwriter.worksheet_write_number(
-                worksheet,
-                @intCast(row_idx + 1),
-                @intCast(col_idx),
+            try worksheet.writeNumber(
+                .{ .row = @intCast(row_idx + 1), .col = @intCast(col_idx) },
                 @floatFromInt(value),
-                null,
+                .default,
             );
         }
     }
 }
 
-pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-chart_data_tools.xlsx");
-    const worksheet = xlsxwriter.workbook_add_worksheet(workbook, null);
-
-    // Add a bold format to use to highlight the header cells
-    const bold = xlsxwriter.workbook_add_format(workbook);
-    _ = xlsxwriter.format_set_bold(bold);
-
-    // Write some data for the chart
-    writeWorksheetData(worksheet, bold);
-
-    // Chart 1. Example with High Low Lines
-    var chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with High-Low Lines");
-
-    // Add the first series to the chart
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add high-low lines to the chart
-    _ = xlsxwriter.chart_set_high_low_lines(chart, null);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 1, 4, chart);
-
-    // Chart 2. Example with Drop Lines
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with Drop Lines");
-
-    // Add the first series to the chart
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add drop lines to the chart
-    _ = xlsxwriter.chart_set_drop_lines(chart, null);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 17, 4, chart);
-
-    // Chart 3. Example with Up-Down bars
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with Up-Down bars");
-
-    // Add the first series to the chart
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add Up-Down bars to the chart
-    _ = xlsxwriter.chart_set_up_down_bars(chart);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 33, 4, chart);
-
-    // Chart 4. Example with Up-Down bars with formatting
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with Up-Down bars");
-
-    // Add the first series to the chart
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add Up-Down bars to the chart, with formatting
-    var line = xlsxwriter.lxw_chart_line{ .color = xlsxwriter.LXW_COLOR_BLACK };
-    var up_fill = xlsxwriter.lxw_chart_fill{ .color = 0x00B050 };
-    var down_fill = xlsxwriter.lxw_chart_fill{ .color = xlsxwriter.LXW_COLOR_RED };
-
-    _ = xlsxwriter.chart_set_up_down_bars_format(chart, &line, &up_fill, &line, &down_fill);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 49, 4, chart);
-
-    // Chart 5. Example with Markers and data labels
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with Data Labels and Markers");
-
-    // Add the first series to the chart
-    const series = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add series markers
-    _ = xlsxwriter.chart_series_set_marker_type(series, xlsxwriter.LXW_CHART_MARKER_CIRCLE);
-
-    // Add series data labels
-    _ = xlsxwriter.chart_series_set_labels(series);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 65, 4, chart);
-
-    // Chart 6. Example with Error Bars
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with Error Bars");
-
-    // Add the first series to the chart
-    const series2 = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add error bars to show Standard Error
-    _ = xlsxwriter.chart_series_set_error_bars(
-        series2.*.y_error_bars,
-        xlsxwriter.LXW_CHART_ERROR_BAR_TYPE_STD_ERROR,
-        0,
-    );
-
-    // Add series data labels
-    _ = xlsxwriter.chart_series_set_labels(series2);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 81, 4, chart);
-
-    // Chart 7. Example with a trendline
-    chart = xlsxwriter.workbook_add_chart(workbook, xlsxwriter.LXW_CHART_LINE);
-
-    // Add a chart title
-    _ = xlsxwriter.chart_title_set_name(chart, "Chart with a Trendline");
-
-    // Add the first series to the chart
-    const series3 = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$B$2:$B$7");
-    _ = xlsxwriter.chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
-
-    // Add a polynomial trendline
-    var poly_line = xlsxwriter.lxw_chart_line{
-        .color = xlsxwriter.LXW_COLOR_GRAY,
-        .dash_type = xlsxwriter.LXW_CHART_LINE_DASH_LONG_DASH,
-    };
-
-    _ = xlsxwriter.chart_series_set_trendline(series3, xlsxwriter.LXW_CHART_TRENDLINE_TYPE_POLY, 3);
-    _ = xlsxwriter.chart_series_set_trendline_line(series3, &poly_line);
-
-    // Insert the chart into the worksheet
-    _ = xlsxwriter.worksheet_insert_chart(worksheet, 97, 4, chart);
-
-    _ = xlsxwriter.workbook_close(workbook);
-}
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");
+const WorkSheet = xwz.WorkSheet;
+const Format = xwz.Format;

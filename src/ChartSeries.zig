@@ -2,6 +2,8 @@ const ChartSeries = @This();
 
 alloc: ?std.mem.Allocator,
 chartseries_c: ?*c.lxw_chart_series,
+x_error_bars: ErrorBars,
+y_error_bars: ErrorBars,
 
 // pub extern fn chart_series_set_categories(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
 pub inline fn setCategories(
@@ -181,11 +183,14 @@ pub const Point = extern struct {
 };
 
 // pub extern fn chart_series_set_points(series: [*c]lxw_chart_series, points: [*c][*c]lxw_chart_point) lxw_error;
-pub inline fn setPoints(self: ChartSeries, points: []const Point) !void {
+pub inline fn setPoints(
+    self: ChartSeries,
+    points: []const Point,
+) !void {
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
         allocator
     else
-        return XlsxError.SetPoints;
+        return XlsxError.SetPointsNoAlloc;
 
     var line_array = try allocator.alloc(c.lxw_chart_line, points.len);
     defer allocator.free(line_array);
@@ -260,15 +265,15 @@ pub inline fn setLabelsOptions(
     );
 }
 
-pub const ChartDataLabel = struct {
-    value: ?[:0]const u8 = null,
+pub const DataLabel = struct {
+    value: ?[*:0]const u8 = null,
     hide: bool = false,
-    font: ?*ChartFont = null,
-    line: ?*ChartLine = null,
-    fill: ?*ChartFill = null,
-    pattern: ?*ChartPattern = null,
+    font: ?*const ChartFont = null,
+    line: ?*const ChartLine = null,
+    fill: ?*const ChartFill = null,
+    pattern: ?*const ChartPattern = null,
 
-    pub const default = ChartDataLabel{
+    pub const default = DataLabel{
         .value = null,
         .hide = false,
         .font = null,
@@ -276,28 +281,58 @@ pub const ChartDataLabel = struct {
         .fill = null,
         .pattern = null,
     };
-
-    inline fn toC(self: ChartDataLabel) c.lxw_chart_data_label {
-        return c.lxw_chart_data_label{
-            .value = self.value,
-            .hide = @intFromBool(self.hide),
-            .font = @ptrCast(self.font),
-            .line = @ptrCast(self.line),
-            .fill = @ptrCast(self.fill),
-            .pattern = @ptrCast(self.pattern),
-        };
-    }
 };
-pub const ChartDataLabelArray = [:null]ChartDataLabel;
+
 // pub extern fn chart_series_set_labels_custom(series: [*c]lxw_chart_series, data_labels: [*c][*c]lxw_chart_data_label) lxw_error;
-pub inline fn setLabelsCustom(
-    self: ChartSeries,
-    data_labels: ChartDataLabelArray,
-) void {
-    c.chart_series_set_labels_custom(
+pub inline fn setLabelsCustom(self: ChartSeries, data_labels: []const DataLabel) !void {
+    const allocator: std.mem.Allocator = if (self.alloc) |allocator|
+        allocator
+    else
+        return XlsxError.SetLabelsCustomNoAllocator;
+
+    var font_array = try allocator.alloc(c.lxw_chart_font, data_labels.len);
+    defer allocator.free(font_array);
+    var line_array = try allocator.alloc(c.lxw_chart_line, data_labels.len);
+    defer allocator.free(line_array);
+    var fill_array = try allocator.alloc(c.lxw_chart_fill, data_labels.len);
+    defer allocator.free(fill_array);
+    var pattern_array = try allocator.alloc(c.lxw_chart_pattern, data_labels.len);
+    defer allocator.free(pattern_array);
+    var label_array = try allocator.alloc(c.lxw_chart_data_label, data_labels.len);
+    defer allocator.free(label_array);
+    var label_c = try allocator.allocSentinel(?*c.lxw_chart_data_label, data_labels.len, null);
+    defer allocator.free(label_c);
+
+    for (data_labels, 0..) |label, i| {
+        label_array[i].value = label.value;
+        label_array[i].hide = @intFromBool(label.hide);
+
+        if (label.font) |font| {
+            font_array[i] = font.toC();
+            label_array[i].font = &font_array[i];
+        } else label_array[i].font = null;
+
+        if (label.line) |line| {
+            line_array[i] = line.toC();
+            label_array[i].line = &line_array[i];
+        } else label_array[i].line = null;
+
+        if (label.fill) |fill| {
+            fill_array[i] = fill.toC();
+            label_array[i].fill = &fill_array[i];
+        } else label_array[i].fill = null;
+
+        if (label.pattern) |pattern| {
+            pattern_array[i] = pattern.toC();
+            label_array[i].pattern = &pattern_array[i];
+        } else label_array[i].pattern = null;
+
+        label_c[i] = &label_array[i];
+    }
+    try check(c.chart_series_set_labels_custom(
         self.chartseries_c,
-        @ptrCast(@constCast(data_labels)),
-    );
+        @ptrCast(label_c.ptr),
+    ));
 }
 
 pub const LabelSeparator = enum(u8) {

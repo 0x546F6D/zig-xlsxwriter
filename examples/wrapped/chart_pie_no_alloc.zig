@@ -101,12 +101,11 @@ fn writeWorksheetData(worksheet: WorkSheet, bold: Format) !void {
     try worksheet.writeNumber(.{ .row = 3, .col = 1 }, 10, .default);
 }
 
-const std = @import("std");
 var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
 const alloc = dbga.allocator();
 const h = @import("_helper.zig");
 const xwz = @import("xlsxwriter");
 const WorkSheet = xwz.WorkSheet;
 const Format = xwz.Format;
-const PointNoAlloc = xwz.ChartSeriesPointNoAlloc;
-const PointNoAllocArray = xwz.ChartSeriesPointNoAllocArray;
+const PointNoAlloc = xwz.ChartPointNoAlloc;
+const PointNoAllocArray = xwz.ChartPointNoAllocArray;

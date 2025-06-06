@@ -15,7 +15,7 @@ pub const Options = struct {
     description: ?[*:0]const u8 = null,
     decorative: bool = false,
 
-    inline fn toC(self: Options) c.lxw_chart_options {
+    pub inline fn toC(self: Options) c.lxw_chart_options {
         return c.lxw_chart_options{
             .x_offset = self.x_offset,
             .y_offset = self.y_offset,
@@ -197,7 +197,7 @@ pub const Font = struct {
         .baseline = 0,
     };
 
-    inline fn toC(self: Font) c.lxw_chart_font {
+    pub inline fn toC(self: Font) c.lxw_chart_font {
         return c.struct_lxw_chart_font{
             .name = self.name,
             .size = self.size,
@@ -317,14 +317,14 @@ pub inline fn setUpDownBars(self: Chart) void {
 pub const Line = struct {
     color: DefinedColors = .default,
     none: bool = false,
-    width: f32 = 2.25,
+    width: f32 = 0,
     dash_type: LineDashType = .solid,
     transparency: u8 = 0,
 
     pub const default = Line{
         .color = .default,
         .none = false,
-        .width = 2.25,
+        .width = 0,
         .dash_type = .solid,
         .transparency = 0,
     };
@@ -364,39 +364,43 @@ pub const Fill = struct {
 // pub extern fn chart_set_up_down_bars_format(chart: [*c]lxw_chart, up_bar_line: [*c]lxw_chart_line, up_bar_fill: [*c]lxw_chart_fill, down_bar_line: [*c]lxw_chart_line, down_bar_fill: [*c]lxw_chart_fill) void;
 pub inline fn setUpDownBarsFormat(
     self: Chart,
-    up_bar_line: Line,
-    up_bar_fill: Fill,
-    down_bar_line: Line,
-    down_bar_fill: Fill,
+    up_bar_line: ?Line,
+    up_bar_fill: ?Fill,
+    down_bar_line: ?Line,
+    down_bar_fill: ?Fill,
 ) void {
     c.chart_set_up_down_bars_format(
         self.chart_c,
-        @constCast(&up_bar_line.toC()),
-        @constCast(&up_bar_fill.toC()),
-        @constCast(&down_bar_line.toC()),
-        @constCast(&down_bar_fill.toC()),
+        if (up_bar_line) |line| @constCast(&line.toC()) else null,
+        if (up_bar_fill) |fill| @constCast(&fill.toC()) else null,
+        if (down_bar_line) |line| @constCast(&line.toC()) else null,
+        if (down_bar_fill) |fill| @constCast(&fill.toC()) else null,
+        // @constCast(&up_bar_line.toC()),
+        // @constCast(&up_bar_fill.toC()),
+        // @constCast(&down_bar_line.toC()),
+        // @constCast(&down_bar_fill.toC()),
     );
 }
 
 // pub extern fn chart_set_drop_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
 pub inline fn setDropLines(
     self: Chart,
-    line: Line,
+    line: ?Line,
 ) void {
     c.chart_set_drop_lines(
         self.chart_c,
-        @constCast(&line.toC()),
+        if (line) |line_o| @constCast(&line_o.toC()) else null,
     );
 }
 
 // pub extern fn chart_set_high_low_lines(chart: [*c]lxw_chart, line: [*c]lxw_chart_line) void;
 pub inline fn setHighLowLines(
     self: Chart,
-    line: Line,
+    line: ?Line,
 ) void {
     c.chart_set_high_low_lines(
         self.chart_c,
-        @constCast(&line.toC()),
+        if (line) |line_o| @constCast(&line_o.toC()) else null,
     );
 }
 
@@ -571,14 +575,17 @@ pub inline fn plotAreaSetLayout(
 
 // pub extern fn chart_add_series(chart: [*c]lxw_chart, categories: [*c]const u8, values: [*c]const u8) [*c]lxw_chart_series;
 pub inline fn addSeries(self: Chart, categories: ?[*:0]const u8, values: ?[*:0]const u8) XlsxError!ChartSeries {
+    const series = c.chart_add_series(
+        self.chart_c,
+        categories,
+        values,
+    ) orelse
+        return XlsxError.ChartAddSeries;
     return ChartSeries{
         .alloc = self.alloc,
-        .chartseries_c = c.chart_add_series(
-            self.chart_c,
-            categories,
-            values,
-        ) orelse
-            return XlsxError.ChartAddSeries,
+        .chartseries_c = series,
+        .x_error_bars = .{ .error_bars_c = series.*.x_error_bars },
+        .y_error_bars = .{ .error_bars_c = series.*.y_error_bars },
     };
 }
 
@@ -604,9 +611,10 @@ const XlsxError = @import("errors.zig").XlsxError;
 const Cell = @import("utility.zig").Cell;
 const DefinedColors = @import("format.zig").DefinedColors;
 pub const ChartSeries = @import("ChartSeries.zig");
-pub const ChartSeriesPoint = ChartSeries.Point;
-pub const ChartSeriesPointNoAlloc = ChartSeries.PointNoAlloc;
-pub const ChartSeriesPointNoAllocArray = ChartSeries.PointNoAllocArray;
+pub const ChartPoint = ChartSeries.Point;
+pub const ChartPointNoAlloc = ChartSeries.PointNoAlloc;
+pub const ChartPointNoAllocArray = ChartSeries.PointNoAllocArray;
+pub const ChartDataLabel = ChartSeries.DataLabel;
 pub const ChartAxis = @import("ChartAxis.zig");
 pub const ChartAxisType = ChartAxis.Type;
 const ObjectPosition = @import("WorkSheet.zig").ObjectPosition;

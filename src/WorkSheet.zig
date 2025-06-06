@@ -567,7 +567,7 @@ pub inline fn writeRichString(
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
         allocator
     else
-        return XlsxError.WriteRichString;
+        return XlsxError.WriteRichStringNoAlloc;
 
     var rich_string_array = try allocator.alloc(c.lxw_rich_string_tuple, rich_string.len);
     defer allocator.free(rich_string_array);
@@ -1492,7 +1492,7 @@ pub inline fn addTable(
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
         allocator
     else
-        return XlsxError.AddTable;
+        return XlsxError.AddTableNoAlloc;
 
     // convert table_columns to [*c][*c]lxw_table_column
     var table_column_array = try allocator.alloc(c.lxw_table_column, options.columns.len);

@@ -74,6 +74,7 @@ pub const XlsxError = error{
     WriteRichString,
     AddTable,
     SetPoints,
+    SetLabelsCustomNoAllocator,
 };
 
 pub inline fn checkResult(error_code: c_uint) XlsxError!void {
@@ -157,17 +158,21 @@ pub inline fn strError(err: anyerror) []const u8 {
         error.AddChart => "add_chart() returned a null pointer.",
         error.ChartAddSeries => "chart_add_series() returned a null pointer.",
         error.GetErrorBars => "chart_series_get_error_bars() returned a null pointer.",
-        error.WriteRichString =>
+        error.WriteRichStringNoAlloc =>
         \\No Allocator provided to initWorkBook(), writeRichString() cannot be called,
         \\ > Provide Allocator or use writeRichStringNoAlloc() instead.
         ,
-        error.AddTable =>
+        error.AddTableNoAlloc =>
         \\No Allocator provided to initWorkBook(), addTables() cannot be called,
         \\ > Provide Allocator or use addTablesNoAlloc() instead.
         ,
-        error.SetPoints =>
+        error.SetPointsNoAlloc =>
         \\No Allocator provided to initWorkBook(), setPoints() cannot be called,
         \\ > Provide Allocator or use setPointsNoAlloc() instead.
+        ,
+        error.SetLabelsCustomNoAlloc =>
+        \\No Allocator provided to initWorkBook(), setLabelsCustom() cannot be called,
+        \\ > Provide Allocator or use setLabelsCustomNoAlloc() instead.
         ,
         else => "unknown error, might not be an xlsxwriter error",
     };
