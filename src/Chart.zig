@@ -477,7 +477,7 @@ pub inline fn legendSetLayout(self: Chart, layout: Layout) void {
 }
 
 // pub extern fn chart_legend_set_font(chart: [*c]lxw_chart, font: [*c]lxw_chart_font) void;
-pub inline fn legendsetFont(self: Chart, font: Font) void {
+pub inline fn legendSetFont(self: Chart, font: Font) void {
     c.chart_legend_set_font(
         self.chart_c,
         @constCast(&font.toC()),

@@ -65,8 +65,7 @@ pub const DefinedColors = enum(u32) {
     // Some colors are changed to reflect Excel default RGB code
     black = c.LXW_COLOR_BLACK,
     white = c.LXW_COLOR_WHITE,
-    // blue = c.LXW_COLOR_BLUE,
-    blue = 0x0070C0,
+    blue = c.LXW_COLOR_BLUE,
     brown = c.LXW_COLOR_BROWN,
     cyan = c.LXW_COLOR_CYAN,
     gray = c.LXW_COLOR_GRAY,
@@ -92,6 +91,7 @@ pub const DefinedColors = enum(u32) {
     light_green = 0x92D050,
     light_blue = 0x00B0F0,
     dark_blue = 0x002060,
+    excel_blue = 0x0070C0,
     // Additional Colors
     rose = 0xFF7474,
     light_rose = 0xFFC6C6,
