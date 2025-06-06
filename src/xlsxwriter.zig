@@ -75,6 +75,8 @@ pub const ChartPoint = ChartSeries.Point;
 pub const ChartPointNoAlloc = ChartSeries.PointNoAlloc;
 pub const ChartPointNoAllocArray = ChartSeries.PointNoAllocArray;
 pub const ChartDataLabel = ChartSeries.DataLabel;
+pub const ChartDataLabelNoAlloc = ChartSeries.DataLabelNoAlloc;
+pub const ChartDataLabelNoAllocArray = ChartSeries.DataLabelNoAllocArray;
 pub const ChartAxis = Chart.ChartAxis;
 pub const ChartAxisType = ChartAxis.Type;
 

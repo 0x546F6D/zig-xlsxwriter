@@ -335,6 +335,15 @@ pub inline fn setLabelsCustom(self: ChartSeries, data_labels: []const DataLabel)
     ));
 }
 
+pub const DataLabelNoAlloc = c.lxw_chart_data_label;
+pub const DataLabelNoAllocArray = [:null]const ?*const DataLabelNoAlloc;
+pub inline fn setLabelsCustomNoAlloc(self: ChartSeries, data_labels: DataLabelNoAllocArray) !void {
+    try check(c.chart_series_set_labels_custom(
+        self.chartseries_c,
+        @ptrCast(@constCast(data_labels)),
+    ));
+}
+
 pub const LabelSeparator = enum(u8) {
     comma = c.LXW_CHART_LABEL_SEPARATOR_COMMA,
     semicolon = c.LXW_CHART_LABEL_SEPARATOR_SEMICOLON,
