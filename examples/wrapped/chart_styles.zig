@@ -1,31 +1,26 @@
-//
-// An example showing all 48 default chart styles available in Excel 2007
-// using the libxlsxwriter library. Note, these styles are not the same as the
-// styles available in Excel 2013.
-//
-// Copyright 2014-2025, John McNamara, jmcnamara@cpan.org
-//
-//
-
-const std = @import("std");
-const xlsxwriter = @import("xlsxwriter");
-
 pub fn main() !void {
-    const workbook = xlsxwriter.workbook_new("zig-chart_styles.xlsx");
+    defer _ = dbga.deinit();
+
+    const xlsx_path = try h.getXlsxPath(alloc, @src().file);
+    defer alloc.free(xlsx_path);
+
+    // Create a workbook and add a worksheet.
+    const workbook = try xwz.initWorkBook(null, xlsx_path, null);
+    defer workbook.deinit() catch {};
 
     // Define chart types and names
-    const chart_types = [_]u8{
-        xlsxwriter.LXW_CHART_COLUMN,
-        xlsxwriter.LXW_CHART_AREA,
-        xlsxwriter.LXW_CHART_LINE,
-        xlsxwriter.LXW_CHART_PIE,
+    const chart_types = [_]xwz.ChartType{
+        .column,
+        .area,
+        .line,
+        .pie,
     };
     const chart_names = [_][:0]const u8{ "Column", "Area", "Line", "Pie" };
 
     // Create a worksheet for each chart type
     for (chart_types, chart_names) |chart_type, chart_name| {
-        const worksheet = xlsxwriter.workbook_add_worksheet(workbook, chart_name);
-        _ = xlsxwriter.worksheet_set_zoom(worksheet, 30);
+        const worksheet = try workbook.addWorkSheet(chart_name);
+        worksheet.setZoom(30);
 
         // Create 48 charts, each with a different style
         var style_num: u8 = 1;
@@ -33,17 +28,17 @@ pub fn main() !void {
         while (row_num < 90) : (row_num += 15) {
             var col_num: usize = 0;
             while (col_num < 64) : (col_num += 8) {
-                const chart = xlsxwriter.workbook_add_chart(workbook, chart_type);
+                const chart = try workbook.addChart(chart_type);
 
                 // Create chart title with style number
                 var title_buf: [32]u8 = undefined;
                 const title = std.fmt.bufPrintZ(&title_buf, "Style {d}", .{style_num}) catch unreachable;
 
-                _ = xlsxwriter.chart_add_series(chart, null, "=Data!$A$1:$A$6");
-                _ = xlsxwriter.chart_title_set_name(chart, title.ptr);
-                _ = xlsxwriter.chart_set_style(chart, style_num);
+                _ = try chart.addSeries(null, "=Data!$A$1:$A$6");
+                chart.titleSetName(title);
+                chart.setStyle(style_num);
 
-                _ = xlsxwriter.worksheet_insert_chart(worksheet, @intCast(row_num), @intCast(col_num), chart);
+                try worksheet.insertChart(.{ .row = @intCast(row_num), .col = @intCast(col_num) }, chart, null);
 
                 style_num += 1;
             }
@@ -51,13 +46,17 @@ pub fn main() !void {
     }
 
     // Create a worksheet with data for the charts
-    const data_worksheet = xlsxwriter.workbook_add_worksheet(workbook, "Data");
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 0, 0, 10, null);
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 1, 0, 40, null);
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 2, 0, 50, null);
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 3, 0, 20, null);
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 4, 0, 10, null);
-    _ = xlsxwriter.worksheet_write_number(data_worksheet, 5, 0, 50, null);
-
-    _ = xlsxwriter.workbook_close(workbook);
+    const data_worksheet = try workbook.addWorkSheet("Data");
+    try data_worksheet.writeNumber(.{}, 10, .default);
+    try data_worksheet.writeNumber(.{ .row = 1 }, 40, .default);
+    try data_worksheet.writeNumber(.{ .row = 2 }, 50, .default);
+    try data_worksheet.writeNumber(.{ .row = 3 }, 20, .default);
+    try data_worksheet.writeNumber(.{ .row = 4 }, 10, .default);
+    try data_worksheet.writeNumber(.{ .row = 5 }, 50, .default);
 }
+
+const std = @import("std");
+var dbga: @import("std").heap.DebugAllocator(.{}) = .init;
+const alloc = dbga.allocator();
+const h = @import("_helper.zig");
+const xwz = @import("xlsxwriter");

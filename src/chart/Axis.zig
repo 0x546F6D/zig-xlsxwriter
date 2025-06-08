@@ -1,4 +1,4 @@
-const ChartAxis = @This();
+const Axis = @This();
 
 axis_c: ?*c.lxw_chart_axis,
 
@@ -49,7 +49,7 @@ pub const TickMark = enum(u8) {
 
 // pub extern fn chart_axis_set_name(axis: [*c]lxw_chart_axis, name: [*c]const u8) void;
 pub inline fn setName(
-    self: ChartAxis,
+    self: Axis,
     name: [:0]const u8,
 ) void {
     c.chart_axis_set_name(
@@ -60,7 +60,7 @@ pub inline fn setName(
 
 // pub extern fn chart_axis_set_name_range(axis: [*c]lxw_chart_axis, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn setNameRange(
-    self: ChartAxis,
+    self: Axis,
     sheetname: [:0]const u8,
     cell: Cell,
 ) void {
@@ -73,7 +73,7 @@ pub inline fn setNameRange(
 }
 
 // pub extern fn chart_axis_set_name_layout(axis: [*c]lxw_chart_axis, layout: [*c]lxw_chart_layout) void;
-pub inline fn setNameLayout(self: ChartAxis, layout: ChartLayout) void {
+pub inline fn setNameLayout(self: Axis, layout: ChartLayout) void {
     c.chart_axis_set_name_layout(
         self.axis_c,
         @constCast(&layout.toC()),
@@ -81,7 +81,7 @@ pub inline fn setNameLayout(self: ChartAxis, layout: ChartLayout) void {
 }
 
 // pub extern fn chart_axis_set_name_font(axis: [*c]lxw_chart_axis, font: [*c]lxw_chart_font) void;
-pub inline fn setNameFont(self: ChartAxis, font: ChartFont) void {
+pub inline fn setNameFont(self: Axis, font: ChartFont) void {
     c.chart_axis_set_name_font(
         self.axis_c,
         @constCast(&font.toC()),
@@ -89,7 +89,7 @@ pub inline fn setNameFont(self: ChartAxis, font: ChartFont) void {
 }
 
 // pub extern fn chart_axis_set_num_font(axis: [*c]lxw_chart_axis, font: [*c]lxw_chart_font) void;
-pub inline fn setNumFont(self: ChartAxis, font: ChartFont) void {
+pub inline fn setNumFont(self: Axis, font: ChartFont) void {
     c.chart_axis_set_num_font(
         self.axis_c,
         @constCast(&font.toC()),
@@ -97,7 +97,7 @@ pub inline fn setNumFont(self: ChartAxis, font: ChartFont) void {
 }
 
 // pub extern fn chart_axis_set_num_format(axis: [*c]lxw_chart_axis, num_format: [*c]const u8) void;
-pub inline fn setNumFormat(self: ChartAxis, num_format: [:0]const u8) void {
+pub inline fn setNumFormat(self: Axis, num_format: [:0]const u8) void {
     c.chart_axis_set_num_format(
         self.axis_c,
         num_format,
@@ -105,7 +105,7 @@ pub inline fn setNumFormat(self: ChartAxis, num_format: [:0]const u8) void {
 }
 
 // pub extern fn chart_axis_set_line(axis: [*c]lxw_chart_axis, line: [*c]lxw_chart_line) void;
-pub inline fn setLine(self: ChartAxis, line: ChartLine) void {
+pub inline fn setLine(self: Axis, line: ChartLine) void {
     c.chart_axis_set_line(
         self.axis_c,
         @constCast(&line.toC()),
@@ -113,7 +113,7 @@ pub inline fn setLine(self: ChartAxis, line: ChartLine) void {
 }
 
 // pub extern fn chart_axis_set_fill(axis: [*c]lxw_chart_axis, fill: [*c]lxw_chart_fill) void;
-pub inline fn setFill(self: ChartAxis, fill: ChartFill) void {
+pub inline fn setFill(self: Axis, fill: ChartFill) void {
     c.chart_axis_set_fill(
         self.axis_c,
         @constCast(&fill.toC()),
@@ -121,7 +121,7 @@ pub inline fn setFill(self: ChartAxis, fill: ChartFill) void {
 }
 
 // pub extern fn chart_axis_set_pattern(axis: [*c]lxw_chart_axis, pattern: [*c]lxw_chart_pattern) void;
-pub inline fn setPattern(self: ChartAxis, pattern: ChartPattern) void {
+pub inline fn setPattern(self: Axis, pattern: ChartPattern) void {
     c.chart_axis_set_pattern(
         self.axis_c,
         @constCast(&pattern.toC()),
@@ -129,32 +129,32 @@ pub inline fn setPattern(self: ChartAxis, pattern: ChartPattern) void {
 }
 
 // pub extern fn chart_axis_set_reverse(axis: [*c]lxw_chart_axis) void;
-pub inline fn setReverse(self: ChartAxis) void {
+pub inline fn setReverse(self: Axis) void {
     c.chart_axis_set_reverse(self.axis_c);
 }
 
 // pub extern fn chart_axis_set_crossing(axis: [*c]lxw_chart_axis, value: f64) void;
-pub inline fn setCrossing(self: ChartAxis, value: f64) void {
+pub inline fn setCrossing(self: Axis, value: f64) void {
     c.chart_axis_set_crossing(self.axis_c, value);
 }
 
 // pub extern fn chart_axis_set_crossing_max(axis: [*c]lxw_chart_axis) void;
-pub inline fn setCrossingMax(self: ChartAxis) void {
+pub inline fn setCrossingMax(self: Axis) void {
     c.chart_axis_set_crossing_max(self.axis_c);
 }
 
 // pub extern fn chart_axis_set_crossing_min(axis: [*c]lxw_chart_axis) void;
-pub inline fn setCrossingMin(self: ChartAxis) void {
+pub inline fn setCrossingMin(self: Axis) void {
     c.chart_axis_set_crossing_min(self.axis_c);
 }
 
 // pub extern fn chart_axis_off(axis: [*c]lxw_chart_axis) void;
-pub inline fn off(self: ChartAxis) void {
+pub inline fn off(self: Axis) void {
     c.chart_axis_set_crossing_min(self.axis_c);
 }
 
 // pub extern fn chart_axis_set_position(axis: [*c]lxw_chart_axis, position: u8) void;
-pub inline fn setPosition(self: ChartAxis, position: Position) void {
+pub inline fn setPosition(self: Axis, position: Position) void {
     c.chart_axis_set_position(
         self.axis_c,
         @intFromEnum(position),
@@ -162,7 +162,7 @@ pub inline fn setPosition(self: ChartAxis, position: Position) void {
 }
 
 // pub extern fn chart_axis_set_label_position(axis: [*c]lxw_chart_axis, position: u8) void;
-pub inline fn setLabelPosition(self: ChartAxis, position: LabelPosition) void {
+pub inline fn setLabelPosition(self: Axis, position: LabelPosition) void {
     c.chart_axis_set_label_position(
         self.axis_c,
         @intFromEnum(position),
@@ -170,7 +170,7 @@ pub inline fn setLabelPosition(self: ChartAxis, position: LabelPosition) void {
 }
 
 // pub extern fn chart_axis_set_label_align(axis: [*c]lxw_chart_axis, @"align": u8) void;
-pub inline fn setLabelAlign(self: ChartAxis, @"align": LabelAlignment) void {
+pub inline fn setLabelAlign(self: Axis, @"align": LabelAlignment) void {
     c.chart_axis_set_label_position(
         self.axis_c,
         @intFromEnum(@"align"),
@@ -178,52 +178,52 @@ pub inline fn setLabelAlign(self: ChartAxis, @"align": LabelAlignment) void {
 }
 
 // pub extern fn chart_axis_set_min(axis: [*c]lxw_chart_axis, min: f64) void;
-pub inline fn setMin(self: ChartAxis, min: f64) void {
+pub inline fn setMin(self: Axis, min: f64) void {
     c.chart_axis_set_min(self.axis_c, min);
 }
 
 // pub extern fn chart_axis_set_max(axis: [*c]lxw_chart_axis, max: f64) void;
-pub inline fn setMax(self: ChartAxis, max: f64) void {
+pub inline fn setMax(self: Axis, max: f64) void {
     c.chart_axis_set_max(self.axis_c, max);
 }
 
 // pub extern fn chart_axis_set_log_base(axis: [*c]lxw_chart_axis, log_base: u16) void;
-pub inline fn setLogBase(self: ChartAxis, log_base: f64) void {
+pub inline fn setLogBase(self: Axis, log_base: f64) void {
     c.chart_axis_set_log_base(self.axis_c, log_base);
 }
 
 // pub extern fn chart_axis_set_major_tick_mark(axis: [*c]lxw_chart_axis, @"type": u8) void;
-pub inline fn setMajorTickMark(self: ChartAxis, @"type": TickMark) void {
+pub inline fn setMajorTickMark(self: Axis, @"type": TickMark) void {
     c.chart_axis_set_major_tick_mark(self.axis_c, @"type");
 }
 
 // pub extern fn chart_axis_set_minor_tick_mark(axis: [*c]lxw_chart_axis, @"type": u8) void;
-pub inline fn setMinorTickMark(self: ChartAxis, @"type": TickMark) void {
+pub inline fn setMinorTickMark(self: Axis, @"type": TickMark) void {
     c.chart_axis_set_minor_tick_mark(self.axis_c, @"type");
 }
 
 // pub extern fn chart_axis_set_interval_unit(axis: [*c]lxw_chart_axis, unit: u16) void;
-pub inline fn setIntervalUnit(self: ChartAxis, unit: u16) void {
+pub inline fn setIntervalUnit(self: Axis, unit: u16) void {
     c.chart_axis_set_interval_unit(self.axis_c, unit);
 }
 
 // pub extern fn chart_axis_set_interval_tick(axis: [*c]lxw_chart_axis, unit: u16) void;
-pub inline fn setIntervalTick(self: ChartAxis, unit: u16) void {
+pub inline fn setIntervalTick(self: Axis, unit: u16) void {
     c.chart_axis_set_interval_tick(self.axis_c, unit);
 }
 
 // pub extern fn chart_axis_set_major_unit(axis: [*c]lxw_chart_axis, unit: f64) void;
-pub inline fn setMajorUnit(self: ChartAxis, unit: f64) void {
+pub inline fn setMajorUnit(self: Axis, unit: f64) void {
     c.chart_axis_set_major_unit(self.axis_c, unit);
 }
 
 // pub extern fn chart_axis_set_minor_unit(axis: [*c]lxw_chart_axis, unit: f64) void;
-pub inline fn setMinorUnit(self: ChartAxis, unit: f64) void {
+pub inline fn setMinorUnit(self: Axis, unit: f64) void {
     c.chart_axis_set_minor_unit(self.axis_c, unit);
 }
 
 // pub extern fn chart_axis_set_display_units(axis: [*c]lxw_chart_axis, units: u8) void;
-pub inline fn setDisplayUnits(self: ChartAxis, units: DisplayUnit) void {
+pub inline fn setDisplayUnits(self: Axis, units: DisplayUnit) void {
     c.chart_axis_set_display_units(
         self.axis_c,
         @intFromEnum(units),
@@ -231,7 +231,7 @@ pub inline fn setDisplayUnits(self: ChartAxis, units: DisplayUnit) void {
 }
 
 // pub extern fn chart_axis_set_display_units_visible(axis: [*c]lxw_chart_axis, visible: u8) void;
-pub inline fn setDisplayUnitsVisible(self: ChartAxis, visible: bool) void {
+pub inline fn setDisplayUnitsVisible(self: Axis, visible: bool) void {
     c.chart_axis_set_display_units_visible(
         self.axis_c,
         @intFromBool(visible),
@@ -239,7 +239,7 @@ pub inline fn setDisplayUnitsVisible(self: ChartAxis, visible: bool) void {
 }
 
 // pub extern fn chart_axis_major_gridlines_set_visible(axis: [*c]lxw_chart_axis, visible: u8) void;
-pub inline fn setMajorGridLinesVisible(self: ChartAxis, visible: bool) void {
+pub inline fn setMajorGridLinesVisible(self: Axis, visible: bool) void {
     c.chart_axis_major_gridlines_set_visible(
         self.axis_c,
         @intFromBool(visible),
@@ -247,7 +247,7 @@ pub inline fn setMajorGridLinesVisible(self: ChartAxis, visible: bool) void {
 }
 
 // pub extern fn chart_axis_minor_gridlines_set_visible(axis: [*c]lxw_chart_axis, visible: u8) void;
-pub inline fn setMinorGridLinesVisible(self: ChartAxis, visible: bool) void {
+pub inline fn setMinorGridLinesVisible(self: Axis, visible: bool) void {
     c.chart_axis_minor_gridlines_set_visible(
         self.axis_c,
         @intFromBool(visible),
@@ -255,7 +255,7 @@ pub inline fn setMinorGridLinesVisible(self: ChartAxis, visible: bool) void {
 }
 
 // pub extern fn chart_axis_major_gridlines_set_line(axis: [*c]lxw_chart_axis, line: [*c]lxw_chart_line) void;
-pub inline fn setMajorGridLinesLine(self: ChartAxis, line: ChartLine) void {
+pub inline fn setMajorGridLinesLine(self: Axis, line: ChartLine) void {
     c.chart_axis_major_gridlines_set_line(
         self.axis_c,
         @constCast(&line.toC()),
@@ -263,7 +263,7 @@ pub inline fn setMajorGridLinesLine(self: ChartAxis, line: ChartLine) void {
 }
 
 // pub extern fn chart_axis_minor_gridlines_set_line(axis: [*c]lxw_chart_axis, line: [*c]lxw_chart_line) void;
-pub inline fn setMinorGridLinesLine(self: ChartAxis, line: ChartLine) void {
+pub inline fn setMinorGridLinesLine(self: Axis, line: ChartLine) void {
     c.chart_axis_minor_gridlines_set_line(
         self.axis_c,
         @constCast(&line.toC()),
@@ -271,10 +271,11 @@ pub inline fn setMinorGridLinesLine(self: ChartAxis, line: ChartLine) void {
 }
 
 const c = @import("lxw");
-const xlsxwriter = @import("xlsxwriter.zig");
-const Cell = @import("utility.zig").Cell;
-const ChartFont = @import("Chart.zig").Font;
-const ChartLayout = @import("Chart.zig").Layout;
-const ChartLine = @import("Chart.zig").Line;
-const ChartFill = @import("Chart.zig").Fill;
-const ChartPattern = @import("Chart.zig").Pattern;
+const xlsxwriter = @import("../xlsxwriter.zig");
+const Cell = @import("../utility.zig").Cell;
+const Chart = @import("../Chart.zig");
+const ChartFont = Chart.Font;
+const ChartLayout = Chart.Layout;
+const ChartLine = Chart.Line;
+const ChartFill = Chart.Fill;
+const ChartPattern = Chart.Pattern;

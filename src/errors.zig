@@ -71,10 +71,10 @@ pub const XlsxError = error{
     AddChart,
     ChartAddSeries,
     GetErrorBars,
-    WriteRichString,
-    AddTable,
-    SetPoints,
-    SetLabelsCustomNoAllocator,
+    WriteRichStringNoAlloc,
+    AddTableNoAlloc,
+    SetPointsNoAlloc,
+    SetLabelsCustomNoAlloc,
 };
 
 pub inline fn checkResult(error_code: c_uint) XlsxError!void {

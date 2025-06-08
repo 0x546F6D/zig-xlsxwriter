@@ -28,6 +28,7 @@ pub fn build(b: *std.Build) void {
     });
     xlsxwriter_mod.addImport("lxw", lxw_mod);
 
+    const run_step = b.step("run", "run the build example(s)");
     const make = b.option([]const u8, "make", "Provide name of example to make example (ex: 'tutorial1'") orelse null;
     if (make) |name| {
         var dbga: std.heap.DebugAllocator(.{}) = .init;
@@ -35,18 +36,57 @@ pub fn build(b: *std.Build) void {
         const alloc = dbga.allocator();
 
         const example_dir = "examples/wrapped";
-        const example_path = std.fmt.allocPrint(alloc, "{s}/{s}.zig", .{ example_dir, name }) catch example_dir ++ "/tutorial1.zig";
-        defer alloc.free(example_path);
-        makeExample(b, .{
-            .path = example_path,
-            .zig_mod = xlsxwriter_mod,
-            .target = target,
-            .optimize = optimize,
-        });
+
+        if (std.mem.eql(u8, "all", name)) {
+            // build all the example
+            const ex_dir_o = b.build_root.handle.openDir(example_dir, .{ .iterate = true }) catch null;
+            var ex_dir = if (ex_dir_o) |dir| dir else return;
+            defer ex_dir.close();
+            var walker = ex_dir.walk(alloc) catch return;
+            defer walker.deinit();
+            while (walker.next() catch null) |entry| {
+                switch (entry.kind) {
+                    std.fs.File.Kind.file => {
+                        if (!std.mem.eql(u8, entry.basename, "_helper.zig") and
+                            std.mem.eql(u8, entry.basename[entry.basename.len - 4 .. entry.basename.len], ".zig"))
+                        {
+                            const example_path = std.fmt.allocPrint(alloc, "{s}/{s}", .{ example_dir, entry.basename }) catch example_dir ++ "/tutorial1.zig";
+                            defer alloc.free(example_path);
+
+                            makeExample(
+                                b,
+                                .{
+                                    .path = example_path,
+                                    .zig_mod = xlsxwriter_mod,
+                                    .target = target,
+                                    .optimize = optimize,
+                                },
+                                run_step,
+                            );
+                        }
+                    },
+                    else => {},
+                }
+            }
+        } else {
+            const example_path = std.fmt.allocPrint(alloc, "{s}/{s}.zig", .{ example_dir, name }) catch example_dir ++ "/tutorial1.zig";
+            defer alloc.free(example_path);
+
+            makeExample(
+                b,
+                .{
+                    .path = example_path,
+                    .zig_mod = xlsxwriter_mod,
+                    .target = target,
+                    .optimize = optimize,
+                },
+                run_step,
+            );
+        }
     }
 }
 
-fn makeExample(b: *std.Build, options: BuildInfo) void {
+fn makeExample(b: *std.Build, options: BuildInfo, run_step: *std.Build.Step) void {
     const example = b.addExecutable(.{
         .name = options.filename(),
         .root_source_file = b.path(options.path),
@@ -67,8 +107,6 @@ fn makeExample(b: *std.Build, options: BuildInfo) void {
         run_cmd.addArgs(args);
     }
 
-    const descr = b.fmt("Run the {s} example", .{options.filename()});
-    const run_step = b.step(options.filename(), descr);
     run_step.dependOn(&run_cmd.step);
 }
 

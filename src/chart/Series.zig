@@ -1,4 +1,4 @@
-const ChartSeries = @This();
+const Series = @This();
 
 alloc: ?std.mem.Allocator,
 chartseries_c: ?*c.lxw_chart_series,
@@ -7,7 +7,7 @@ y_error_bars: ErrorBars,
 
 // pub extern fn chart_series_set_categories(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
 pub inline fn setCategories(
-    self: ChartSeries,
+    self: Series,
     sheetname: [:0]const u8,
     range: Range,
 ) void {
@@ -23,7 +23,7 @@ pub inline fn setCategories(
 
 // pub extern fn chart_series_set_values(series: [*c]lxw_chart_series, sheetname: [*c]const u8, first_row: lxw_row_t, first_col: lxw_col_t, last_row: lxw_row_t, last_col: lxw_col_t) void;
 pub inline fn setValues(
-    self: ChartSeries,
+    self: Series,
     sheetname: [:0]const u8,
     range: Range,
 ) void {
@@ -39,7 +39,7 @@ pub inline fn setValues(
 
 // pub extern fn chart_series_set_name(series: [*c]lxw_chart_series, name: [*c]const u8) void;
 pub inline fn setName(
-    self: ChartSeries,
+    self: Series,
     name: [:0]const u8,
 ) void {
     c.chart_series_set_name(
@@ -50,7 +50,7 @@ pub inline fn setName(
 
 // pub extern fn chart_series_set_name_range(series: [*c]lxw_chart_series, sheetname: [*c]const u8, row: lxw_row_t, col: lxw_col_t) void;
 pub inline fn setNameRange(
-    self: ChartSeries,
+    self: Series,
     sheetname: [:0]const u8,
     cell: Cell,
 ) void {
@@ -64,7 +64,7 @@ pub inline fn setNameRange(
 
 // pub extern fn chart_series_set_line(series: [*c]lxw_chart_series, line: [*c]lxw_chart_line) void;
 pub inline fn setLine(
-    self: ChartSeries,
+    self: Series,
     line: ChartLine,
 ) void {
     c.chart_series_set_line(
@@ -75,7 +75,7 @@ pub inline fn setLine(
 
 // pub extern fn chart_series_set_fill(series: [*c]lxw_chart_series, fill: [*c]lxw_chart_fill) void;
 pub inline fn setFill(
-    self: ChartSeries,
+    self: Series,
     fill: ChartFill,
 ) void {
     c.chart_series_set_fill(
@@ -85,13 +85,13 @@ pub inline fn setFill(
 }
 
 // pub extern fn chart_series_set_invert_if_negative(series: [*c]lxw_chart_series) void;
-pub inline fn setInvertIfNegative(self: ChartSeries) void {
+pub inline fn setInvertIfNegative(self: Series) void {
     c.chart_series_set_invert_if_negative(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_pattern(series: [*c]lxw_chart_series, pattern: [*c]lxw_chart_pattern) void;
 pub inline fn setPattern(
-    self: ChartSeries,
+    self: Series,
     pattern: ChartPattern,
 ) void {
     c.chart_series_set_pattern(
@@ -116,7 +116,7 @@ pub const MarkerType = enum(u8) {
 
 // pub extern fn chart_series_set_marker_type(series: [*c]lxw_chart_series, @"type": u8) void;
 pub inline fn setMarkerType(
-    self: ChartSeries,
+    self: Series,
     @"type": MarkerType,
 ) void {
     c.chart_series_set_marker_type(
@@ -127,7 +127,7 @@ pub inline fn setMarkerType(
 
 // pub extern fn chart_series_set_marker_size(series: [*c]lxw_chart_series, size: u8) void;
 pub inline fn setMarkerSize(
-    self: ChartSeries,
+    self: Series,
     size: u8,
 ) void {
     c.chart_series_set_marker_size(
@@ -138,7 +138,7 @@ pub inline fn setMarkerSize(
 
 // pub extern fn chart_series_set_marker_line(series: [*c]lxw_chart_series, line: [*c]lxw_chart_line) void;
 pub inline fn setMarkerLine(
-    self: ChartSeries,
+    self: Series,
     line: ChartLine,
 ) void {
     c.chart_series_set_marker_line(
@@ -149,7 +149,7 @@ pub inline fn setMarkerLine(
 
 // pub extern fn chart_series_set_marker_fill(series: [*c]lxw_chart_series, fill: [*c]lxw_chart_fill) void;
 pub inline fn setMarkerFill(
-    self: ChartSeries,
+    self: Series,
     fill: ChartFill,
 ) void {
     c.chart_series_set_marker_fill(
@@ -160,7 +160,7 @@ pub inline fn setMarkerFill(
 
 // pub extern fn chart_series_set_marker_pattern(series: [*c]lxw_chart_series, pattern: [*c]lxw_chart_pattern) void;
 pub inline fn setMarkerPattern(
-    self: ChartSeries,
+    self: Series,
     pattern: ChartPattern,
 ) void {
     c.chart_series_set_marker_pattern(
@@ -184,7 +184,7 @@ pub const Point = extern struct {
 
 // pub extern fn chart_series_set_points(series: [*c]lxw_chart_series, points: [*c][*c]lxw_chart_point) lxw_error;
 pub inline fn setPoints(
-    self: ChartSeries,
+    self: Series,
     points: []const Point,
 ) !void {
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
@@ -230,7 +230,7 @@ pub inline fn setPoints(
 
 pub const PointNoAlloc = c.lxw_chart_point;
 pub const PointNoAllocArray = [:null]const ?*const PointNoAlloc;
-pub inline fn setPointsNoAlloc(self: ChartSeries, points: PointNoAllocArray) !void {
+pub inline fn setPointsNoAlloc(self: Series, points: PointNoAllocArray) !void {
     try check(c.chart_series_set_points(
         self.chartseries_c,
         @ptrCast(@constCast(points)),
@@ -238,7 +238,7 @@ pub inline fn setPointsNoAlloc(self: ChartSeries, points: PointNoAllocArray) !vo
 }
 
 // pub extern fn chart_series_set_smooth(series: [*c]lxw_chart_series, smooth: u8) void;
-pub inline fn setSmooth(self: ChartSeries, smooth: bool) void {
+pub inline fn setSmooth(self: Series, smooth: bool) void {
     c.chart_series_set_smooth(
         self.chartseries_c,
         @intFromBool(smooth),
@@ -246,13 +246,13 @@ pub inline fn setSmooth(self: ChartSeries, smooth: bool) void {
 }
 
 // pub extern fn chart_series_set_labels(series: [*c]lxw_chart_series) void;
-pub inline fn setLabels(self: ChartSeries) void {
+pub inline fn setLabels(self: Series) void {
     c.chart_series_set_labels(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_labels_options(series: [*c]lxw_chart_series, show_name: u8, show_category: u8, show_value: u8) void;
 pub inline fn setLabelsOptions(
-    self: ChartSeries,
+    self: Series,
     show_name: bool,
     show_category: bool,
     show_value: bool,
@@ -284,11 +284,11 @@ pub const DataLabel = struct {
 };
 
 // pub extern fn chart_series_set_labels_custom(series: [*c]lxw_chart_series, data_labels: [*c][*c]lxw_chart_data_label) lxw_error;
-pub inline fn setLabelsCustom(self: ChartSeries, data_labels: []const DataLabel) !void {
+pub inline fn setLabelsCustom(self: Series, data_labels: []const DataLabel) !void {
     const allocator: std.mem.Allocator = if (self.alloc) |allocator|
         allocator
     else
-        return XlsxError.SetLabelsCustomNoAllocator;
+        return XlsxError.SetLabelsCustomNoAlloc;
 
     var font_array = try allocator.alloc(c.lxw_chart_font, data_labels.len);
     defer allocator.free(font_array);
@@ -337,7 +337,7 @@ pub inline fn setLabelsCustom(self: ChartSeries, data_labels: []const DataLabel)
 
 pub const DataLabelNoAlloc = c.lxw_chart_data_label;
 pub const DataLabelNoAllocArray = [:null]const ?*const DataLabelNoAlloc;
-pub inline fn setLabelsCustomNoAlloc(self: ChartSeries, data_labels: DataLabelNoAllocArray) !void {
+pub inline fn setLabelsCustomNoAlloc(self: Series, data_labels: DataLabelNoAllocArray) !void {
     try check(c.chart_series_set_labels_custom(
         self.chartseries_c,
         @ptrCast(@constCast(data_labels)),
@@ -354,7 +354,7 @@ pub const LabelSeparator = enum(u8) {
 
 // pub extern fn chart_series_set_labels_separator(series: [*c]lxw_chart_series, separator: u8) void;
 pub inline fn setLabelsSeparator(
-    self: ChartSeries,
+    self: Series,
     separator: LabelSeparator,
 ) void {
     c.chart_series_set_labels_separator(
@@ -378,7 +378,7 @@ pub const LabelPosition = enum(u8) {
 
 // pub extern fn chart_series_set_labels_position(series: [*c]lxw_chart_series, position: u8) void;
 pub inline fn setLabelsPosition(
-    self: ChartSeries,
+    self: Series,
     position: LabelPosition,
 ) void {
     c.chart_series_set_labels_position(
@@ -388,23 +388,23 @@ pub inline fn setLabelsPosition(
 }
 
 // pub extern fn chart_series_set_labels_leader_line(series: [*c]lxw_chart_series) void;
-pub inline fn setLabelsLeaderLine(self: ChartSeries) void {
+pub inline fn setLabelsLeaderLine(self: Series) void {
     c.chart_series_set_labels_leader_line(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_labels_legend(series: [*c]lxw_chart_series) void;
-pub inline fn setLabelsLegend(self: ChartSeries) void {
+pub inline fn setLabelsLegend(self: Series) void {
     c.chart_series_set_labels_legend(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_labels_percentage(series: [*c]lxw_chart_series) void;
-pub inline fn setLabelsPercentage(self: ChartSeries) void {
+pub inline fn setLabelsPercentage(self: Series) void {
     c.chart_series_set_labels_percentage(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_labels_num_format(series: [*c]lxw_chart_series, num_format: [*c]const u8) void;
 pub inline fn setLabelsNumFormat(
-    self: ChartSeries,
+    self: Series,
     num_format: [:0]const u8,
 ) void {
     c.chart_series_set_labels_position(
@@ -414,7 +414,7 @@ pub inline fn setLabelsNumFormat(
 }
 
 // pub extern fn chart_series_set_labels_font(series: [*c]lxw_chart_series, font: [*c]lxw_chart_font) void;
-pub inline fn setLabelsFont(self: ChartSeries, font: ChartFont) void {
+pub inline fn setLabelsFont(self: Series, font: ChartFont) void {
     c.chart_series_set_labels_font(
         self.chartseries_c,
         @constCast(&font.toC()),
@@ -423,7 +423,7 @@ pub inline fn setLabelsFont(self: ChartSeries, font: ChartFont) void {
 
 // pub extern fn chart_series_set_labels_line(series: [*c]lxw_chart_series, line: [*c]lxw_chart_line) void;
 pub inline fn setLabelsLine(
-    self: ChartSeries,
+    self: Series,
     line: ChartLine,
 ) void {
     c.chart_series_set_labels_line(
@@ -434,7 +434,7 @@ pub inline fn setLabelsLine(
 
 // pub extern fn chart_series_set_labels_fill(series: [*c]lxw_chart_series, fill: [*c]lxw_chart_fill) void;
 pub inline fn setLabelsFill(
-    self: ChartSeries,
+    self: Series,
     fill: ChartFill,
 ) void {
     c.chart_series_set_labels_fill(
@@ -445,7 +445,7 @@ pub inline fn setLabelsFill(
 
 // pub extern fn chart_series_set_labels_pattern(series: [*c]lxw_chart_series, pattern: [*c]lxw_chart_pattern) void;
 pub inline fn setLabelsPattern(
-    self: ChartSeries,
+    self: Series,
     pattern: ChartPattern,
 ) void {
     c.chart_series_set_labels_pattern(
@@ -465,7 +465,7 @@ pub const TrendlineType = enum(u8) {
 
 // pub extern fn chart_series_set_trendline(series: [*c]lxw_chart_series, @"type": u8, value: u8) void;
 pub inline fn setTrendline(
-    self: ChartSeries,
+    self: Series,
     @"type": TrendlineType,
     value: u8,
 ) void {
@@ -478,7 +478,7 @@ pub inline fn setTrendline(
 
 // pub extern fn chart_series_set_trendline_forecast(series: [*c]lxw_chart_series, forward: f64, backward: f64) void;
 pub inline fn setTrendlineForecast(
-    self: ChartSeries,
+    self: Series,
     forward: f64,
     backward: f64,
 ) void {
@@ -490,18 +490,18 @@ pub inline fn setTrendlineForecast(
 }
 
 // pub extern fn chart_series_set_trendline_equation(series: [*c]lxw_chart_series) void;
-pub inline fn setTrendlineEquation(self: ChartSeries) void {
+pub inline fn setTrendlineEquation(self: Series) void {
     c.chart_series_set_trendline_equation(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_trendline_r_squared(series: [*c]lxw_chart_series) void;
-pub inline fn setTrendlineRSquared(self: ChartSeries) void {
+pub inline fn setTrendlineRSquared(self: Series) void {
     c.chart_series_set_trendline_r_squared(self.chartseries_c);
 }
 
 // pub extern fn chart_series_set_trendline_intercept(series: [*c]lxw_chart_series, intercept: f64) void;
 pub inline fn setTrendlineIntercept(
-    self: ChartSeries,
+    self: Series,
     intercept: f64,
 ) void {
     c.chart_series_set_trendline_intercept(
@@ -512,7 +512,7 @@ pub inline fn setTrendlineIntercept(
 
 // pub extern fn chart_series_set_trendline_name(series: [*c]lxw_chart_series, name: [*c]const u8) void;
 pub inline fn setTrendlineName(
-    self: ChartSeries,
+    self: Series,
     name: [:0]const u8,
 ) void {
     c.chart_series_set_trendline_intercept(
@@ -523,7 +523,7 @@ pub inline fn setTrendlineName(
 
 // pub extern fn chart_series_set_trendline_line(series: [*c]lxw_chart_series, line: [*c]lxw_chart_line) void;
 pub inline fn setTrendlineLine(
-    self: ChartSeries,
+    self: Series,
     line: ChartLine,
 ) void {
     c.chart_series_set_trendline_line(
@@ -534,7 +534,7 @@ pub inline fn setTrendlineLine(
 
 // pub extern fn chart_series_get_error_bars(series: [*c]lxw_chart_series, axis_type: lxw_chart_error_bar_axis) [*c]lxw_series_error_bars;
 pub inline fn getErrorBars(
-    self: ChartSeries,
+    self: Series,
     axis_type: ErrorBarsAxis,
 ) XlsxError!ErrorBars {
     return ErrorBars{
@@ -547,15 +547,16 @@ pub inline fn getErrorBars(
 
 const std = @import("std");
 const c = @import("lxw");
-const xlsxwriter = @import("xlsxwriter.zig");
-const XlsxError = @import("errors.zig").XlsxError;
-const check = @import("errors.zig").checkResult;
-const Cell = @import("utility.zig").Cell;
-const Range = @import("utility.zig").Range;
-const ChartFont = @import("Chart.zig").Font;
-const ChartLine = @import("Chart.zig").Line;
-const ChartFill = @import("Chart.zig").Fill;
-const ChartPattern = @import("Chart.zig").Pattern;
-const PatternType = @import("Chart.zig").PatternType;
+const xlsxwriter = @import("../xlsxwriter.zig");
+const XlsxError = @import("../errors.zig").XlsxError;
+const check = @import("../errors.zig").checkResult;
+const Cell = @import("../utility.zig").Cell;
+const Range = @import("../utility.zig").Range;
+const Chart = @import("../Chart.zig");
+const ChartFont = Chart.Font;
+const ChartLayout = Chart.Layout;
+const ChartLine = Chart.Line;
+const ChartFill = Chart.Fill;
+const ChartPattern = Chart.Pattern;
 const ErrorBars = @import("ErrorBars.zig");
 const ErrorBarsAxis = ErrorBars.Axis;

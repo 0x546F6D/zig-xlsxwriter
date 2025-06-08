@@ -69,8 +69,7 @@ pub const DefinedColors = enum(u32) {
     brown = c.LXW_COLOR_BROWN,
     cyan = c.LXW_COLOR_CYAN,
     gray = c.LXW_COLOR_GRAY,
-    // green = c.LXW_COLOR_GREEN,
-    green = 0x00B050,
+    green = c.LXW_COLOR_GREEN,
     // lime = c.LXW_COLOR_LIME,
     lime = 0xE4FFB5,
     magenta = c.LXW_COLOR_MAGENTA,
@@ -92,6 +91,7 @@ pub const DefinedColors = enum(u32) {
     light_blue = 0x00B0F0,
     dark_blue = 0x002060,
     excel_blue = 0x0070C0,
+    excel_green = 0x00B050,
     // Additional Colors
     rose = 0xFF7474,
     light_rose = 0xFFC6C6,

@@ -34,23 +34,29 @@ pub const RowColOptions = WorkSheet.RowColOptions;
 pub const RichStringTuple = WorkSheet.RichStringTuple;
 pub const RichStringTupleNoAlloc = WorkSheet.RichStringTupleNoAlloc;
 pub const RichStringNoAllocArray = WorkSheet.RichStringNoAllocArray;
-pub const ImageOptions = WorkSheet.ImageOptions;
-pub const DataValidation = WorkSheet.DataValidation;
-pub const ConditionalFormat = WorkSheet.ConditionalFormat;
-pub const TableColumn = WorkSheet.TableColumn;
-pub const TableOptions = WorkSheet.TableOptions;
-pub const TableColumnNoAlloc = WorkSheet.TableColumnNoAlloc;
-pub const TableColumnNoAllocArray = WorkSheet.TableColumnNoAllocArray;
-pub const TableOptionsNoAlloc = WorkSheet.TableOptionsNoAlloc;
 pub const HeaderFooterOptions = WorkSheet.HeaderFooterOptions;
-pub const CommentOptions = WorkSheet.CommentOptions;
 pub const ButtonOptions = WorkSheet.ButtonOptions;
 pub const ObjectProperties = WorkSheet.ObjectProperties;
 
-pub const filter = @import("filter.zig");
+pub const filter = @import("worksheet/filter.zig");
 pub const FilterRule = filter.FilterRule;
 pub const filter_or = filter.filter_or;
 pub const filter_and = filter.filter_and;
+
+pub const table = @import("worksheet/table.zig");
+pub const TableColumn = table.TableColumn;
+pub const TableOptions = table.TableOptions;
+pub const TableColumnNoAlloc = table.TableColumnNoAlloc;
+pub const TableColumnNoAllocArray = table.TableColumnNoAllocArray;
+pub const TableOptionsNoAlloc = table.TableOptionsNoAlloc;
+
+pub const ImageOptions = @import("worksheet/image.zig").ImageOptions;
+
+pub const ConditionalFormat = @import("worksheet/conditional.zig").ConditionalFormat;
+
+pub const DataValidation = @import("worksheet/validation.zig").DataValidation;
+
+pub const CommentOptions = @import("worksheet/comment.zig").CommentOptions;
 
 pub const Format = @import("Format.zig");
 pub const DefinedColors = Format.DefinedColors;
@@ -67,7 +73,7 @@ pub const ChartLine = Chart.Line;
 pub const ChartFill = Chart.Fill;
 pub const ChartPattern = Chart.Pattern;
 pub const PatternType = Chart.PatternType;
-pub const ErrorBars = @import("ErrorBars.zig");
+pub const ErrorBars = @import("chart/ErrorBars.zig");
 pub const ErrorBarsAxis = ErrorBars.Axis;
 
 pub const ChartSeries = Chart.ChartSeries;

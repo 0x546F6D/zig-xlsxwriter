@@ -72,4 +72,4 @@ pub inline fn setLine(
 }
 
 const c = @import("lxw");
-const ChartLine = @import("Chart.zig").Line;
+const ChartLine = @import("../Chart.zig").Line;

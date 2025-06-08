@@ -362,4 +362,4 @@ const ChartSheet = @import("ChartSheet.zig");
 const Format = @import("Format.zig");
 const Chart = @import("Chart.zig");
 const ChartType = Chart.Type;
-const ChartAxis = @import("ChartAxis.zig");
+const ChartAxis = @import("chart/Axis.zig");

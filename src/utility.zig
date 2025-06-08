@@ -64,9 +64,4 @@ pub inline fn range(cell_name: [:0]const u8) Range {
     };
 }
 
-// pub extern fn lxw_get_filehandle(buf: [*c][*c]u8, size: [*c]usize, tmpdir: [*c]const u8) [*c]FILE;
-// pub inline fn getFileHandle (buf: [*c][*c]u8, size: [*c]usize, tmpdir: [*c]const u8) [*c]FILE
-
 const c = @import("lxw");
-const CString = @import("xlsxwriter.zig").CString;
-const CStringArray = @import("xlsxwriter.zig").CStringArray;

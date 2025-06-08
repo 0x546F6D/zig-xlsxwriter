@@ -86,11 +86,11 @@ pub inline fn filterList(
 
 const Allocator = @import("std").mem.Allocator;
 const c = @import("lxw");
-const CStringArray = @import("xlsxwriter.zig").CStringArray;
-const utility = @import("utility.zig");
+const CStringArray = @import("../xlsxwriter.zig").CStringArray;
+const utility = @import("../utility.zig");
 const Cell = utility.Cell;
 const Cols = utility.Cols;
 const Range = utility.Range;
-const WorkSheet = @import("WorkSheet.zig");
-const XlsxError = @import("errors.zig").XlsxError;
-const check = @import("errors.zig").checkResult;
+const WorkSheet = @import("../WorkSheet.zig");
+const XlsxError = @import("../errors.zig").XlsxError;
+const check = @import("../errors.zig").checkResult;
