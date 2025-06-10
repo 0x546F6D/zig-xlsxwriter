@@ -226,10 +226,10 @@ pub fn main() !void {
     series.setLabels();
 
     // Create some custom labels.
-    data_label_1 = .{ .value = "=Sheet1!$C$2", .font = @constCast(&font.toC()) };
+    data_label_1 = .{ .value = "=Sheet1!$C$2", .font = @constCast(&font.toC(false)) };
     data_label_2 = .{};
-    data_label_3 = .{ .value = "=Sheet1!$C$4", .font = @constCast(&font.toC()) };
-    data_label_4 = .{ .value = "=Sheet1!$C$5", .font = @constCast(&font.toC()) };
+    data_label_3 = .{ .value = "=Sheet1!$C$4", .font = @constCast(&font.toC(false)) };
+    data_label_4 = .{ .value = "=Sheet1!$C$5", .font = @constCast(&font.toC(false)) };
 
     // Create an array of label pointers.
     const data_labels7 = &.{

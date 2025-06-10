@@ -308,7 +308,7 @@ pub inline fn setLabelsCustom(self: Series, data_labels: []const DataLabel) !voi
         label_array[i].hide = @intFromBool(label.hide);
 
         if (label.font) |font| {
-            font_array[i] = font.toC();
+            font_array[i] = font.toC(false);
             label_array[i].font = &font_array[i];
         } else label_array[i].font = null;
 
@@ -417,7 +417,7 @@ pub inline fn setLabelsNumFormat(
 pub inline fn setLabelsFont(self: Series, font: ChartFont) void {
     c.chart_series_set_labels_font(
         self.chartseries_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(false)),
     );
 }
 

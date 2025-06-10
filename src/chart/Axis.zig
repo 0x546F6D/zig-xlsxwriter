@@ -84,7 +84,7 @@ pub inline fn setNameLayout(self: Axis, layout: ChartLayout) void {
 pub inline fn setNameFont(self: Axis, font: ChartFont) void {
     c.chart_axis_set_name_font(
         self.axis_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(false)),
     );
 }
 
@@ -92,7 +92,7 @@ pub inline fn setNameFont(self: Axis, font: ChartFont) void {
 pub inline fn setNumFont(self: Axis, font: ChartFont) void {
     c.chart_axis_set_num_font(
         self.axis_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(false)),
     );
 }
 

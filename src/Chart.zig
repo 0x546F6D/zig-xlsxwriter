@@ -175,7 +175,7 @@ pub inline fn titleSetNameRange(
 pub const Font = struct {
     name: ?[*:0]const u8 = null,
     size: f64 = 0,
-    bold: bool = true,
+    bold: ?bool = null,
     italic: bool = false,
     underline: bool = false,
     rotation: i32 = 0,
@@ -187,7 +187,7 @@ pub const Font = struct {
     pub const default = Font{
         .name = null,
         .size = 0,
-        .bold = false,
+        .bold = null,
         .italic = false,
         .underline = false,
         .rotation = 0,
@@ -197,12 +197,11 @@ pub const Font = struct {
         .baseline = 0,
     };
 
-    pub inline fn toC(self: Font) c.lxw_chart_font {
-        return c.struct_lxw_chart_font{
+    pub inline fn toC(self: Font, default_true: bool) c.lxw_chart_font {
+        return c.lxw_chart_font{
             .name = self.name,
             .size = self.size,
-            // bold by default, need to explicitely disable it
-            .bold = if (self.bold) @intFromBool(self.bold) else @intFromEnum(Bool.explicit_false),
+            .bold = checkBoolField(self.bold, default_true),
             .italic = @intFromBool(self.italic),
             .underline = @intFromBool(self.underline),
             .rotation = self.rotation,
@@ -218,7 +217,7 @@ pub const Font = struct {
 pub inline fn titleSetNameFont(self: Chart, font: Font) void {
     c.chart_title_set_name_font(
         self.chart_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(true)),
     );
 }
 
@@ -304,7 +303,7 @@ pub inline fn setTableGrid(
 pub inline fn setTableFont(self: Chart, font: Font) void {
     c.chart_set_table_font(
         self.chart_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(false)),
     );
 }
 
@@ -480,7 +479,7 @@ pub inline fn legendSetLayout(self: Chart, layout: Layout) void {
 pub inline fn legendSetFont(self: Chart, font: Font) void {
     c.chart_legend_set_font(
         self.chart_c,
-        @constCast(&font.toC()),
+        @constCast(&font.toC(false)),
     );
 }
 
@@ -609,6 +608,7 @@ const CStringArray = xlsxwriter.CStringArray;
 const Bool = xlsxwriter.Boolean;
 const XlsxError = @import("errors.zig").XlsxError;
 const Cell = @import("utility.zig").Cell;
+const checkBoolField = @import("utility.zig").checkBoolField;
 const DefinedColors = @import("format.zig").DefinedColors;
 pub const ChartSeries = @import("chart/Series.zig");
 pub const ChartPoint = ChartSeries.Point;

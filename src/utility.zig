@@ -64,4 +64,14 @@ pub inline fn range(cell_name: [:0]const u8) Range {
     };
 }
 
+pub inline fn checkBoolField(field: ?bool, default_true: bool) u8 {
+    // return default value if field not set
+    if (field == null) return 0;
+    // return field value if field is set and default is false
+    if (!default_true) return @intFromBool(field.?);
+    // return explicit_false if field is set to false but default is true
+    return if (field.?) 1 else @intFromEnum(Bool.explicit_false);
+}
+
 const c = @import("lxw");
+const Bool = @import("xlsxwriter.zig").Boolean;
