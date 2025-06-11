@@ -1,5 +1,7 @@
 # zig-xlsxwriter
 
+Branch to add the unit and functional tests as well as re-implement the python .xlsx files comparison code in zig.
+
 The `zig-xlsxwriter` is a wrapper of [`libxlsxwriter`](https://github.com/jmcnamara/libxlsxwriter) that can be used to write text, numbers,
 dates and formulas to multiple worksheets in a new Excel 2007+ xlsx file. It
 has a focus on performance and on fidelity with the file format created by
